@@ -2,6 +2,9 @@
   "$schema": "https://turborepo.org/schema.json",
   "ui": "tui",
   "tasks": {
+    "ncu": {
+      "dependsOn": ["^ncu"]
+    },
     "topo": {
       "dependsOn": ["^topo"]
     },
@@ -46,6 +49,10 @@
     }
   },
   "globalEnv": [
+    "DATABASE_URL",
+    "NEXT_PUBLIC_CLERK_FRONTEND_API",
+    "CLERK_API_KEY",
+    "CLERK_JWT_KEY",
     "POSTGRES_URL",
     "AUTH_DISCORD_ID",
     "AUTH_DISCORD_SECRET",
