@@ -56,7 +56,10 @@
     "AUTH_DISCORD_SECRET",
     "AUTH_REDIRECT_PROXY_URL",
     "AUTH_SECRET",
-    "PORT"
+    "PORT",
+    "SITE_URL",
+    "BETTER_AUTH_EMAIL",
+    "EXPO_PUBLIC_CONVEX_URL"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",

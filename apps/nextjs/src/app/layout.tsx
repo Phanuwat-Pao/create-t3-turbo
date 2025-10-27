@@ -4,8 +4,8 @@ import { GeistSans } from "geist/font/sans";
 import { Toaster } from "@acme/ui/sonner";
 import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
 
+import { ConvexClientProvider } from "~/convex/react";
 import { createMetadata } from "~/lib/metadata";
-import { TRPCReactProvider } from "~/trpc/react";
 
 import "./globals.css";
 
@@ -30,7 +30,7 @@ export default function RootLayout({
       </head>
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
           <div className="absolute right-4 bottom-4">
             <ThemeToggle />
           </div>

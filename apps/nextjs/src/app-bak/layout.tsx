@@ -5,8 +5,8 @@ import { cn } from "@acme/ui";
 import { Toaster } from "@acme/ui/sonner";
 import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
 
+import { TRPCReactProvider } from "~/convex/react";
 import { env } from "~/env";
-import { TRPCReactProvider } from "~/trpc/react";
 
 import "~/app/globals.css";
 

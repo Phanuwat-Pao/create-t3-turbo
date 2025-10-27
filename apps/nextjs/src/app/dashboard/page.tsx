@@ -1,42 +1,17 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { fetchQuery } from "convex/nextjs";
 
-import type { ActiveOrganization } from "@acme/auth";
+import { api } from "@acme/convex/_generated/api.js";
 
-import type { Session } from "~/auth/client";
-import { auth } from "~/auth/server";
+import type { ActiveOrganization, Session } from "~/auth/client";
+import { getToken } from "~/auth/server";
 import AccountSwitcher from "~/components/account-switch";
 import { OrganizationCard } from "./organization-card";
 import UserCard from "./user-card";
 
 export default async function DashboardPage() {
-  const [
-    session,
-    activeSessions,
-    deviceSessions,
-    organization,
-    // subscriptions
-  ] = await Promise.all([
-    auth.api.getSession({
-      headers: await headers(),
-    }),
-    auth.api.listSessions({
-      headers: await headers(),
-    }),
-    auth.api.listDeviceSessions({
-      headers: await headers(),
-    }),
-    auth.api.getFullOrganization({
-      headers: await headers(),
-    }),
-    // auth.api.listActiveSubscriptions({
-    //   headers: await headers(),
-    // }),
-  ]).catch((e) => {
-    console.log(e);
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw redirect("/sign-in");
-  });
+  const token = await getToken();
+  const [session, activeSessions, deviceSessions, organization] =
+    await fetchQuery(api.auth.getDashboard, {}, { token });
   return (
     <div className="w-full">
       <div className="flex flex-col gap-4">

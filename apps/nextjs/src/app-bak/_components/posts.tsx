@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import type { RouterOutputs } from "@acme/api";
+import type { RouterOutputs } from "@acme/convex";
 import { CreatePostSchema } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
@@ -21,7 +21,7 @@ import {
 } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 
-import { useTRPC } from "~/trpc/react";
+import { useTRPC } from "~/convex/react";
 
 export function CreatePostForm() {
   const trpc = useTRPC();

@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, MailPlus } from "lucide-react";
 import { toast } from "sonner";
 
-import type { ActiveOrganization, Invitation } from "@acme/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
@@ -38,7 +37,7 @@ import {
   SelectValue,
 } from "@acme/ui/select";
 
-import type { Session } from "~/auth/client";
+import type { ActiveOrganization, Invitation, Session } from "~/auth/client";
 import { authClient as client } from "~/auth/client";
 
 export function OrganizationCard(props: {
