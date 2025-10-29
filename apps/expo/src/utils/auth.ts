@@ -1,16 +1,26 @@
+import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 import { expoClient } from "@better-auth/expo/client";
 import { convexClient } from "@convex-dev/better-auth/client/plugins";
 import {
   adminClient,
   deviceAuthorizationClient,
+  emailOTPClient,
+  genericOAuthClient,
+  inferAdditionalFields,
   lastLoginMethodClient,
+  magicLinkClient,
   multiSessionClient,
+  oneTimeTokenClient,
   organizationClient,
   passkeyClient,
+  phoneNumberClient,
   twoFactorClient,
+  usernameClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+
+import type { auth } from "@acme/convex/betterAuth/auth";
 
 import { getBaseUrl } from "./base-url";
 
@@ -18,10 +28,18 @@ export const authClient = createAuthClient({
   baseURL: getBaseUrl(),
   plugins: [
     expoClient({
-      scheme: "expo",
-      storagePrefix: "expo",
+      scheme: Constants.expoConfig?.scheme as string,
+      storagePrefix: Constants.expoConfig?.scheme as string,
       storage: SecureStore,
     }),
+
+    inferAdditionalFields<typeof auth>(),
+    magicLinkClient(),
+    emailOTPClient(),
+    usernameClient(),
+    phoneNumberClient(),
+    oneTimeTokenClient(),
+
     organizationClient(),
     twoFactorClient({
       onTwoFactorRedirect() {
@@ -38,7 +56,7 @@ export const authClient = createAuthClient({
     //   },
     // }),
     // oidcClient(),
-    // genericOAuthClient(),
+    genericOAuthClient(),
     // stripeClient({
     //   subscription: true,
     // }),

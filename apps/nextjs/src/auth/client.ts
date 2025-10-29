@@ -26,7 +26,6 @@ export const authClient = createAuthClient({
   baseURL: env.NEXT_PUBLIC_SITE_URL,
   plugins: [
     inferAdditionalFields<typeof auth>(),
-
     magicLinkClient(),
     emailOTPClient(),
     usernameClient(),
