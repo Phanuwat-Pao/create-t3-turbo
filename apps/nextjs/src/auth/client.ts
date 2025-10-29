@@ -2,21 +2,37 @@ import { convexClient } from "@convex-dev/better-auth/client/plugins";
 import {
   adminClient,
   deviceAuthorizationClient,
+  emailOTPClient,
+  genericOAuthClient,
   inferAdditionalFields,
   lastLoginMethodClient,
+  magicLinkClient,
   multiSessionClient,
+  oneTimeTokenClient,
   organizationClient,
   passkeyClient,
+  phoneNumberClient,
   twoFactorClient,
+  usernameClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { toast } from "sonner";
 
-import type { auth } from "@acme/convex/betterAuth/auth.js";
+import type { auth } from "@acme/convex/betterAuth/auth";
+
+import { env } from "~/env";
 
 export const authClient = createAuthClient({
+  baseURL: env.NEXT_PUBLIC_CONVEX_SITE_URL,
   plugins: [
     inferAdditionalFields<typeof auth>(),
+
+    magicLinkClient(),
+    emailOTPClient(),
+    usernameClient(),
+    phoneNumberClient(),
+    oneTimeTokenClient(),
+
     organizationClient(),
     twoFactorClient({
       onTwoFactorRedirect() {
@@ -33,7 +49,7 @@ export const authClient = createAuthClient({
     //   },
     // }),
     // oidcClient(),
-    // genericOAuthClient(),
+    genericOAuthClient(),
     // stripeClient({
     //   subscription: true,
     // }),
@@ -51,8 +67,6 @@ export const authClient = createAuthClient({
 });
 
 export type AuthClient = typeof authClient;
-export type Session = (typeof authClient)["$Infer"]["Session"];
-export type ActiveOrganization =
-  (typeof authClient)["$Infer"]["ActiveOrganization"];
-
-export type Invitation = (typeof authClient)["$Infer"]["Invitation"];
+export type Session = AuthClient["$Infer"]["Session"];
+export type ActiveOrganization = AuthClient["$Infer"]["ActiveOrganization"];
+export type Invitation = AuthClient["$Infer"]["Invitation"];

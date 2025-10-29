@@ -7,7 +7,7 @@ import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
 import { ConvexClientProvider } from "~/convex/react";
 import { createMetadata } from "~/lib/metadata";
 
-import "./globals.css";
+import "./styles.css";
 
 export const metadata = createMetadata({
   title: {

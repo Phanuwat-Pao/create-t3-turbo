@@ -4,7 +4,10 @@
   "type": "module",
   "license": "MIT",
   "exports": {
-    "./": "./convex/"
+    "./auth": "./convex/auth.ts",
+    "./_generated/api": "./convex/_generated/api.js",
+    "./betterAuth/auth": "./convex/betterAuth/auth.ts",
+    "./betterAuth/_generated/api": "./convex/betterAuth/_generated/api.js"
   },
   "scripts": {
     "updates": "ncu -u",

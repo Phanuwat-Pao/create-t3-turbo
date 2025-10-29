@@ -13,12 +13,7 @@ export const env = createEnv({
    * Specify your server-side environment variables schema here.
    * This way you can ensure the app isn't built with invalid env vars.
    */
-  server: {
-    POSTGRES_URL: z.url(),
-    EMAIL_USER: z.email(),
-    EMAIL_PASS: z.string(),
-    ADMINS: z.array(z.string()),
-  },
+  server: {},
 
   /**
    * Specify your client-side environment variables schema here.
@@ -27,6 +22,7 @@ export const env = createEnv({
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
     NEXT_PUBLIC_CONVEX_URL: z.url(),
+    NEXT_PUBLIC_CONVEX_SITE_URL: z.url(),
   },
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
@@ -34,6 +30,7 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_CONVEX_URL: process.env.NEXT_PUBLIC_CONVEX_URL,
+    NEXT_PUBLIC_CONVEX_SITE_URL: process.env.NEXT_PUBLIC_CONVEX_SITE_URL,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   skipValidation:

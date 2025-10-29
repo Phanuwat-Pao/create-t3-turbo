@@ -1,37 +1,36 @@
-import { fetchQuery } from "convex/nextjs";
+import { headers as NextHeaders } from "next/headers";
 
-import { api } from "@acme/convex/_generated/api.js";
-
-import type { ActiveOrganization, Session } from "~/auth/client";
-import { getToken } from "~/auth/server";
+import { authClient } from "~/auth/client";
 import AccountSwitcher from "~/components/account-switch";
 import { OrganizationCard } from "./organization-card";
 import UserCard from "./user-card";
 
 export default async function DashboardPage() {
-  const token = await getToken();
+  const headers = await NextHeaders();
   const [session, activeSessions, deviceSessions, organization] =
-    await fetchQuery(api.auth.getDashboard, {}, { token });
+    await Promise.all([
+      authClient.getSession({ fetchOptions: { headers } }),
+      authClient.listSessions({ fetchOptions: { headers } }),
+      authClient.multiSession.listDeviceSessions({ fetchOptions: { headers } }),
+      authClient.organization.getFullOrganization({
+        fetchOptions: { headers },
+      }),
+    ]);
+
   return (
     <div className="w-full">
       <div className="flex flex-col gap-4">
-        <AccountSwitcher
-          sessions={JSON.parse(JSON.stringify(deviceSessions)) as Session[]}
-        />
+        <AccountSwitcher sessions={deviceSessions.data ?? []} />
         <UserCard
-          session={JSON.parse(JSON.stringify(session)) as Session}
-          activeSessions={
-            JSON.parse(JSON.stringify(activeSessions)) as Session["session"][]
-          }
+          session={session.data}
+          activeSessions={activeSessions.data ?? []}
           // subscription={subscriptions.find(
           //   (sub) => sub.status === "active" || sub.status === "trialing",
           // )}
         />
         <OrganizationCard
-          session={JSON.parse(JSON.stringify(session)) as Session}
-          activeOrganization={
-            JSON.parse(JSON.stringify(organization)) as ActiveOrganization
-          }
+          session={session.data}
+          activeOrganization={organization.data}
         />
       </div>
     </div>

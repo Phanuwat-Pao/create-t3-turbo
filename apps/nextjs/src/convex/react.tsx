@@ -10,6 +10,7 @@ import { env } from "~/env";
 const convex = new ConvexReactClient(env.NEXT_PUBLIC_CONVEX_URL, {
   // Optionally pause queries until the user is authenticated
   expectAuth: true,
+  verbose: true,
 });
 
 export function ConvexClientProvider({ children }: { children: ReactNode }) {

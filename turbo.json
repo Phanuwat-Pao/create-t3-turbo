@@ -1,6 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
-  "ui": "stream",
+  "ui": "tui",
   "tasks": {
     "topo": {
       "dependsOn": ["^topo"]
@@ -59,7 +59,8 @@
     "PORT",
     "SITE_URL",
     "BETTER_AUTH_EMAIL",
-    "EXPO_PUBLIC_CONVEX_URL"
+    "EXPO_PUBLIC_CONVEX_URL",
+    "ADMIN_USER_IDS"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",

@@ -3,11 +3,11 @@ import Link from "next/link";
 
 import { Button } from "@acme/ui/button";
 
-import { auth } from "~/auth/server";
+import { authClient } from "~/auth/client";
 
 export async function SignInButton() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
+  const { data: session } = await authClient.getSession({
+    fetchOptions: { headers: await headers() },
   });
 
   return (

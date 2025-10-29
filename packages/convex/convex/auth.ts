@@ -1,4 +1,5 @@
 import type { GenericCtx } from "@convex-dev/better-auth";
+import type { BetterAuthOptions } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { createClient } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
@@ -18,7 +19,6 @@ import {
   lastLoginMethod,
   magicLink,
   multiSession,
-  oidcProvider,
   oneTap,
   oneTimeToken,
   openAPI,
@@ -46,6 +46,8 @@ import {
 const from = process.env.BETTER_AUTH_EMAIL ?? "delivered@resend.dev";
 
 const siteUrl = process.env.SITE_URL;
+
+const adminUserIds = process.env.ADMIN_USER_IDS?.split(",") ?? [];
 export const resend: Resend = new Resend(components.resend, {});
 
 // The component client has methods needed for integrating Convex with Better Auth,
@@ -56,7 +58,7 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
     local: {
       schema: authSchema,
     },
-    verbose: false,
+    verbose: true,
   },
 );
 
@@ -100,6 +102,9 @@ export const createAuth = (
       },
     },
     rateLimit: {
+      enabled: true,
+      window: 60,
+      max: 100,
       storage: "database",
     },
     plugins: [
@@ -136,9 +141,9 @@ export const createAuth = (
           },
         ],
       }),
-      oidcProvider({
-        loginPage: "/login",
-      }),
+      // oidcProvider({
+      //   loginPage: "/login",
+      // }),
       oneTimeToken(),
       jwt(),
 
@@ -175,7 +180,7 @@ export const createAuth = (
       openAPI(),
       bearer(),
       admin({
-        adminUserIds: [],
+        adminUserIds,
       }),
       multiSession(),
       // oAuthProxy(),
@@ -350,7 +355,7 @@ export const createAuth = (
       }),
       lastLoginMethod(),
     ],
-  });
+  } satisfies BetterAuthOptions);
 };
 
 // Example function for getting the current user
@@ -369,26 +374,5 @@ export const getUserById = query({
     return ctx.runQuery(components.betterAuth.auth.getUser, {
       userId: args.userId,
     });
-  },
-});
-
-export const getDashboard = query({
-  args: {},
-  handler: async (ctx) => {
-    const { auth, headers } = await authComponent.getAuth(createAuth, ctx);
-    return await Promise.all([
-      auth.api.getSession({
-        headers,
-      }),
-      auth.api.listSessions({
-        headers,
-      }),
-      auth.api.listDeviceSessions({
-        headers,
-      }),
-      auth.api.getFullOrganization({
-        headers,
-      }),
-    ]);
   },
 });
