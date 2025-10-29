@@ -52,10 +52,12 @@
     "@acme/tsconfig": "workspace:*",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
+    "eas-cli": "^16.25.1",
     "eslint": "catalog:",
     "prettier": "catalog:",
     "tailwindcss": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "ws": "^8.18.0"
   },
   "prettier": "@acme/prettier-config"
 }

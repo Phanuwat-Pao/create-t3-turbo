@@ -41,7 +41,7 @@ onlyBuiltDependencies:
 overrides:
   "@types/minimatch": 5.1.2
   vite: 7.1.12
-  ws: ^6.1.2
+  ws: ^8.18.0
 
 publicHoistPattern:
   - "@ianvs/prettier-plugin-sort-imports"
