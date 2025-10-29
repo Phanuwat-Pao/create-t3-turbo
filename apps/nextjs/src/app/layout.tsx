@@ -7,7 +7,7 @@ import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
 import { ConvexClientProvider } from "~/convex/react";
 import { createMetadata } from "~/lib/metadata";
 
-import "./styles.css";
+import "~/app/styles.css";
 
 export const metadata = createMetadata({
   title: {
@@ -25,9 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
+      {/* <head>
         <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
-      </head>
+      </head> */}
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ConvexClientProvider>{children}</ConvexClientProvider>
