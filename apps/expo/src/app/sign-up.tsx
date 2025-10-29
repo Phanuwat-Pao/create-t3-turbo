@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Image, KeyboardAvoidingView, View } from "react-native";
+import { Alert, Image, KeyboardAvoidingView, View } from "react-native";
 import { useRouter } from "expo-router";
 
 import { Button } from "~/components/ui/button";
@@ -72,7 +72,7 @@ export default function SignUp() {
                 },
                 {
                   onError: (ctx) => {
-                    alert(ctx.error.message);
+                    Alert.alert(ctx.error.message);
                   },
                   onSuccess: (ctx) => {
                     router.push("/dashboard");

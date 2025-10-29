@@ -3,8 +3,10 @@ import { useColorScheme } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ConvexReactClient } from "convex/react";
 
+import { queryClient } from "~/utils/api";
 import { authClient } from "~/utils/auth";
 
 import "../styles.css";
@@ -26,21 +28,23 @@ export default function RootLayout() {
   return (
     <StrictMode>
       <ConvexBetterAuthProvider client={convex} authClient={authClient}>
-        {/*
+        <QueryClientProvider client={queryClient}>
+          {/*
           The Stack component displays the current page.
           It also allows you to configure your screens 
         */}
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: "#c03484",
-            },
-            contentStyle: {
-              backgroundColor: colorScheme == "dark" ? "#09090B" : "#FFFFFF",
-            },
-          }}
-        />
-        <StatusBar />
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: "#c03484",
+              },
+              contentStyle: {
+                backgroundColor: colorScheme == "dark" ? "#09090B" : "#FFFFFF",
+              },
+            }}
+          />
+          <StatusBar />
+        </QueryClientProvider>
       </ConvexBetterAuthProvider>
     </StrictMode>
   );

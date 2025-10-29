@@ -37,7 +37,7 @@ export default function ForgetPassword() {
         <View className="w-full gap-2">
           <Button
             onPress={() => {
-              authClient.forgetPassword({
+              void authClient.forgetPassword({
                 email,
                 redirectTo: "/reset-password",
               });
@@ -54,7 +54,7 @@ export default function ForgetPassword() {
             className="w-full flex-row items-center gap-4"
             variant="outline"
           >
-            <Icons name="arrowleft" size={18} />
+            <Icons name="arrow-left" size={18} />
             <Text>Back to Sign In</Text>
           </Button>
         </View>

@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { View } from "react-native";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/AntDesign";
-import { useStore } from "@nanostores/react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -11,7 +10,7 @@ import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
 export default function Dashboard() {
-  const { data: session, isPending } = useStore(authClient.useSession);
+  const { data: session, isPending } = authClient.useSession();
   useEffect(() => {
     if (!session && !isPending) {
       router.push("/");
