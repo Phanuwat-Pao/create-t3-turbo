@@ -13,7 +13,7 @@ import {
 } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
-import { authClient } from "~/lib/auth-client";
+import { authClient } from "~/utils/auth";
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState("");
