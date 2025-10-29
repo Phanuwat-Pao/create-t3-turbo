@@ -11,7 +11,6 @@
   },
   "scripts": {
     "updates": "ncu -u",
-    "build": "convex dev",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "convex dev",
     "format": "prettier --check . --ignore-path ../../.gitignore",

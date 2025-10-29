@@ -37,14 +37,6 @@
     "//#clean": {
       "cache": false
     },
-    "push": {
-      "cache": false,
-      "interactive": true
-    },
-    "studio": {
-      "cache": false,
-      "persistent": true
-    },
     "ui-add": {
       "cache": false,
       "interactive": true
@@ -60,7 +52,10 @@
     "SITE_URL",
     "BETTER_AUTH_EMAIL",
     "EXPO_PUBLIC_CONVEX_URL",
-    "ADMIN_USER_IDS"
+    "ADMIN_USER_IDS",
+    "CONVEX_URL",
+    "CONVEX_SITE_URL",
+    "EXPO_URL"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",

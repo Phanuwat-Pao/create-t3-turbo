@@ -23,7 +23,7 @@ import type { auth } from "@acme/convex/betterAuth/auth";
 import { env } from "~/env";
 
 export const authClient = createAuthClient({
-  baseURL: env.NEXT_PUBLIC_CONVEX_SITE_URL,
+  baseURL: env.NEXT_PUBLIC_SITE_URL,
   plugins: [
     inferAdditionalFields<typeof auth>(),
 

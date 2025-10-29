@@ -19,6 +19,7 @@ import {
   lastLoginMethod,
   magicLink,
   multiSession,
+  oAuthProxy,
   oneTap,
   oneTimeToken,
   openAPI,
@@ -42,10 +43,13 @@ import {
   sendResetPassword,
   sendVerificationEmail,
 } from "./email";
+import { allowedOrigins } from "./origins";
 
 const from = process.env.BETTER_AUTH_EMAIL ?? "delivered@resend.dev";
 
 const siteUrl = process.env.SITE_URL;
+
+const convexSiteUrl = process.env.CONVEX_SITE_URL;
 
 const adminUserIds = process.env.ADMIN_USER_IDS?.split(",") ?? [];
 export const resend: Resend = new Resend(components.resend, {});
@@ -66,10 +70,6 @@ export const createAuth = (
   ctx: GenericCtx<DataModel>,
   { optionsOnly } = { optionsOnly: false },
 ) => {
-  const trustedOrigins = ["expo://"];
-  if (siteUrl) {
-    trustedOrigins.push(siteUrl);
-  }
   return betterAuth({
     // disable logging when createAuth is called just to generate options.
     // this is not required, but there's a lot of noise in logs without it.
@@ -77,7 +77,14 @@ export const createAuth = (
       disabled: optionsOnly,
     },
     baseURL: siteUrl,
-    trustedOrigins,
+    trustedOrigins: allowedOrigins,
+    // advanced: {
+    //   defaultCookieAttributes: {
+    //     sameSite: "none",
+    //     secure: true,
+    //     partitioned: true, // New browser standards will mandate this for foreign cookies
+    //   },
+    // },
     database: authComponent.adapter(ctx),
     // Configure simple, non-verified email/password to get started
     emailAndPassword: {
@@ -183,7 +190,7 @@ export const createAuth = (
         adminUserIds,
       }),
       multiSession(),
-      // oAuthProxy(),
+      oAuthProxy({ currentURL: siteUrl, productionURL: convexSiteUrl }),
       nextCookies(),
       oneTap(),
       customSession(async (session) => {
