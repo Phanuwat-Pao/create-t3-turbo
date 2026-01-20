@@ -65,9 +65,7 @@ def buildService(serviceName, servicePath, dockerfile, imageTag) {
                 -t ${REGISTRY_URL}/${REGISTRY_PROJECT}/${imageName}:latest \
                 . 2>&1
         """
-        
-        sendDiscordEmbed("🔨 Docker Build", "Built `${serviceName}` → `${fullImage}`", env.COLOR_ORANGE.toInteger())
-        
+      
         // Push to registry
         docker.withRegistry("https://${REGISTRY_URL}", REGISTRY_CREDENTIALS_ID) {
             sh """
@@ -75,9 +73,7 @@ def buildService(serviceName, servicePath, dockerfile, imageTag) {
                 docker push ${REGISTRY_URL}/${REGISTRY_PROJECT}/${imageName}:latest
             """
         }
-        
-        sendDiscordEmbed("🚢 Image Pushed", "**Service:** `${serviceName}`\\n**Image:** `${fullImage}`", env.COLOR_BLUE_INFO.toInteger())
-        
+             
         // Clean up local images
         sh """
             docker rmi ${fullImage} || true
@@ -87,7 +83,6 @@ def buildService(serviceName, servicePath, dockerfile, imageTag) {
         return fullImage
         
     } catch (Exception e) {
-        sendDiscordEmbed("❌ Build Failed", "**Service:** `${serviceName}`\\n**Error:** ${e.getMessage()}", env.COLOR_DARK_RED.toInteger())
         throw e
     }
 }
@@ -117,12 +112,7 @@ def scanImage(String fullImage) {
                 def criticalVulns = sh(script: """
                     jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL") | "• **" + .VulnerabilityID + "**: " + .Title + " (Package: " + .PkgName + ")"' ${reportFile} 2>/dev/null
                 """, returnStdout: true).trim()
-                
-                sendDiscordEmbed("🚨 Critical Vulnerabilities Found", 
-                    "**Image:** `${fullImage}`\\n**Critical Count:** ${critical}\\n\\n${criticalVulns}", 
-                    env.COLOR_DARK_RED.toInteger())
-            } else {
-                sendDiscordEmbed("✅ Trivy Scan Passed", "**Image:** `${fullImage}`\\nNo CRITICAL vulnerabilities found", env.COLOR_GREEN_SUCCESS.toInteger())
+            
             }
         }
     } catch (Exception e) {
@@ -152,7 +142,7 @@ pipeline {
         
         // Branch Configuration
         PRODUCTION_BRANCH = 'production'
-        ALLOWED_BRANCHES = 'production,dev,uat'
+        ALLOWED_BRANCHES = 'production,dev,uat,orpc'
         
         // Environment Credentials (ตั้งค่าใน Jenkins → Credentials → Secret file)
         UAT_ENV_CREDENTIALS_ID = 'turbo-env-uat'
@@ -183,17 +173,6 @@ pipeline {
     }
     
     stages {
-        stage('Init') {
-            steps {
-                script {
-                    if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        sendDiscordEmbed("🚀 Pipeline Started", 
-                            "**Branch:** `${BRANCH_NAME}`\\n**Build:** #${BUILD_NUMBER}\\n**Monorepo:** turbo", 
-                            env.COLOR_BLUE.toInteger())
-                    }
-                }
-            }
-        }
         
         stage('Checkout') {
             steps {
@@ -202,8 +181,7 @@ pipeline {
                     git url: env.GIT_URL, branch: env.BRANCH_NAME, credentialsId: env.GIT_CREDENTIALS_ID
                     
                     if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        sendDiscordEmbed("🔀 Git Checkout", "Cloned branch `${BRANCH_NAME}`", env.COLOR_GREEN.toInteger())
-                    } else {
+                   } else {
                         echo "🛑 Branch ${env.BRANCH_NAME} is not allowed"
                         currentBuild.result = 'NOT_BUILT'
                         error("Branch ${env.BRANCH_NAME} is not allowed")
@@ -254,9 +232,6 @@ pipeline {
                     
                     if (changedServices.isEmpty()) {
                         echo "⏩ No changes detected. Skipping build."
-                        if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                            sendDiscordEmbed('⏭️ Skipped', "No changes detected in any services", env.COLOR_GRAY.toInteger())
-                        }
                         currentBuild.result = 'SUCCESS'
                         return
                     }
@@ -264,10 +239,7 @@ pipeline {
                     env.CHANGED_SERVICES = changedServices.collect { "${it.name}:${it.path}:${it.dockerfile}" }.join(',')
                     def serviceNames = changedServices.collect { it.name }.join(', ')
                     echo "🎯 Services to build: ${serviceNames}"
-                    
-                    if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        sendDiscordEmbed('🔍 Services Detected', "**Changed Services:**\\n${serviceNames}", env.COLOR_PURPLE.toInteger())
-                    }
+                
                 }
             }
         }
@@ -281,9 +253,7 @@ pipeline {
                     
                     echo "[TAG] Image tag: ${env.IMAGE_TAG}"
                     
-                    if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        sendDiscordEmbed("🏷️ Image Tagged", "**Tag:** `${IMAGE_TAG}`\\n**Branch:** `${BRANCH_NAME}`", env.COLOR_ORANGE.toInteger())
-                    }
+   
                 }
             }
         }
@@ -310,12 +280,7 @@ pipeline {
                     
                     env.BUILT_IMAGES = builtImages.collect { "${it.key}=${it.value}" }.join(',')
                     
-                    if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        def serviceNames = servicesToBuild.collect { it.split(':')[0] }.join(', ')
-                        sendDiscordEmbed('🔨 All Builds Completed', 
-                            "**Services:** ${serviceNames}\\n**Tag:** `${IMAGE_TAG}`", 
-                            env.COLOR_GREEN_SUCCESS.toInteger())
-                    }
+
                 }
             }
         }
@@ -358,9 +323,7 @@ pipeline {
             }
             steps {
                 script {
-                    if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        sendDiscordEmbed("🔍 Trivy Scan Started", "Scanning images for vulnerabilities...", env.COLOR_GRAY.toInteger())
-                    }
+
                     
                     def builtImages = env.BUILT_IMAGES.split(',')
                     builtImages.each { imageInfo ->
@@ -368,9 +331,7 @@ pipeline {
                         scanImage(fullImage)
                     }
                     
-                    if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        sendDiscordEmbed('🔒 Security Scans Completed', "All images scanned", env.COLOR_GREEN_SUCCESS.toInteger())
-                    }
+
                 }
             }
         }
@@ -482,9 +443,7 @@ pipeline {
                         docker system df
                     """
                     
-                    if (env.ALLOWED_BRANCHES.split(',').contains(env.BRANCH_NAME)) {
-                        sendDiscordEmbed("✅ Cleanup Complete", "Cleanup finished", env.COLOR_GREEN_SUCCESS_FINAL.toInteger())
-                    }
+
                 }
             }
         }
