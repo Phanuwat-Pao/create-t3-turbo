@@ -1,0 +1,21 @@
+services:
+  turbo-nextjs:
+    image: registry.telecorpthailand.com/turbo/turbo-nextjs-uat:latest
+    container_name: turbo-nextjs
+    ports:
+      - "63700:3000"
+    environment:
+      - PNPM_HOME=/pnpm
+    working_dir: /app
+    restart: always
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+  turbo-expressjs:
+    image: registry.telecorpthailand.com/turbo/turbo-expressjs-uat:latest
+    container_name: turbo-expressjs
+    environment:
+      - PNPM_HOME=/pnpm
+    working_dir: /app
+    restart: always
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"

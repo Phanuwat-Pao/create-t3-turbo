@@ -7,6 +7,8 @@
   },
   "packageManager": "pnpm@10.19.0",
   "scripts": {
+    "ncu": "ncu -u",
+    "ncu:workspace": "turbo run ncu",
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
@@ -30,6 +32,7 @@
     "@acme/prettier-config": "workspace:*",
     "@turbo/gen": "^2.5.8",
     "dotenv-cli": "^10.0.0",
+    "npm-check-updates": "^19.3.1",
     "prettier": "catalog:",
     "turbo": "^2.5.8",
     "typescript": "catalog:"

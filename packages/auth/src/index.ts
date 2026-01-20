@@ -2,7 +2,7 @@ import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { oAuthProxy } from "better-auth/plugins";
+import { oAuthProxy,openAPI } from "better-auth/plugins";
 
 import { db } from "@acme/db/client";
 
@@ -13,8 +13,8 @@ export function initAuth<
   productionUrl: string;
   secret: string | undefined;
 
-  discordClientId: string;
-  discordClientSecret: string;
+  discordClientId?: string;
+  discordClientSecret?: string;
   extraPlugins?: TExtraPlugins;
 }) {
   const config = {
@@ -29,13 +29,17 @@ export function initAuth<
       }),
       expo(),
       ...(options.extraPlugins ?? []),
+
+      openAPI({
+        disableDefaultReference:true,
+      }),
     ],
     socialProviders: {
-      discord: {
+      discord: options.discordClientId && options.discordClientSecret ? {
         clientId: options.discordClientId,
         clientSecret: options.discordClientSecret,
         redirectURI: `${options.productionUrl}/api/auth/callback/discord`,
-      },
+      } : undefined,
     },
     trustedOrigins: ["expo://"],
     onAPIError: {
