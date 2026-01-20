@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { HydrateClient, prefetch, trpc } from "~/trpc/server";
+import { HydrateClient, orpc, prefetch } from "~/rpc/server";
 import { AuthShowcase } from "./_components/auth-showcase";
 import {
   CreatePostForm,
@@ -9,7 +9,7 @@ import {
 } from "./_components/posts";
 
 export default function HomePage() {
-  prefetch(trpc.post.all.queryOptions());
+  prefetch(orpc.post.all.queryOptions());
 
   return (
     <HydrateClient>

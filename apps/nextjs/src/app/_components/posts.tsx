@@ -6,6 +6,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { ORPCError } from "@orpc/client";
 
 import type { RouterOutputs } from "@acme/api";
 import { CreatePostSchema } from "@acme/db/schema";
@@ -21,21 +22,21 @@ import {
 import { Input } from "@acme/ui/input";
 import { toast } from "@acme/ui/toast";
 
-import { useTRPC } from "~/trpc/react";
+import { orpc } from "~/rpc/react";
 
 export function CreatePostForm() {
-  const trpc = useTRPC();
-
   const queryClient = useQueryClient();
   const createPost = useMutation(
-    trpc.post.create.mutationOptions({
+    orpc.post.create.mutationOptions({
       onSuccess: async () => {
         form.reset();
-        await queryClient.invalidateQueries(trpc.post.pathFilter());
+        await queryClient.invalidateQueries({ queryKey: orpc.post.key() });
       },
       onError: (err) => {
+        const isUnauthorized =
+          err instanceof ORPCError && err.code === "UNAUTHORIZED";
         toast.error(
-          err.data?.code === "UNAUTHORIZED"
+          isUnauthorized
             ? "You must be logged in to post"
             : "Failed to create post",
         );
@@ -118,8 +119,7 @@ export function CreatePostForm() {
 }
 
 export function PostList() {
-  const trpc = useTRPC();
-  const { data: posts } = useSuspenseQuery(trpc.post.all.queryOptions());
+  const { data: posts } = useSuspenseQuery(orpc.post.all.queryOptions());
 
   if (posts.length === 0) {
     return (
@@ -147,16 +147,17 @@ export function PostList() {
 export function PostCard(props: {
   post: RouterOutputs["post"]["all"][number];
 }) {
-  const trpc = useTRPC();
   const queryClient = useQueryClient();
   const deletePost = useMutation(
-    trpc.post.delete.mutationOptions({
+    orpc.post.delete.mutationOptions({
       onSuccess: async () => {
-        await queryClient.invalidateQueries(trpc.post.pathFilter());
+        await queryClient.invalidateQueries({ queryKey: orpc.post.key() });
       },
       onError: (err) => {
+        const isUnauthorized =
+          err instanceof ORPCError && err.code === "UNAUTHORIZED";
         toast.error(
-          err.data?.code === "UNAUTHORIZED"
+          isUnauthorized
             ? "You must be logged in to delete a post"
             : "Failed to delete post",
         );

@@ -4,9 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, Stack } from "expo-router";
 import { LegendList } from "@legendapp/list";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ORPCError } from "@orpc/client";
 
 import type { RouterOutputs } from "~/utils/api";
-import { trpc } from "~/utils/api";
+import { orpc } from "~/utils/api";
 import { authClient } from "~/utils/auth";
 
 function PostCard(props: {
@@ -45,14 +46,17 @@ function CreatePost() {
   const [content, setContent] = useState("");
 
   const { mutate, error } = useMutation(
-    trpc.post.create.mutationOptions({
+    orpc.post.create.mutationOptions({
       async onSuccess() {
         setTitle("");
         setContent("");
-        await queryClient.invalidateQueries(trpc.post.all.queryFilter());
+        await queryClient.invalidateQueries({ queryKey: orpc.post.key() });
       },
     }),
   );
+
+  const isUnauthorized =
+    error instanceof ORPCError && error.code === "UNAUTHORIZED";
 
   return (
     <View className="mt-4 flex gap-2">
@@ -62,22 +66,12 @@ function CreatePost() {
         onChangeText={setTitle}
         placeholder="Title"
       />
-      {error?.data?.zodError?.fieldErrors.title && (
-        <Text className="text-destructive mb-2">
-          {error.data.zodError.fieldErrors.title}
-        </Text>
-      )}
       <TextInput
         className="border-input bg-background text-foreground items-center rounded-md border px-3 text-lg leading-tight"
         value={content}
         onChangeText={setContent}
         placeholder="Content"
       />
-      {error?.data?.zodError?.fieldErrors.content && (
-        <Text className="text-destructive mb-2">
-          {error.data.zodError.fieldErrors.content}
-        </Text>
-      )}
       <Pressable
         className="bg-primary flex items-center rounded-sm p-2"
         onPress={() => {
@@ -89,7 +83,7 @@ function CreatePost() {
       >
         <Text className="text-foreground">Create</Text>
       </Pressable>
-      {error?.data?.code === "UNAUTHORIZED" && (
+      {isUnauthorized && (
         <Text className="text-destructive mt-2">
           You need to be logged in to create a post
         </Text>
@@ -126,12 +120,12 @@ function MobileAuth() {
 export default function Index() {
   const queryClient = useQueryClient();
 
-  const postQuery = useQuery(trpc.post.all.queryOptions());
+  const postQuery = useQuery(orpc.post.all.queryOptions());
 
   const deletePostMutation = useMutation(
-    trpc.post.delete.mutationOptions({
+    orpc.post.delete.mutationOptions({
       onSettled: () =>
-        queryClient.invalidateQueries(trpc.post.all.queryFilter()),
+        queryClient.invalidateQueries({ queryKey: orpc.post.key() }),
     }),
   );
 

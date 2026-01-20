@@ -39,7 +39,7 @@ This is a T3 Stack monorepo using Turborepo with pnpm workspaces. Package names 
 - **tanstack-start**: TanStack Start v1 (rc) web app alternative
 
 ### Shared Packages (`packages/`)
-- **api** (`@acme/api`): tRPC v11 router - exports `appRouter`, `createTRPCContext`, procedure helpers
+- **api** (`@acme/api`): oRPC router - exports `appRouter`, `createContext`, procedure helpers
 - **auth** (`@acme/auth`): Better Auth configuration with Discord OAuth, Expo support, and OAuth proxy plugin
 - **db** (`@acme/db`): Drizzle ORM with Vercel Postgres (edge-compatible). Exports:
   - `@acme/db/client` - database client instance
@@ -55,12 +55,13 @@ This is a T3 Stack monorepo using Turborepo with pnpm workspaces. Package names 
 
 ## Key Patterns
 
-### tRPC Setup
+### oRPC Setup
 - Routers defined in `packages/api/src/router/`
 - Root router in `packages/api/src/root.ts`
-- Context and procedures in `packages/api/src/trpc.ts`
+- Context and procedures in `packages/api/src/orpc.ts`
 - Use `publicProcedure` for unauthenticated endpoints, `protectedProcedure` for authenticated
-- In Next.js: `trpc` from `~/trpc/server` for RSC, `useTRPC` from `~/trpc/react` for client components
+- In Next.js: `orpc` from `~/rpc/server` for RSC, `orpc` from `~/rpc/react` for client components
+- API endpoint at `/api/rpc/[[...rest]]/route.ts` using `RPCHandler`
 
 ### Database Schema
 - Define tables in `packages/db/src/schema.ts` using Drizzle's `pgTable`
@@ -72,10 +73,11 @@ This is a T3 Stack monorepo using Turborepo with pnpm workspaces. Package names 
 - Required: `POSTGRES_URL`, `AUTH_SECRET`, `AUTH_DISCORD_ID`, `AUTH_DISCORD_SECRET`
 - Apps use `dotenv -e ../../.env --` (via `with-env` script) to load root `.env`
 
-### Adding tRPC Procedures
+### Adding oRPC Procedures
 1. Create/edit router file in `packages/api/src/router/`
 2. Add router to `packages/api/src/root.ts`
 3. Input validation with Zod, use `@acme/validators` for shared schemas
+4. Use `.handler(({ context, input }) => ...)` pattern for procedure handlers
 
 ## CI
 
