@@ -17,6 +17,10 @@ export const env = createEnv({
    */
   server: {
     POSTGRES_URL: z.url(),
+    TRUSTED_ORIGINS: z
+      .string()
+      .default("")
+      .transform((s) => (s ? s.split(",").map((o) => o.trim()) : [])),
   },
 
   /**

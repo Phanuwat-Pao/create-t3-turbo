@@ -3,10 +3,10 @@ import { onError } from "@orpc/server";
 import { CompressionPlugin } from "@orpc/server/fetch";
 import { CORSPlugin } from "@orpc/server/plugins";
 
-import { appRouter, createORPCContext } from "@acme/api";
+import { appRouter, createContext } from "@acme/api";
 
 import { auth } from "~/auth/server";
-import origins from "~/config/origin.config";
+import origins from "~/config/origin";
 
 // const handler = new RPCHandler(appRouter, {
 //   interceptors: [
@@ -33,7 +33,7 @@ const handler = new OpenAPIHandler(appRouter, {
 });
 
 async function handleRequest(request: Request) {
-  const context = await createORPCContext({
+  const context = await createContext({
     auth,
     headers: request.headers,
   });

@@ -9,6 +9,7 @@
 import { ORPCError, os } from "@orpc/server";
 
 import type { Auth, Session } from "@acme/auth";
+import type { Database } from "@acme/db/client";
 import { db } from "@acme/db/client";
 
 /**
@@ -27,7 +28,7 @@ import { db } from "@acme/db/client";
 export interface Context {
   authApi: Auth["api"];
   session: Session | null;
-  db: typeof db;
+  db: Database;
 }
 
 export const createContext = async (opts: {
@@ -83,6 +84,14 @@ const withTiming = base.use(async ({ context, next, path }) => {
   return result;
 });
 
+export const withTransaction = withTiming.use(async ({ context, next }) => {
+  return await db.transaction(async (tx) =>
+    next({
+      context: { ...context, db: tx },
+    }),
+  );
+});
+
 /**
  * Public (unauthed) procedure
  *
@@ -100,7 +109,7 @@ export const publicProcedure = withTiming;
  *
  * @see https://orpc.dev/docs/middleware
  */
-export const protectedProcedure = withTiming.use(async ({ context, next }) => {
+export const protectedProcedure = withTransaction.use(async ({ context, next }) => {
   if (!context.session?.user) {
     throw new ORPCError("UNAUTHORIZED");
   }

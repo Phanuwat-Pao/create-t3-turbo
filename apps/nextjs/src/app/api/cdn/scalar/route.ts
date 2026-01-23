@@ -3,7 +3,7 @@ import path from "node:path";
 
 export const dynamic = "force-static";
 
-export async function GET() {
+export function GET() {
   // open the file
   const filename = path.join(
     process.cwd(),
