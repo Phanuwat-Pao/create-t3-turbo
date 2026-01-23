@@ -137,7 +137,7 @@ pipeline {
         REGISTRY_CREDENTIALS_ID = '667'  // ← เปลี่ยนเป็น credential ID
         
         // Git Configuration
-        GIT_URL = 'https://gitea.telecorpthailand.com/phanuwat.lua/turbo.git'  // ← เปลี่ยนเป็น repo ของคุณ
+        GIT_URL = 'https://gitea.telecorpthailand.com/phanuwat.lua/create-t3-turbo.git'  // ← เปลี่ยนเป็น repo ของคุณ
         GIT_CREDENTIALS_ID = '55'  // ← เปลี่ยนเป็น credential ID
         
         // Branch Configuration
