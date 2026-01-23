@@ -4,7 +4,7 @@
 // Define all services in the Hospital24 monorepo
 def SERVICES = [
     [name: 'turbo-nextjs', path: 'apps/nextjs', dockerfile: 'docker/Dockerfile.nextjs'],
-    [name: 'turbo-expressjs', path: 'apps/expressjs', dockerfile: 'docker/Dockerfile.expressjs']
+    // [name: 'turbo-expressjs', path: 'apps/expressjs', dockerfile: 'docker/Dockerfile.expressjs']
 ]
 
 // ============================================
@@ -224,7 +224,7 @@ pipeline {
                             file == "turbo.json"
                         }
                         
-                        if (hasChanges) {
+                        if (hasChanges || SERVICES.size() == 1) {
                             changedServices.add(service)
                             echo "✅ Detected changes in: ${service.name}"
                         }
