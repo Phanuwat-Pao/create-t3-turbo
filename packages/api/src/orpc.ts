@@ -8,7 +8,7 @@
  */
 import { ORPCError, os } from "@orpc/server";
 
-import type { Auth, Session } from "@acme/auth";
+import type { Auth, AuthApi, Session } from "@acme/auth";
 import type { Database } from "@acme/db/client";
 import { db } from "@acme/db/client";
 
@@ -26,15 +26,15 @@ import { db } from "@acme/db/client";
  */
 
 export interface Context {
-  authApi: Auth["api"];
+  authApi: AuthApi;
   session: Session | null;
   db: Database;
 }
 
-export const createContext = async (opts: {
+export async function createContext(opts: {
   headers: Headers;
   auth: Auth;
-}): Promise<Context> => {
+}): Promise<Context> {
   const authApi = opts.auth.api;
   const session = await authApi.getSession({
     headers: opts.headers,
@@ -44,7 +44,7 @@ export const createContext = async (opts: {
     session,
     db,
   };
-};
+}
 
 /**
  * 2. INITIALIZATION
