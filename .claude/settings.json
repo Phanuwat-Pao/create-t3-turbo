@@ -16,7 +16,8 @@
       "WebFetch(domain:docs.ultracite.ai)",
       "Bash(pnpm check:*)",
       "Bash(pnpm check:fix:*)",
-      "Bash(pnpx oxfmt:*)"
+      "Bash(pnpx oxfmt:*)",
+      "Bash(npm view:*)"
     ]
   }
 }
