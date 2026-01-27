@@ -15,12 +15,29 @@
   "arrowParens": "always",
   "endOfLine": "lf",
   "experimentalSortPackageJson": true,
+  "experimentalTailwindcss": {
+    "functions": ["cva", "cx", "cn"],
+  },
   "experimentalSortImports": {
     "ignoreCase": true,
     "newlinesBetween": true,
     "order": "asc",
   },
-  "experimentalTailwindcss": {
-    "functions": ["cn", "cva", "cx"],
-  },
+  "importOrder": [
+    "<TYPES>",
+    "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
+    "^(next/(.*)$)|^(next$)",
+    "^(expo(.*)$)|^(expo$)",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "<TYPES>^@acme",
+    "^@acme/(.*)$",
+    "",
+    "<TYPES>^[.|..|~]",
+    "^~/",
+    "^[../]",
+    "^[./]",
+  ],
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderTypeScriptVersion": "5.0.0",
 }
