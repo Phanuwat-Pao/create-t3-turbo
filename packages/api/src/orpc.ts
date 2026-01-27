@@ -1,7 +1,6 @@
 import type { Auth, AuthApi, Session } from "@acme/auth";
-import type { Database } from "@acme/db/client";
 
-import { db } from "@acme/db/client";
+import { type Database, db } from "@acme/db/client";
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
  * 1. You want to modify request context (see Part 1)
@@ -11,6 +10,7 @@ import { db } from "@acme/db/client";
  * The pieces you will need to use are documented accordingly near the end
  */
 import { ORPCError, os } from "@orpc/server";
+import { setTimeout } from "node:timers/promises";
 
 /**
  * 1. CONTEXT
@@ -73,7 +73,7 @@ const withTiming = base.use(async ({ context, next, path }) => {
   if (process.env.NODE_ENV === "development") {
     // artificial delay in dev 100-500ms
     const waitMs = Math.floor(Math.random() * 400) + 100;
-    await new Promise((resolve) => setTimeout(resolve, waitMs));
+    await setTimeout(waitMs);
   }
 
   const result = await next({ context });
@@ -84,13 +84,12 @@ const withTiming = base.use(async ({ context, next, path }) => {
   return result;
 });
 
-export const withTransaction = withTiming.use(
-  async ({ context, next }) =>
-    await db.transaction(async (tx) =>
-      next({
-        context: { ...context, db: tx },
-      })
-    )
+export const withTransaction = withTiming.use(async ({ context, next }) =>
+  db.transaction(async (tx) =>
+    next({
+      context: { ...context, db: tx },
+    })
+  )
 );
 
 /**
@@ -110,19 +109,17 @@ export const publicProcedure = withTiming;
  *
  * @see https://orpc.dev/docs/middleware
  */
-export const protectedProcedure = withTransaction.use(
-  async ({ context, next }) => {
-    if (!context.session?.user) {
-      throw new ORPCError("UNAUTHORIZED");
-    }
-    return next({
-      context: {
-        // infers the `session` as non-nullable
-        session: { ...context.session, user: context.session.user },
-      },
-    });
+export const protectedProcedure = withTransaction.use(({ context, next }) => {
+  if (!context.session?.user) {
+    throw new ORPCError("UNAUTHORIZED");
   }
-);
+  return next({
+    context: {
+      // infers the `session` as non-nullable
+      session: { ...context.session, user: context.session.user },
+    },
+  });
+});
 
 // Re-export ORPCError for use in client-side error handling
 export { ORPCError };

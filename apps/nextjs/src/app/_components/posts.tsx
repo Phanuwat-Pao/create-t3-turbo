@@ -21,8 +21,55 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 import { orpc } from "~/rpc/react";
+
+function TextField(props: {
+  field: {
+    handleBlur: () => void;
+    handleChange: (value: string) => void;
+    name: string;
+    state: {
+      meta: {
+        errors: ({ message?: string } | undefined)[];
+        isTouched: boolean;
+        isValid: boolean;
+      };
+      value: string;
+    };
+  };
+  label: string;
+  placeholder: string;
+}) {
+  const { field, label, placeholder } = props;
+  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      field.handleChange(e.target.value);
+    },
+    [field]
+  );
+
+  return (
+    <Field data-invalid={isInvalid}>
+      <FieldContent>
+        <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+      </FieldContent>
+      <Input
+        aria-invalid={isInvalid}
+        id={field.name}
+        name={field.name}
+        onBlur={field.handleBlur}
+        onChange={handleChange}
+        placeholder={placeholder}
+        value={field.state.value}
+      />
+      {isInvalid && <FieldError errors={field.state.meta.errors} />}
+    </Field>
+  );
+}
 
 export function CreatePostForm() {
   const queryClient = useQueryClient();
@@ -55,63 +102,27 @@ export function CreatePostForm() {
     },
   });
 
+  const handleSubmit = useCallback(
+    (event: React.FormEvent) => {
+      event.preventDefault();
+      form.handleSubmit();
+    },
+    [form]
+  );
+
   return (
-    <form
-      className="w-full max-w-2xl"
-      onSubmit={(event) => {
-        event.preventDefault();
-        void form.handleSubmit();
-      }}
-    >
+    <form className="w-full max-w-2xl" onSubmit={handleSubmit}>
       <FieldGroup>
-        <form.Field
-          name="title"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldContent>
-                  <FieldLabel htmlFor={field.name}>Bug Title</FieldLabel>
-                </FieldContent>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="Title"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        />
-        <form.Field
-          name="content"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldContent>
-                  <FieldLabel htmlFor={field.name}>Content</FieldLabel>
-                </FieldContent>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="Content"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        />
+        <form.Field name="title">
+          {(field) => (
+            <TextField field={field} label="Bug Title" placeholder="Title" />
+          )}
+        </form.Field>
+        <form.Field name="content">
+          {(field) => (
+            <TextField field={field} label="Content" placeholder="Content" />
+          )}
+        </form.Field>
       </FieldGroup>
       <Button type="submit">Create</Button>
     </form>
@@ -165,6 +176,10 @@ export function PostCard(props: {
     })
   );
 
+  const handleDelete = useCallback(() => {
+    deletePost.mutate(props.post.id);
+  }, [deletePost, props.post.id]);
+
   return (
     <div className="bg-muted flex flex-row rounded-lg p-4">
       <div className="grow">
@@ -173,9 +188,9 @@ export function PostCard(props: {
       </div>
       <div>
         <Button
-          variant="ghost"
           className="text-primary cursor-pointer text-sm font-bold uppercase hover:bg-transparent hover:text-white"
-          onClick={() => deletePost.mutate(props.post.id)}
+          onClick={handleDelete}
+          variant="ghost"
         >
           Delete
         </Button>

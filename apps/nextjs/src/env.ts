@@ -4,24 +4,6 @@ import { vercel } from "@t3-oss/env-nextjs/presets-zod";
 import { z } from "zod/v4";
 
 export const env = createEnv({
-  extends: [authEnv(), vercel()],
-  shared: {
-    NODE_ENV: z
-      .enum(["development", "production", "test"])
-      .default("development"),
-  },
-  /**
-   * Specify your server-side environment variables schema here.
-   * This way you can ensure the app isn't built with invalid env vars.
-   */
-  server: {
-    POSTGRES_URL: z.url(),
-    TRUSTED_ORIGINS: z
-      .string()
-      .default("")
-      .transform((s) => (s ? s.split(",").map((o) => o.trim()) : [])),
-  },
-
   /**
    * Specify your client-side environment variables schema here.
    * For them to be exposed to the client, prefix them with `NEXT_PUBLIC_`.
@@ -36,6 +18,23 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
 
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  },
+  extends: [authEnv(), vercel()],
+  /**
+   * Specify your server-side environment variables schema here.
+   * This way you can ensure the app isn't built with invalid env vars.
+   */
+  server: {
+    POSTGRES_URL: z.url(),
+    TRUSTED_ORIGINS: z
+      .string()
+      .default("")
+      .transform((s) => (s ? s.split(",").map((o) => o.trim()) : [])),
+  },
+  shared: {
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
   },
   skipValidation:
     !!process.env.CI || process.env.npm_lifecycle_event === "lint",

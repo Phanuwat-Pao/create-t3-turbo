@@ -1,11 +1,9 @@
 "use client";
 
-import type { VariantProps } from "class-variance-authority";
-
 import { cn } from "@acme/ui";
 import { Label } from "@acme/ui/label";
 import { Separator } from "@acme/ui/separator";
-import { cva } from "class-variance-authority";
+import { type VariantProps, cva } from "class-variance-authority";
 import { useMemo } from "react";
 
 export function FieldSet({
@@ -69,7 +67,6 @@ const fieldVariants = cva(
     },
     variants: {
       orientation: {
-        vertical: ["flex-col [&>*]:w-full [&>.sr-only]:w-auto"],
         horizontal: [
           "flex-row items-center",
           "[&>[data-slot=field-label]]:flex-auto",
@@ -80,6 +77,7 @@ const fieldVariants = cva(
           "@md/field-group:[&>[data-slot=field-label]]:flex-auto",
           "@md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px",
         ],
+        vertical: ["flex-col [&>*]:w-full [&>.sr-only]:w-auto"],
       },
     },
   }
@@ -225,8 +223,8 @@ export function FieldError({
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
         {errors.map(
-          (error, index) =>
-            error.message && <li key={index}>{error.message}</li>
+          (error) =>
+            error.message && <li key={error.message}>{error.message}</li>
         )}
       </ul>
     );

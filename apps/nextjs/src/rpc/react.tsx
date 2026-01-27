@@ -38,7 +38,7 @@ const link = new RPCLink({
   headers: () => ({
     "x-trpc-source": "nextjs-react",
   }),
-  url: getBaseUrl() + "/api/rpc",
+  url: `${getBaseUrl()}/api/rpc`,
 });
 
 const client: RouterClient<AppRouter> = createORPCClient(link);

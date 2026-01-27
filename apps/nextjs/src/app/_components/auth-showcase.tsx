@@ -4,28 +4,35 @@ import { redirect } from "next/navigation";
 
 import { auth, getSession } from "~/auth/server";
 
+async function signInWithDiscord() {
+  "use server";
+  const res = await auth.api.signInSocial({
+    body: {
+      callbackURL: "/",
+      provider: "discord",
+    },
+  });
+  if (!res.url) {
+    throw new Error("No URL returned from signInSocial");
+  }
+  redirect(res.url);
+}
+
+async function signOut() {
+  "use server";
+  await auth.api.signOut({
+    headers: await headers(),
+  });
+  redirect("/");
+}
+
 export async function AuthShowcase() {
   const session = await getSession();
 
   if (!session) {
     return (
-      <form>
-        <Button
-          size="lg"
-          formAction={async () => {
-            "use server";
-            const res = await auth.api.signInSocial({
-              body: {
-                callbackURL: "/",
-                provider: "discord",
-              },
-            });
-            if (!res.url) {
-              throw new Error("No URL returned from signInSocial");
-            }
-            redirect(res.url);
-          }}
-        >
+      <form action={signInWithDiscord}>
+        <Button size="lg" type="submit">
           Sign in with Discord
         </Button>
       </form>
@@ -38,17 +45,8 @@ export async function AuthShowcase() {
         <span>Logged in as {session.user.name}</span>
       </p>
 
-      <form>
-        <Button
-          size="lg"
-          formAction={async () => {
-            "use server";
-            await auth.api.signOut({
-              headers: await headers(),
-            });
-            redirect("/");
-          }}
-        >
+      <form action={signOut}>
+        <Button size="lg" type="submit">
           Sign out
         </Button>
       </form>

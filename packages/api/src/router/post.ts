@@ -7,8 +7,8 @@ import { protectedProcedure, publicProcedure } from "../orpc";
 export const postRouter = {
   all: publicProcedure.handler(({ context }) =>
     context.db.query.Post.findMany({
-      orderBy: desc(Post.id),
       limit: 10,
+      orderBy: desc(Post.id),
     })
   ),
 

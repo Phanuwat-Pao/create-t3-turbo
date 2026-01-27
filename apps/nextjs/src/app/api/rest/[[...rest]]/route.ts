@@ -7,25 +7,17 @@ import { CORSPlugin } from "@orpc/server/plugins";
 import { auth } from "~/auth/server";
 import origins from "~/config/origin";
 
-// const handler = new RPCHandler(appRouter, {
-//   interceptors: [
-//     onError((error) => {
-//       console.error(error);
-//     }),
-//   ],
-// });
+function logError(error: unknown) {
+  console.error(error);
+}
 
 const handler = new OpenAPIHandler(appRouter, {
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
-  ],
+  interceptors: [onError(logError)],
   plugins: [
     new CORSPlugin({
-      origin: origins,
       credentials: true,
       exposeHeaders: ["Content-Disposition"],
+      origin: origins,
     }),
     new CompressionPlugin(),
   ],
@@ -36,9 +28,10 @@ async function handleRequest(request: Request) {
     auth,
     headers: request.headers,
   });
+  // Provide initial context if needed
   const { response } = await handler.handle(request, {
     context,
-    prefix: `/api/rest`, // Provide initial context if needed
+    prefix: `/api/rest`,
   });
 
   return response ?? new Response("Not found", { status: 404 });

@@ -6,20 +6,21 @@ import { cache } from "react";
 
 import { env } from "~/env";
 
-const baseUrl =
-  env.VERCEL_ENV === "production"
-    ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : env.VERCEL_ENV === "preview"
-      ? `https://${env.VERCEL_URL}`
-      : "http://localhost:3000";
+function getBaseUrl() {
+  if (env.VERCEL_ENV === "production") {
+    return `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (env.VERCEL_ENV === "preview") {
+    return `https://${env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+}
 
 export const auth = initAuth({
-  baseUrl,
+  baseUrl: getBaseUrl(),
+  extraPlugins: [nextCookies()],
   productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL ?? "turbo.t3.gg"}`,
   secret: env.AUTH_SECRET,
-  // discordClientId: env.AUTH_DISCORD_ID,
-  // discordClientSecret: env.AUTH_DISCORD_SECRET,
-  extraPlugins: [nextCookies()],
 });
 
 export const getSession = cache(async () =>

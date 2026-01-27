@@ -6,12 +6,12 @@ import { RPCHandler } from "@orpc/server/fetch";
 
 import { auth } from "~/auth/server";
 
+function logError(error: unknown) {
+  console.error(">>> oRPC Error:", error);
+}
+
 const handler = new RPCHandler(appRouter, {
-  interceptors: [
-    onError((error) => {
-      console.error(">>> oRPC Error:", error);
-    }),
-  ],
+  interceptors: [onError(logError)],
 });
 
 /**
@@ -36,8 +36,8 @@ export const OPTIONS = () => {
 async function handleRequest(req: NextRequest) {
   const { response, matched } = await handler.handle(req, {
     context: await createContext({
-      headers: req.headers,
       auth,
+      headers: req.headers,
     }),
     prefix: "/api/rpc",
   });

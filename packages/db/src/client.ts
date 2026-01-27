@@ -1,8 +1,7 @@
 import type { ExtractTablesWithRelations } from "drizzle-orm";
-import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 
-import { drizzle } from "drizzle-orm/node-postgres";
+import { type NodePgQueryResultHKT, drizzle } from "drizzle-orm/node-postgres";
 
 import * as schema from "./schema";
 

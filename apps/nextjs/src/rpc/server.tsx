@@ -30,7 +30,7 @@ const link = new RPCLink({
       "x-trpc-source": "rsc",
     };
   },
-  url: getBaseUrl() + "/api/rpc",
+  url: `${getBaseUrl()}/api/rpc`,
 });
 
 const client: RouterClient<AppRouter> = createORPCClient(link);
@@ -46,9 +46,13 @@ export function HydrateClient(props: { children: React.ReactNode }) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function prefetch<T extends { queryKey: any; queryFn: any }>(
+export async function prefetch<T extends { queryKey: any; queryFn: any }>(
   queryOptions: T
 ) {
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(queryOptions);
+  try {
+    await queryClient.prefetchQuery(queryOptions);
+  } catch {
+    // Silently ignore prefetch errors - they'll be handled when the query actually runs
+  }
 }

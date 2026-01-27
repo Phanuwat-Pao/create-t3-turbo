@@ -1,5 +1,5 @@
 /**
- * @fileoverview Better Auth CLI Configuration
+ * @file Better Auth CLI Configuration
  *
  * This file is used exclusively by the Better Auth CLI to generate database schemas.
  * DO NOT USE THIS FILE DIRECTLY IN YOUR APPLICATION.
@@ -15,8 +15,8 @@ import { initAuth } from "../src/index";
 /**
  * CLI-only authentication configuration for schema generation.
  *
- * @warning This configuration is NOT intended for runtime use.
- * @warning Use the main auth configuration from "../src/index.ts" for your application.
+ * Note: This configuration is NOT intended for runtime use.
+ * Use the main auth configuration from "../src/index.ts" for your application.
  */
 export const auth = initAuth({
   baseUrl: "http://localhost:3000",

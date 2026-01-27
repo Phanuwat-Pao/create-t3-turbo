@@ -1,8 +1,10 @@
-import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
-
 import { db } from "@acme/db/client";
 import { expo } from "@better-auth/expo";
-import { betterAuth } from "better-auth";
+import {
+  type BetterAuthOptions,
+  type BetterAuthPlugin,
+  betterAuth,
+} from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { oAuthProxy, openAPI } from "better-auth/plugins";
 

@@ -160,13 +160,17 @@ export function useTheme() {
 export function ThemeToggle() {
   const { setTheme } = useTheme();
 
+  const setLight = React.useCallback(() => setTheme("light"), [setTheme]);
+  const setDark = React.useCallback(() => setTheme("dark"), [setTheme]);
+  const setAuto = React.useCallback(() => setTheme("auto"), [setTheme]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
-          size="icon"
           className="[&>svg]:absolute [&>svg]:size-5 [&>svg]:scale-0"
+          size="icon"
+          variant="outline"
         >
           <SunIcon className="light:scale-100! auto:scale-0!" />
           <MoonIcon className="auto:scale-0! dark:scale-100!" />
@@ -175,15 +179,9 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("auto")}>
-          System
-        </DropdownMenuItem>
+        <DropdownMenuItem onClick={setLight}>Light</DropdownMenuItem>
+        <DropdownMenuItem onClick={setDark}>Dark</DropdownMenuItem>
+        <DropdownMenuItem onClick={setAuto}>System</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
