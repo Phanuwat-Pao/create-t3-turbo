@@ -16,19 +16,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   assetBundlePatterns: ["**/*"],
   ios: {
     bundleIdentifier: "your.bundle.identifier",
-    supportsTablet: true,
     icon: {
       light: "./assets/icon-light.png",
       dark: "./assets/icon-dark.png",
     },
+    supportsTablet: true,
   },
   android: {
-    package: "your.bundle.identifier",
     adaptiveIcon: {
       foregroundImage: "./assets/icon-light.png",
       backgroundColor: "#1F104A",
     },
     edgeToEdgeEnabled: true,
+    package: "your.bundle.identifier",
   },
   // extra: {
   //   eas: {
@@ -36,10 +36,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   //   },
   // },
   experiments: {
-    tsconfigPaths: true,
-    typedRoutes: true,
     reactCanary: true,
     reactCompiler: true,
+    tsconfigPaths: true,
+    typedRoutes: true,
   },
   plugins: [
     "expo-router",
@@ -49,11 +49,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-splash-screen",
       {
         backgroundColor: "#E4E4E7",
-        image: "./assets/icon-light.png",
         dark: {
           backgroundColor: "#18181B",
           image: "./assets/icon-dark.png",
         },
+        image: "./assets/icon-light.png",
       },
     ],
   ],

@@ -1,26 +1,28 @@
-import { cache } from "react";
-import { headers } from "next/headers";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import type { AppRouter } from "@acme/api";
+import type { RouterClient } from "@orpc/server";
+
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
-import type { RouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-
-import type { AppRouter } from "@acme/api";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { headers } from "next/headers";
+import { cache } from "react";
 
 import { env } from "~/env";
+
 import { createQueryClient } from "./query-client";
 
 const getQueryClient = cache(createQueryClient);
 
 // For RSC, create a server-side client
 const getBaseUrl = () => {
-  if (env.VERCEL_URL) return `https://${env.VERCEL_URL}`;
+  if (env.VERCEL_URL) {
+    return `https://${env.VERCEL_URL}`;
+  }
   return `http://localhost:3000`;
 };
 
 const link = new RPCLink({
-  url: getBaseUrl() + "/api/rpc",
   headers: async () => {
     const heads = await headers();
     return {
@@ -28,6 +30,7 @@ const link = new RPCLink({
       "x-trpc-source": "rsc",
     };
   },
+  url: getBaseUrl() + "/api/rpc",
 });
 
 const client: RouterClient<AppRouter> = createORPCClient(link);
@@ -44,7 +47,7 @@ export function HydrateClient(props: { children: React.ReactNode }) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function prefetch<T extends { queryKey: any; queryFn: any }>(
-  queryOptions: T,
+  queryOptions: T
 ) {
   const queryClient = getQueryClient();
   void queryClient.prefetchQuery(queryOptions);

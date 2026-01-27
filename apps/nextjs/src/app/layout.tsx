@@ -1,29 +1,28 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 
 import { cn } from "@acme/ui";
 import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
 import { Toaster } from "@acme/ui/toast";
+import { Geist, Geist_Mono } from "next/font/google";
 
 import { env } from "~/env";
 import { ORPCReactProvider } from "~/rpc/react";
-
 import "~/app/styles.css";
 
 export const metadata: Metadata = {
+  description: "Simple monorepo with shared backend for web & mobile apps",
   metadataBase: new URL(
     env.VERCEL_ENV === "production"
       ? "https://turbo.t3.gg"
-      : "http://localhost:3000",
+      : "http://localhost:3000"
   ),
-  title: "Create T3 Turbo",
-  description: "Simple monorepo with shared backend for web & mobile apps",
   openGraph: {
     title: "Create T3 Turbo",
     description: "Simple monorepo with shared backend for web & mobile apps",
     url: "https://create-t3-turbo.vercel.app",
     siteName: "Create T3 Turbo",
   },
+  title: "Create T3 Turbo",
   twitter: {
     card: "summary_large_image",
     site: "@jullerino",
@@ -33,8 +32,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { color: "white", media: "(prefers-color-scheme: light)" },
+    { color: "black", media: "(prefers-color-scheme: dark)" },
   ],
 };
 
@@ -54,7 +53,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         className={cn(
           "bg-background text-foreground min-h-screen font-sans antialiased",
           geistSans.variable,
-          geistMono.variable,
+          geistMono.variable
         )}
       >
         <ThemeProvider>

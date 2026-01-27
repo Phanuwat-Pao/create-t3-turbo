@@ -1,9 +1,8 @@
+import { appRouter, createContext } from "@acme/api";
 import { OpenAPIHandler } from "@orpc/openapi/fetch";
 import { onError } from "@orpc/server";
 import { CompressionPlugin } from "@orpc/server/fetch";
 import { CORSPlugin } from "@orpc/server/plugins";
-
-import { appRouter, createContext } from "@acme/api";
 
 import { auth } from "~/auth/server";
 import origins from "~/config/origin";
@@ -17,6 +16,11 @@ import origins from "~/config/origin";
 // });
 
 const handler = new OpenAPIHandler(appRouter, {
+  interceptors: [
+    onError((error) => {
+      console.error(error);
+    }),
+  ],
   plugins: [
     new CORSPlugin({
       origin: origins,
@@ -24,11 +28,6 @@ const handler = new OpenAPIHandler(appRouter, {
       exposeHeaders: ["Content-Disposition"],
     }),
     new CompressionPlugin(),
-  ],
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
   ],
 });
 
@@ -38,8 +37,8 @@ async function handleRequest(request: Request) {
     headers: request.headers,
   });
   const { response } = await handler.handle(request, {
-    prefix: `/api/rest`,
-    context, // Provide initial context if needed
+    context,
+    prefix: `/api/rest`, // Provide initial context if needed
   });
 
   return response ?? new Response("Not found", { status: 404 });

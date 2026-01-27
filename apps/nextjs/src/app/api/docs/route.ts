@@ -1,9 +1,8 @@
+import { appRouter } from "@acme/api";
 // app/reference/route.ts
 import { OpenAPIGenerator } from "@orpc/openapi";
 import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
 import { ApiReference } from "@scalar/nextjs-api-reference";
-
-import { appRouter } from "@acme/api";
 
 import { auth } from "~/auth/server";
 import { getBaseUrl } from "~/config/base-url";
@@ -31,12 +30,12 @@ const config = {
   cdn: `/api/cdn/scalar`,
   sources: [
     {
-      title: "Better Auth",
       content: authSwagger,
+      title: "Better Auth",
     },
     {
-      title: "Nextjs API",
       content: spec,
+      title: "Nextjs API",
     },
   ],
 } satisfies Parameters<typeof ApiReference>[0];

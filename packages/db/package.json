@@ -1,6 +1,7 @@
 {
   "name": "@acme/db",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": {
@@ -16,16 +17,13 @@
       "default": "./src/schema.ts"
     }
   },
-  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
-    "format": "prettier --check . --ignore-path ../../.gitignore",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config",
     "push": "pnpm with-env drizzle-kit push",
     "studio": "pnpm with-env drizzle-kit studio",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "typecheck": "tsgo --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
@@ -37,14 +35,10 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@acme/eslint-config": "workspace:*",
-    "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
     "@types/pg": "^8.16.0",
+    "@typescript/native-preview": "catalog:",
     "drizzle-kit": "^0.31.5",
-    "eslint": "catalog:",
-    "prettier": "catalog:",
     "typescript": "catalog:"
-  },
-  "prettier": "@acme/prettier-config"
+  }
 }

@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:oxc.rs)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:orpc.dev)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:orpc.unnoq.com)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:docs.ultracite.ai)",
+      "Bash(pnpm check:*)",
+      "Bash(pnpm check:fix:*)",
+      "Bash(pnpx oxfmt:*)"
+    ]
+  }
+}

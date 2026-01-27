@@ -1,107 +1,14 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Build & Development Commands
-
-```bash
-pnpm i                    # Install dependencies
-pnpm dev                  # Run all apps in development mode (turbo watch)
-pnpm dev:next             # Run only Next.js app and dependencies
-pnpm build                # Build all packages and apps
-pnpm typecheck            # Run TypeScript checks (uses tsgo - native TypeScript)
-pnpm check                # Check linting and formatting with Ultracite (oxlint + oxfmt)
-pnpm check:fix            # Auto-fix linting and formatting issues
-
-# Database
-pnpm db:push              # Push Drizzle schema to database
-pnpm db:studio            # Open Drizzle Studio
-
-# Auth
-pnpm auth:generate        # Generate Better Auth schema to packages/db/src/auth-schema.ts
-
-# UI
-pnpm ui-add               # Add shadcn/ui components interactively
-
-# New package
-pnpm turbo gen init       # Generate a new package with tooling configured
-```
-
-## Architecture
-
-This is a T3 Stack monorepo using Turborepo with pnpm workspaces. Package names use the `@acme` prefix.
-
-### Apps (`apps/`)
-
-- **nextjs**: Next.js 15 web app with App Router, React 19, Tailwind CSS v4
-- **expo**: React Native app with Expo SDK 54, Expo Router, NativeWind v5
-- **tanstack-start**: TanStack Start v1 (rc) web app alternative
-
-### Shared Packages (`packages/`)
-
-- **api** (`@acme/api`): oRPC router - exports `appRouter`, `createContext`, procedure helpers
-- **auth** (`@acme/auth`): Better Auth configuration with Discord OAuth, Expo support, and OAuth proxy plugin
-- **db** (`@acme/db`): Drizzle ORM with Vercel Postgres (edge-compatible). Exports:
-  - `@acme/db/client` - database client instance
-  - `@acme/db/schema` - Drizzle schema definitions
-- **ui** (`@acme/ui`): shadcn/ui components. Import individual components: `@acme/ui/button`
-- **validators** (`@acme/validators`): Shared Zod schemas for client/server validation
-
-### Tooling (`tooling/`)
-
-- **tailwind**: Shared Tailwind CSS theme
-- **typescript**: Shared tsconfig bases
-
-### Code Quality Tools
-
-- **Ultracite**: Zero-config preset wrapping oxlint (linter) + oxfmt (formatter)
-- **@typescript/native-preview**: Go-based native TypeScript compiler (`tsgo`) for ~10x faster type checking
-
-## Key Patterns
-
-### oRPC Setup
-
-- Routers defined in `packages/api/src/router/`
-- Root router in `packages/api/src/root.ts`
-- Context and procedures in `packages/api/src/orpc.ts`
-- Use `publicProcedure` for unauthenticated endpoints, `protectedProcedure` for authenticated
-- In Next.js: `orpc` from `~/rpc/server` for RSC, `orpc` from `~/rpc/react` for client components
-- API endpoint at `/api/rpc/[[...rest]]/route.ts` using `RPCHandler`
-
-### Database Schema
-
-- Define tables in `packages/db/src/schema.ts` using Drizzle's `pgTable`
-- Use `drizzle-zod` `createInsertSchema` for validation schemas
-- Auth tables auto-generated in `packages/db/src/auth-schema.ts`
-
-### Environment Variables
-
-- Copy `.env.example` to `.env` at root
-- Required: `POSTGRES_URL`, `AUTH_SECRET`, `AUTH_DISCORD_ID`, `AUTH_DISCORD_SECRET`
-- Apps use `dotenv -e ../../.env --` (via `with-env` script) to load root `.env`
-
-### Adding oRPC Procedures
-
-1. Create/edit router file in `packages/api/src/router/`
-2. Add router to `packages/api/src/root.ts`
-3. Input validation with Zod, use `@acme/validators` for shared schemas
-4. Use `.handler(({ context, input }) => ...)` pattern for procedure handlers
-
-## CI
-
-GitHub Actions runs `check` (ultracite) and `typecheck` (tsgo) on PRs and pushes to main.
-
 # Ultracite Code Standards
 
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
 
 ## Quick Reference
 
-- **Fix issues**: `pnpm check:fix`
-- **Check for issues**: `pnpm check`
+- **Format code**: `pnpm dlx ultracite fix`
+- **Check for issues**: `pnpm dlx ultracite check`
 - **Diagnose setup**: `pnpm dlx ultracite doctor`
 
-Oxlint + Oxfmt (the underlying engines) provide robust linting and formatting. Most issues are automatically fixable.
+Oxlint + Oxfmt (the underlying engine) provides robust linting and formatting. Most issues are automatically fixable.
 
 ---
 
@@ -212,4 +119,4 @@ Oxlint + Oxfmt's linter will catch most issues automatically. Focus your attenti
 
 ---
 
-Most formatting and common issues are automatically fixed by Oxlint + Oxfmt. Run `pnpm check:fix` before committing to ensure compliance.
+Most formatting and common issues are automatically fixed by Oxlint + Oxfmt. Run `pnpm dlx ultracite fix` before committing to ensure compliance.

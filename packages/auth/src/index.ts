@@ -1,10 +1,10 @@
 import type { BetterAuthOptions, BetterAuthPlugin } from "better-auth";
+
+import { db } from "@acme/db/client";
 import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { oAuthProxy,openAPI } from "better-auth/plugins";
-
-import { db } from "@acme/db/client";
+import { oAuthProxy, openAPI } from "better-auth/plugins";
 
 export function initAuth<
   TExtraPlugins extends BetterAuthPlugin[] = [],
@@ -18,11 +18,15 @@ export function initAuth<
   extraPlugins?: TExtraPlugins;
 }) {
   const config = {
+    baseURL: options.baseUrl,
     database: drizzleAdapter(db, {
       provider: "pg",
     }),
-    baseURL: options.baseUrl,
-    secret: options.secret,
+    onAPIError: {
+      onError(error, ctx) {
+        console.error("BETTER AUTH API ERROR", error, ctx);
+      },
+    },
     plugins: [
       oAuthProxy({
         productionURL: options.productionUrl,
@@ -31,22 +35,21 @@ export function initAuth<
       ...(options.extraPlugins ?? []),
 
       openAPI({
-        disableDefaultReference:true,
+        disableDefaultReference: true,
       }),
     ],
+    secret: options.secret,
     socialProviders: {
-      discord: options.discordClientId && options.discordClientSecret ? {
-        clientId: options.discordClientId,
-        clientSecret: options.discordClientSecret,
-        redirectURI: `${options.productionUrl}/api/auth/callback/discord`,
-      } : undefined,
+      discord:
+        options.discordClientId && options.discordClientSecret
+          ? {
+              clientId: options.discordClientId,
+              clientSecret: options.discordClientSecret,
+              redirectURI: `${options.productionUrl}/api/auth/callback/discord`,
+            }
+          : undefined,
     },
     trustedOrigins: ["expo://"],
-    onAPIError: {
-      onError(error, ctx) {
-        console.error("BETTER AUTH API ERROR", error, ctx);
-      },
-    },
   } satisfies BetterAuthOptions;
 
   return betterAuth(config);

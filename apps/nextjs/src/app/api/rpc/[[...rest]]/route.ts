@@ -1,8 +1,8 @@
 import type { NextRequest } from "next/server";
-import { RPCHandler } from "@orpc/server/fetch";
-import { onError } from "@orpc/server";
 
 import { appRouter, createContext } from "@acme/api";
+import { onError } from "@orpc/server";
+import { RPCHandler } from "@orpc/server/fetch";
 
 import { auth } from "~/auth/server";
 
@@ -35,11 +35,11 @@ export const OPTIONS = () => {
 
 async function handleRequest(req: NextRequest) {
   const { response, matched } = await handler.handle(req, {
-    prefix: "/api/rpc",
     context: await createContext({
       headers: req.headers,
       auth,
     }),
+    prefix: "/api/rpc",
   });
 
   if (matched) {

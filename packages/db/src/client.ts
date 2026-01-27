@@ -1,7 +1,8 @@
-import { drizzle } from "drizzle-orm/node-postgres";
+import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
-import type { ExtractTablesWithRelations } from "drizzle-orm";
+
+import { drizzle } from "drizzle-orm/node-postgres";
 
 import * as schema from "./schema";
 
@@ -10,8 +11,8 @@ if (!process.env.POSTGRES_URL) {
 }
 
 export const db = drizzle(process.env.POSTGRES_URL, {
-  schema,
   casing: "snake_case",
+  schema,
 });
 
 // Define the structure of your schema and its relations

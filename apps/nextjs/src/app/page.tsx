@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { HydrateClient, orpc, prefetch } from "~/rpc/server";
+
 import { AuthShowcase } from "./_components/auth-showcase";
 import {
   CreatePostForm,

@@ -7,7 +7,7 @@ export function GET() {
   // open the file
   const filename = path.join(
     process.cwd(),
-    "node_modules/@scalar/api-reference/dist/browser/standalone.js",
+    "node_modules/@scalar/api-reference/dist/browser/standalone.js"
   );
   const file = fs.readFileSync(filename);
   return new Response(file, {

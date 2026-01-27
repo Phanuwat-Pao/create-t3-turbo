@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
 import { DesktopIcon, MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import * as React from "react";
 import * as z from "zod/v4";
 
 import { Button } from "./button";
@@ -20,7 +20,9 @@ export type ThemeMode = z.output<typeof ThemeModeSchema>;
 export type ResolvedTheme = Exclude<ThemeMode, "auto">;
 
 const getStoredThemeMode = (): ThemeMode => {
-  if (typeof window === "undefined") return "auto";
+  if (typeof window === "undefined") {
+    return "auto";
+  }
   try {
     const storedTheme = localStorage.getItem(themeKey);
     return ThemeModeSchema.parse(storedTheme);
@@ -39,7 +41,9 @@ const setStoredThemeMode = (theme: ThemeMode) => {
 };
 
 const getSystemTheme = () => {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") {
+    return "light";
+  }
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
@@ -72,7 +76,7 @@ const getNextTheme = (current: ThemeMode): ThemeMode => {
   return themes[(themes.indexOf(current) + 1) % themes.length]!;
 };
 
-export const themeDetectorScript = (function () {
+export const themeDetectorScript = (function themeDetectorScript() {
   function themeFn() {
     const isValidTheme = (theme: string): theme is ThemeMode => {
       const validThemes = ["light", "dark", "auto"] as const;
@@ -102,14 +106,16 @@ interface ThemeContextProps {
   toggleMode: () => void;
 }
 const ThemeContext = React.createContext<ThemeContextProps | undefined>(
-  undefined,
+  undefined
 );
 
 export function ThemeProvider({ children }: React.PropsWithChildren) {
   const [themeMode, setThemeMode] = React.useState(getStoredThemeMode);
 
   React.useEffect(() => {
-    if (themeMode !== "auto") return;
+    if (themeMode !== "auto") {
+      return;
+    }
     return setupPreferredListener();
   }, [themeMode]);
 
@@ -128,9 +134,9 @@ export function ThemeProvider({ children }: React.PropsWithChildren) {
   return (
     <ThemeContext
       value={{
-        themeMode,
         resolvedTheme,
         setTheme,
+        themeMode,
         toggleMode,
       }}
     >

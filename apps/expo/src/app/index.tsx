@@ -1,12 +1,13 @@
+import { LegendList } from "@legendapp/list";
+import { ORPCError } from "@orpc/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, Stack } from "expo-router";
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, Stack } from "expo-router";
-import { LegendList } from "@legendapp/list";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ORPCError } from "@orpc/client";
 
 import type { RouterOutputs } from "~/utils/api";
+
 import { orpc } from "~/utils/api";
 import { authClient } from "~/utils/auth";
 
@@ -20,8 +21,8 @@ function PostCard(props: {
         <Link
           asChild
           href={{
-            pathname: "/post/[id]",
             params: { id: props.post.id },
+            pathname: "/post/[id]",
           }}
         >
           <Pressable className="">
@@ -52,7 +53,7 @@ function CreatePost() {
         setContent("");
         await queryClient.invalidateQueries({ queryKey: orpc.post.key() });
       },
-    }),
+    })
   );
 
   const isUnauthorized =
@@ -76,8 +77,8 @@ function CreatePost() {
         className="bg-primary flex items-center rounded-sm p-2"
         onPress={() => {
           mutate({
-            title,
             content,
+            title,
           });
         }}
       >
@@ -105,8 +106,8 @@ function MobileAuth() {
           session
             ? authClient.signOut()
             : authClient.signIn.social({
-                provider: "discord",
                 callbackURL: "/",
+                provider: "discord",
               })
         }
         className="bg-primary flex items-center rounded-sm p-2"
@@ -126,7 +127,7 @@ export default function Index() {
     orpc.post.delete.mutationOptions({
       onSettled: () =>
         queryClient.invalidateQueries({ queryKey: orpc.post.key() }),
-    }),
+    })
   );
 
   return (
