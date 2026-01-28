@@ -1,8 +1,16 @@
 import { protectedProcedure, publicProcedure } from "../orpc";
 
-export const authRouter = {
-  getSecretMessage: protectedProcedure.handler(
-    () => "you can see this secret message!"
-  ),
-  getSession: publicProcedure.handler(({ context }) => context.session),
+export default {
+  getSecretMessage: protectedProcedure
+    .route({
+      method: "GET",
+      path: "/getSecretMessage",
+    })
+    .handler(() => "you can see this secret message!"),
+  getSession: publicProcedure
+    .route({
+      method: "GET",
+      path: "/getSession",
+    })
+    .handler(({ context }) => context.session),
 };

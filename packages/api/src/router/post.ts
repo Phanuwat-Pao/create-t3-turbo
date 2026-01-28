@@ -4,15 +4,24 @@ import { z } from "zod/v4";
 
 import { protectedProcedure, publicProcedure } from "../orpc";
 
-export const postRouter = {
-  all: publicProcedure.handler(({ context }) =>
-    context.db.query.Post.findMany({
-      limit: 10,
-      orderBy: desc(Post.id),
+export default {
+  all: publicProcedure
+    .route({
+      method: "GET",
+      path: "/all",
     })
-  ),
+    .handler(({ context }) =>
+      context.db.query.Post.findMany({
+        limit: 10,
+        orderBy: desc(Post.id),
+      })
+    ),
 
   byId: publicProcedure
+    .route({
+      method: "GET",
+      path: "/byId/{id}",
+    })
     .input(z.object({ id: z.string() }))
     .handler(({ context, input }) =>
       context.db.query.Post.findFirst({
@@ -21,10 +30,18 @@ export const postRouter = {
     ),
 
   create: protectedProcedure
+    .route({
+      method: "POST",
+      path: "/create",
+    })
     .input(CreatePostSchema)
     .handler(({ context, input }) => context.db.insert(Post).values(input)),
 
   delete: protectedProcedure
+    .route({
+      method: "DELETE",
+      path: "/delete/{id}",
+    })
     .input(z.string())
     .handler(({ context, input }) =>
       context.db.delete(Post).where(eq(Post.id, input))

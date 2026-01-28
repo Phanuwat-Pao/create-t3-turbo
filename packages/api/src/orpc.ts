@@ -52,7 +52,8 @@ export async function createContext(opts: {
  * This is where the oRPC api is initialized with context typing.
  * oRPC handles serialization internally (Dates, Maps, Sets, etc.)
  */
-const base = os.$context<Context>();
+export const o = os.$context<Context>();
+const base = o;
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)

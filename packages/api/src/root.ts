@@ -1,10 +1,15 @@
-import { authRouter } from "./router/auth";
-import { postRouter } from "./router/post";
+import { o } from "./orpc";
 
-// In oRPC, routers are plain objects - no wrapper function needed
+// In oRPC, routers use lazy loading with prefix for better code splitting
 export const appRouter = {
-  auth: authRouter,
-  post: postRouter,
+  auth: o
+    .tag("auth")
+    .prefix("/auth")
+    .lazy(() => import("./router/auth")),
+  post: o
+    .tag("post")
+    .prefix("/post")
+    .lazy(() => import("./router/post")),
 };
 
 // export type definition of API
