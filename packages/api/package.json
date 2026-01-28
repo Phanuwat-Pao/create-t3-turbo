@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
+    "@types/pg": "^8.16.0",
     "@typescript/native-preview": "catalog:"
   }
 }

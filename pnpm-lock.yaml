@@ -314,6 +314,9 @@ importers:
       '@acme/tsconfig':
         specifier: workspace:*
         version: link:../../tooling/typescript
+      '@types/pg':
+        specifier: ^8.16.0
+        version: 8.16.0
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260128.1

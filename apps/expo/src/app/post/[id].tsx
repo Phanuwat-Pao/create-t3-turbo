@@ -6,7 +6,7 @@ import { orpc } from "~/utils/api";
 
 export default function Post() {
   const { id } = useGlobalSearchParams<{ id: string }>();
-  const { data } = useQuery(orpc.post.byId.queryOptions({ id }));
+  const { data } = useQuery(orpc.post.byId.queryOptions({ input: { id } }));
 
   if (!data) {
     return null;
