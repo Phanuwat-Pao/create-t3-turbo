@@ -18,7 +18,6 @@ catalog:
   better-auth: 1.4.0-beta.9
   tailwindcss: ^4.1.16
   "@typescript/native-preview": ^7.0.0-dev.20260126.1
-  typescript: ^5.9.3
   zod: ^4.1.12
   vite: 7.1.12
 

@@ -18,9 +18,9 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsgo",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsc",
+    "dev": "tsgo",
     "push": "pnpm with-env drizzle-kit push",
     "studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsgo --noEmit",
@@ -38,7 +38,6 @@
     "@acme/tsconfig": "workspace:*",
     "@types/pg": "^8.16.0",
     "@typescript/native-preview": "catalog:",
-    "drizzle-kit": "^0.31.5",
-    "typescript": "catalog:"
+    "drizzle-kit": "^0.31.5"
   }
 }

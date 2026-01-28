@@ -42,9 +42,6 @@ catalogs:
     tailwindcss:
       specifier: ^4.1.16
       version: 4.1.18
-    typescript:
-      specifier: ^5.9.3
-      version: 5.9.3
     zod:
       specifier: ^4.1.12
       version: 4.3.5
@@ -74,6 +71,9 @@ importers:
       '@turbo/gen':
         specifier: ^2.5.8
         version: 2.7.5(@types/node@25.0.9)(typescript@5.9.3)
+      '@typescript/native-preview':
+        specifier: 'catalog:'
+        version: 7.0.0-dev.20260126.1
       dotenv-cli:
         specifier: ^10.0.0
         version: 10.0.0
@@ -92,9 +92,6 @@ importers:
       turbo:
         specifier: ^2.5.8
         version: 2.7.5
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
       ultracite:
         specifier: 7.0.12
         version: 7.0.12(@orpc/server@1.13.4(ws@8.19.0(bufferutil@4.1.0)))(oxlint@1.41.0)(typescript@5.9.3)
@@ -201,9 +198,6 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.1.18
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   apps/nextjs:
     dependencies:
@@ -295,9 +289,6 @@ importers:
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   packages/api:
     dependencies:
@@ -326,9 +317,6 @@ importers:
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260126.1
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   packages/auth:
     dependencies:
@@ -357,9 +345,6 @@ importers:
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260126.1
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   packages/db:
     dependencies:
@@ -394,9 +379,6 @@ importers:
       drizzle-kit:
         specifier: ^0.31.5
         version: 0.31.8
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   packages/ui:
     dependencies:
@@ -428,9 +410,6 @@ importers:
       react:
         specifier: catalog:react19
         version: 19.1.4
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
       zod:
         specifier: 'catalog:'
         version: 4.3.5
@@ -447,9 +426,6 @@ importers:
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260126.1
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   tooling/github: {}
 
@@ -474,9 +450,6 @@ importers:
       '@typescript/native-preview':
         specifier: 'catalog:'
         version: 7.0.0-dev.20260126.1
-      typescript:
-        specifier: 'catalog:'
-        version: 5.9.3
 
   tooling/typescript: {}
 

@@ -31,7 +31,6 @@
     "@types/react": "catalog:react19",
     "@typescript/native-preview": "catalog:",
     "react": "catalog:react19",
-    "typescript": "catalog:",
     "zod": "catalog:"
   },
   "peerDependencies": {

@@ -19,7 +19,6 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "@typescript/native-preview": "catalog:",
-    "typescript": "catalog:"
+    "@typescript/native-preview": "catalog:"
   }
 }

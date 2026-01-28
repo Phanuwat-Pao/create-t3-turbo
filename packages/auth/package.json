@@ -24,7 +24,6 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@better-auth/cli": "catalog:",
-    "@typescript/native-preview": "catalog:",
-    "typescript": "catalog:"
+    "@typescript/native-preview": "catalog:"
   }
 }

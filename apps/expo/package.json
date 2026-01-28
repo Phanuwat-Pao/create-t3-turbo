@@ -46,7 +46,6 @@
     "@orpc/server": "catalog:",
     "@types/react": "catalog:react19",
     "@typescript/native-preview": "catalog:",
-    "tailwindcss": "catalog:",
-    "typescript": "catalog:"
+    "tailwindcss": "catalog:"
   }
 }
