@@ -8,6 +8,7 @@
     "./postcss-config": "./postcss-config.js"
   },
   "scripts": {
+    "ncu": "ncu -u",
     "clean": "git clean -xdf .cache .turbo node_modules",
     "typecheck": "tsgo --noEmit"
   },

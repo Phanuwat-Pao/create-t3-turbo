@@ -25,10 +25,12 @@
       "cache": false
     },
     "ncu": {
-      "cache": false
+      "cache": false,
+      "persistent": false
     },
     "//#ncu": {
-      "cache": false
+      "cache": false,
+      "persistent": false
     },
     "push": {
       "cache": false,

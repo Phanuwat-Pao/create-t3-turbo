@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "ncu": "ncu -u",
-    "ncu:workspace": "turbo run ncu",
+    "ncu:workspaces": "turbo run ncu",
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
@@ -23,19 +23,19 @@
     "prepare": "lefthook install"
   },
   "devDependencies": {
-    "@turbo/gen": "^2.5.8",
+    "@turbo/gen": "^2.7.6",
     "@typescript/native-preview": "catalog:",
-    "dotenv-cli": "^10.0.0",
-    "lefthook": "^2.0.15",
-    "npm-check-updates": "^19.3.1",
-    "oxfmt": "^0.26.0",
-    "oxlint": "^1.41.0",
-    "turbo": "^2.5.8",
-    "ultracite": "7.0.12"
+    "dotenv-cli": "^11.0.0",
+    "lefthook": "^2.0.16",
+    "npm-check-updates": "^19.3.2",
+    "oxfmt": "^0.27.0",
+    "oxlint": "^1.42.0",
+    "turbo": "^2.7.6",
+    "ultracite": "7.1.1"
   },
   "engines": {
     "node": "^22.21.0",
     "pnpm": "^10.19.0"
   },
-  "packageManager": "pnpm@10.19.0"
+  "packageManager": "pnpm@10.28.2"
 }

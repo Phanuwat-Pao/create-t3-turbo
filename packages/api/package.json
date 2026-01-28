@@ -10,6 +10,7 @@
     }
   },
   "scripts": {
+    "ncu": "ncu -u",
     "build": "tsgo",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsgo",
@@ -19,7 +20,7 @@
     "@acme/auth": "workspace:*",
     "@acme/db": "workspace:*",
     "@acme/validators": "workspace:*",
-    "@aws-sdk/client-s3": "^3.971.0",
+    "@aws-sdk/client-s3": "^3.975.0",
     "@orpc/server": "catalog:",
     "zod": "catalog:"
   },
