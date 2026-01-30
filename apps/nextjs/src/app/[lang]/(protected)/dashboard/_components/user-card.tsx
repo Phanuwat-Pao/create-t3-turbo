@@ -51,6 +51,11 @@ import { UAParser } from "ua-parser-js";
 import type { Session } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
+
+// Extended user type with twoFactor plugin fields
+type ExtendedUser = Session["user"] & { twoFactorEnabled?: boolean };
+// Extended session type with admin plugin fields
+type ExtendedSessionData = Session["session"] & { impersonatedBy?: string };
 import { ChangePasswordForm } from "~/components/forms/change-password-form";
 import { TwoFactorDisableForm } from "~/components/forms/two-factor-disable-form";
 import { TwoFactorEnableForm } from "~/components/forms/two-factor-enable-form";
@@ -272,7 +277,7 @@ const UserCard = (props: {
           <div className="flex flex-col gap-2">
             <p className="text-sm">Two Factor</p>
             <div className="flex gap-2">
-              {!!session?.user.twoFactorEnabled && (
+              {!!(session?.user as ExtendedUser)?.twoFactorEnabled && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="gap-2">
@@ -295,17 +300,17 @@ const UserCard = (props: {
                 <DialogTrigger asChild>
                   <Button
                     variant={
-                      session?.user.twoFactorEnabled ? "destructive" : "outline"
+                      (session?.user as ExtendedUser)?.twoFactorEnabled ? "destructive" : "outline"
                     }
                     className="gap-2"
                   >
-                    {session?.user.twoFactorEnabled ? (
+                    {(session?.user as ExtendedUser)?.twoFactorEnabled ? (
                       <ShieldOff size={16} />
                     ) : (
                       <ShieldCheck size={16} />
                     )}
                     <span className="text-xs md:text-sm">
-                      {session?.user.twoFactorEnabled
+                      {(session?.user as ExtendedUser)?.twoFactorEnabled
                         ? "Disable 2FA"
                         : "Enable 2FA"}
                     </span>
@@ -314,17 +319,17 @@ const UserCard = (props: {
                 <DialogContent className="w-11/12 sm:max-w-[425px]">
                   <DialogHeader>
                     <DialogTitle>
-                      {session?.user.twoFactorEnabled
+                      {(session?.user as ExtendedUser)?.twoFactorEnabled
                         ? "Disable 2FA"
                         : "Enable 2FA"}
                     </DialogTitle>
                     <DialogDescription>
-                      {session?.user.twoFactorEnabled
+                      {(session?.user as ExtendedUser)?.twoFactorEnabled
                         ? "Disable the second factor authentication from your account"
                         : "Enable 2FA to secure your account"}
                     </DialogDescription>
                   </DialogHeader>
-                  {session?.user.twoFactorEnabled ? (
+                  {(session?.user as ExtendedUser)?.twoFactorEnabled ? (
                     <TwoFactorDisableForm onSuccess={handleTwoFactorSuccess} />
                   ) : (
                     <TwoFactorEnableForm onSuccess={handleTwoFactorSuccess} />
@@ -337,7 +342,7 @@ const UserCard = (props: {
       </CardContent>
       <CardFooter className="items-center justify-between gap-2">
         <ChangePassword />
-        {session?.session.impersonatedBy ? (
+        {(session?.session as ExtendedSessionData)?.impersonatedBy ? (
           <Button
             className="z-10 gap-2"
             variant="secondary"
@@ -519,7 +524,7 @@ function AddPasskey() {
 }
 
 interface PasskeyRowProps {
-  passkey: { id: string; name: string | null };
+  passkey: { id: string; name?: string | null };
   isDeleting: boolean;
   onDelete: (id: string) => void;
 }
@@ -579,7 +584,7 @@ function ListPasskeys() {
     setDeletingPasskeyId(passkeyId);
     await authClient.passkey.deletePasskey({
       fetchOptions: {
-        onError: (error) => {
+        onError: (error: { error: { message: string } }) => {
           toast.error(error.error.message);
           setDeletingPasskeyId(null);
         },
@@ -667,3 +672,4 @@ function ListPasskeys() {
     </Dialog>
   );
 }
+

@@ -10,7 +10,6 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 
-import { authClient } from "~/auth/client";
 import { cn } from "~/lib/utils";
 
 function useMediaQuery(query: string) {
@@ -64,12 +63,11 @@ const PlanCard = memo(function PlanCard({
   isDesktop,
   isMonthly,
 }: PlanCardProps) {
-  const handleUpgrade = useCallback(async () => {
-    await authClient.subscription.upgrade({
-      plan: plan.name.toLowerCase(),
-      successUrl: "/dashboard",
-    });
-  }, [plan.name]);
+  const handleUpgrade = useCallback(() => {
+    if (plan.href) {
+      window.location.href = plan.href;
+    }
+  }, [plan.href]);
 
   return (
     <motion.div

@@ -50,7 +50,7 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: string | null;
+  role: string | null | undefined;
   banned: boolean;
 }
 
@@ -164,11 +164,14 @@ export default function Page() {
     authClient.useSession();
   const router = useRouter();
 
+  // Cast user to include role from admin plugin
+  const userRole = (session?.user as { role?: string } | undefined)?.role;
+
   useEffect(() => {
-    if (!isSessionLoading && session?.user?.role !== "admin") {
+    if (!isSessionLoading && userRole !== "admin") {
       router.push("/dashboard");
     }
-  }, [session, isSessionLoading, router]);
+  }, [userRole, isSessionLoading, router]);
 
   if (isSessionLoading) {
     return (
@@ -178,7 +181,7 @@ export default function Page() {
     );
   }
 
-  if (session?.user?.role !== "admin") {
+  if (userRole !== "admin") {
     return null;
   }
 

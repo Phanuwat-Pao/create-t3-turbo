@@ -5,7 +5,6 @@ import AccountSwitcher from "~/components/account-switch";
 import { auth } from "~/lib/auth";
 
 import OrganizationCard from "./_components/organization-card";
-import SubscriptionCard from "./_components/subscription-card";
 import UserCard from "./_components/user-card";
 
 export default async function Page() {
@@ -36,7 +35,6 @@ export default async function Page() {
         />
         <UserCard session={session} activeSessions={activeSessions} />
         <OrganizationCard session={session} />
-        <SubscriptionCard />
       </div>
     </div>
   );

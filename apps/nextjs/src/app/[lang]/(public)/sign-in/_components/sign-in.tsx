@@ -65,7 +65,7 @@ export default function SignIn() {
   const handlePasskeySignIn = useCallback(async () => {
     await authClient.signIn.passkey({
       fetchOptions: {
-        onError(context) {
+        onError(context: { error: { message: string } }) {
           toast.error(`Authentication failed: ${context.error.message}`);
         },
         onSuccess() {

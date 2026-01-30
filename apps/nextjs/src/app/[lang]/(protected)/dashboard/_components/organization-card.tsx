@@ -73,7 +73,7 @@ interface MemberItemProps {
   member: {
     id: string;
     role: OrganizationRole;
-    user: { name: string | null; image: string | null };
+    user: { name: string | null; image: string | null | undefined };
   };
   currentMember: { id: string; role: OrganizationRole } | undefined;
   isRemoving: boolean;

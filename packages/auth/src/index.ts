@@ -1,5 +1,7 @@
 import { db } from "@acme/db/client";
 import { expo } from "@better-auth/expo";
+import { oauthProvider } from "@better-auth/oauth-provider";
+import { passkey } from "@better-auth/passkey";
 import {
   type BetterAuthOptions,
   type BetterAuthPlugin,
@@ -187,6 +189,11 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
         },
       }),
       expo(),
+      passkey(),
+      oauthProvider({
+        consentPage: "/oauth/consent",
+        loginPage: "/sign-in",
+      }),
       customSession(async (session) => ({
         ...session,
         user: {
