@@ -1,14 +1,5 @@
 "use client";
 
-import { ChevronDownIcon, PlusIcon } from "@radix-ui/react-icons";
-import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, MailPlus } from "lucide-react";
-import { useState } from "react";
-
-import type { OrganizationRole, Session } from "~/lib/auth";
-
-import { CreateOrganizationForm } from "~/components/forms/create-organization-form";
-import { InviteMemberForm } from "~/components/forms/invite-member-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
@@ -29,6 +20,15 @@ import {
 } from "@acme/ui/dropdown-menu";
 import { Label } from "@acme/ui/label";
 import { Skeleton } from "@acme/ui/skeleton";
+import { ChevronDownIcon, PlusIcon } from "@radix-ui/react-icons";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2, MailPlus } from "lucide-react";
+import { useState } from "react";
+
+import type { OrganizationRole, Session } from "~/lib/auth";
+
+import { CreateOrganizationForm } from "~/components/forms/create-organization-form";
+import { InviteMemberForm } from "~/components/forms/invite-member-form";
 import { useInvitationCancelMutation } from "~/data/organization/invitation-cancel-mutation";
 import { useMemberRemoveMutation } from "~/data/organization/member-remove-mutation";
 import { useOrganizationActiveMutation } from "~/data/organization/organization-active-mutation";
@@ -172,11 +172,11 @@ const OrganizationCard = (props: { session: Session | null }) => {
                         >
                           {isRemoving ? (
                             <Loader2 className="animate-spin" size={16} />
-                          ) : currentMember?.id === member.id ? (
+                          ) : (currentMember?.id === member.id ? (
                             "Leave"
                           ) : (
                             "Remove"
-                          )}
+                          ))}
                         </Button>
                       )}
                   </div>

@@ -1,9 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-
-import { TwoFactorTotpForm } from "~/components/forms/two-factor-totp-form";
 import { Button } from "@acme/ui/button";
 import {
   Card,
@@ -13,6 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { TwoFactorTotpForm } from "~/components/forms/two-factor-totp-form";
 
 export default function Page() {
   const router = useRouter();

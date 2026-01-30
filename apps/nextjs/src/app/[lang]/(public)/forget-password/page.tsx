@@ -1,10 +1,5 @@
 "use client";
 
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-
-import { ForgetPasswordForm } from "~/components/forms/forget-password-form";
 import { Alert, AlertDescription } from "@acme/ui/alert";
 import { Button } from "@acme/ui/button";
 import {
@@ -15,6 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+
+import { ForgetPasswordForm } from "~/components/forms/forget-password-form";
 
 export default function Page() {
   const [isSubmitted, setIsSubmitted] = useState(false);

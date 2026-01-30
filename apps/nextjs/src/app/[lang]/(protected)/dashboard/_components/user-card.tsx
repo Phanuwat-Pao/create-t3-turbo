@@ -1,32 +1,5 @@
 "use client";
 
-import { MobileIcon } from "@radix-ui/react-icons";
-import {
-  Edit,
-  Fingerprint,
-  Laptop,
-  Loader2,
-  LogOut,
-  Plus,
-  QrCode,
-  ShieldCheck,
-  ShieldOff,
-  StopCircle,
-  Trash,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
-import { UAParser } from "ua-parser-js";
-
-import type { Session } from "~/lib/auth";
-
-import { authClient } from "~/auth/client";
-import { ChangePasswordForm } from "~/components/forms/change-password-form";
-import { TwoFactorDisableForm } from "~/components/forms/two-factor-disable-form";
-import { TwoFactorEnableForm } from "~/components/forms/two-factor-enable-form";
-import { TwoFactorQrForm } from "~/components/forms/two-factor-qr-form";
-import { UpdateUserForm } from "~/components/forms/update-user-form";
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
@@ -56,6 +29,33 @@ import {
   TableHeader,
   TableRow,
 } from "@acme/ui/table";
+import { MobileIcon } from "@radix-ui/react-icons";
+import {
+  Edit,
+  Fingerprint,
+  Laptop,
+  Loader2,
+  LogOut,
+  Plus,
+  QrCode,
+  ShieldCheck,
+  ShieldOff,
+  StopCircle,
+  Trash,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { UAParser } from "ua-parser-js";
+
+import type { Session } from "~/lib/auth";
+
+import { authClient } from "~/auth/client";
+import { ChangePasswordForm } from "~/components/forms/change-password-form";
+import { TwoFactorDisableForm } from "~/components/forms/two-factor-disable-form";
+import { TwoFactorEnableForm } from "~/components/forms/two-factor-enable-form";
+import { TwoFactorQrForm } from "~/components/forms/two-factor-qr-form";
+import { UpdateUserForm } from "~/components/forms/update-user-form";
 import { useRevokeSessionMutation } from "~/data/user/revoke-session-mutation";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
@@ -187,11 +187,11 @@ const UserCard = (props: {
                     >
                       {isTerminating ? (
                         <Loader2 size={15} className="animate-spin" />
-                      ) : isCurrentSession ? (
+                      ) : (isCurrentSession ? (
                         "Sign Out"
                       ) : (
                         "Terminate"
-                      )}
+                      ))}
                     </button>
                   </div>
                 </div>

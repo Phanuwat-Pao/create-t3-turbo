@@ -1,18 +1,13 @@
 "use client";
 
+import { Button } from "@acme/ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import * as z from "zod";
 
-import { Button } from "@acme/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
 import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { convertImageToBase64 } from "~/lib/utils";
@@ -66,7 +61,9 @@ export function UpdateUserForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     try {
       const imageBase64 = image ? await convertImageToBase64(image) : undefined;

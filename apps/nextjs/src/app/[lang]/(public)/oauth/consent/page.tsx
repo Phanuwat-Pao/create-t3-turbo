@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
+import { Card, CardContent } from "@acme/ui/card";
 import {
   ArrowLeftRight,
   ArrowUpRight,
@@ -12,8 +14,6 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { Logo } from "~/components/logo";
-import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
-import { Card, CardContent } from "@acme/ui/card";
 import { auth } from "~/lib/auth";
 
 import { ConsentBtns } from "./consent-buttons";

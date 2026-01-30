@@ -1,5 +1,10 @@
 "use client";
 
+import { Button } from "@acme/ui/button";
+import { Checkbox } from "@acme/ui/checkbox";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
+import { PasswordInput } from "@acme/ui/password-input";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
@@ -7,16 +12,6 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import { Button } from "@acme/ui/button";
-import { Checkbox } from "@acme/ui/checkbox";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
-import { PasswordInput } from "@acme/ui/password-input";
 
 import { LastUsedIndicator } from "../last-used-indicator";
 
@@ -68,7 +63,9 @@ export function SignInForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     startTransition(async () => {
       await authClient.signIn.email(

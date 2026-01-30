@@ -1,10 +1,5 @@
 "use client";
 
-import { AlertCircle, CheckIcon, XIcon } from "lucide-react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
-
 import { Button } from "@acme/ui/button";
 import {
   Card,
@@ -15,6 +10,11 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 import { Skeleton } from "@acme/ui/skeleton";
+import { AlertCircle, CheckIcon, XIcon } from "lucide-react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+
 import { useInviteAcceptMutation } from "~/data/organization/invitation-accept-mutation";
 import { useInvitationQuery } from "~/data/organization/invitation-query";
 import { useInviteRejectMutation } from "~/data/organization/invitation-reject-mutation";
@@ -97,7 +97,7 @@ export default function Page() {
                   have you on board!
                 </p>
               </div>
-            ) : invitation.status === "rejected" ? (
+            ) : (invitation.status === "rejected" ? (
               <div className="space-y-4">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
                   <XIcon className="h-8 w-8 text-red-600" />
@@ -121,7 +121,7 @@ export default function Page() {
                   <strong>{invitation.email}</strong>.
                 </p>
               </div>
-            )}
+            ))}
           </CardContent>
           {invitation.status === "pending" && (
             <CardFooter className="flex justify-between">

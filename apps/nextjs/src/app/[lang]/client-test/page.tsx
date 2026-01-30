@@ -1,10 +1,5 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
-import { toast } from "sonner";
-
-import { authClient } from "~/auth/client";
 import { Button } from "@acme/ui/button";
 import {
   Card,
@@ -16,6 +11,11 @@ import {
 } from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
+import { Loader2 } from "lucide-react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+
+import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
 
@@ -108,9 +108,9 @@ export default function Page() {
             <CardDescription>
               {isPending
                 ? "Loading session..."
-                : session
+                : (session
                   ? "You are currently logged in"
-                  : "You are not logged in"}
+                  : "You are not logged in")}
             </CardDescription>
           </CardHeader>
           <CardContent>

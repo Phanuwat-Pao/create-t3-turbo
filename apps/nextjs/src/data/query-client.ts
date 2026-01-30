@@ -25,7 +25,7 @@ function makeQueryClient() {
 }
 
 // Browser-side QueryClient singleton to prevent recreation during React suspense
-let browserQueryClient;
+let browserQueryClient: QueryClient | undefined;
 
 /**
  * Get QueryClient instance for server/client rendering.
@@ -36,11 +36,12 @@ export function getQueryClient() {
     // Server: always make a new query client
     return makeQueryClient();
   }
-    // Browser: make a new query client if we don't already have one
-    // This is very important, so we don't re-make a new client if React
-    // suspends during the initial render. This may not be needed if we
-    // have a suspense boundary BELOW the creation of the query client
-    if (!browserQueryClient) browserQueryClient = makeQueryClient();
-    return browserQueryClient;
-  
+  // Browser: make a new query client if we don't already have one
+  // This is very important, so we don't re-make a new client if React
+  // suspends during the initial render. This may not be needed if we
+  // have a suspense boundary BELOW the creation of the query client
+  if (!browserQueryClient) {
+    browserQueryClient = makeQueryClient();
+  }
+  return browserQueryClient;
 }

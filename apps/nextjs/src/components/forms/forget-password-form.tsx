@@ -1,18 +1,13 @@
 "use client";
 
+import { Button } from "@acme/ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
 import { Loader2 } from "lucide-react";
 import { useState, useTransition } from "react";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import { Button } from "@acme/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
 
 const forgetPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -55,7 +50,9 @@ export function ForgetPasswordForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     startTransition(async () => {
       try {

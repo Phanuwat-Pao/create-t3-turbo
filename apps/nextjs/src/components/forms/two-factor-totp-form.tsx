@@ -1,18 +1,13 @@
 "use client";
 
+import { Button } from "@acme/ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import { Button } from "@acme/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
 
 const totpSchema = z.object({
   code: z

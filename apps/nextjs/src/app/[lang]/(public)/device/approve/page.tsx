@@ -1,13 +1,13 @@
 "use client";
 
+import { Alert, AlertDescription } from "@acme/ui/alert";
+import { Button } from "@acme/ui/button";
+import { Card } from "@acme/ui/card";
 import { Check, Loader2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { authClient } from "~/auth/client";
-import { Alert, AlertDescription } from "@acme/ui/alert";
-import { Button } from "@acme/ui/button";
-import { Card } from "@acme/ui/card";
 import { useSessionQuery } from "~/data/user/session-query";
 
 export default function Page() {

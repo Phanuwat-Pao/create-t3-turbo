@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import { headers } from "next/headers";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import { auth } from "~/lib/auth";
 
 import { AnotherAccountBtn, SelectAccountBtn } from "./account-button";

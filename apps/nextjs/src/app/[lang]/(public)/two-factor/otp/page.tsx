@@ -1,8 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
-import { TwoFactorEmailOtpForm } from "~/components/forms/two-factor-email-otp-form";
 import {
   Card,
   CardContent,
@@ -10,6 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
+import { useRouter } from "next/navigation";
+
+import { TwoFactorEmailOtpForm } from "~/components/forms/two-factor-email-otp-form";
 
 export default function Page() {
   const router = useRouter();

@@ -11,11 +11,14 @@ export function useImagePreview() {
   }, [imagePreview]);
 
   // Cleanup on unmount
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       if (imagePreviewRef.current) {
         URL.revokeObjectURL(imagePreviewRef.current);
       }
-    }, []);
+    },
+    []
+  );
 
   const handleImageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

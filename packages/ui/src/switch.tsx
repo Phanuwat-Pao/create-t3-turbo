@@ -1,16 +1,15 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as SwitchPrimitive from "@radix-ui/react-switch"
-
-import { cn } from "@acme/ui"
+import { cn } from "@acme/ui";
+import * as SwitchPrimitive from "@radix-ui/react-switch";
+import * as React from "react";
 
 function Switch({
   className,
   size = "default",
   ...props
 }: React.ComponentProps<typeof SwitchPrimitive.Root> & {
-  size?: "sm" | "default"
+  size?: "sm" | "default";
 }) {
   return (
     <SwitchPrimitive.Root
@@ -29,7 +28,7 @@ function Switch({
         )}
       />
     </SwitchPrimitive.Root>
-  )
+  );
 }
 
-export { Switch }
+export { Switch };

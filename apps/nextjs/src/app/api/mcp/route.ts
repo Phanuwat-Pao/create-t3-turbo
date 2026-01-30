@@ -18,7 +18,8 @@ const handler = mcpHandler(
       issuer: baseUrl,
     },
   },
-  (req, jwt) => createMcpHandler(
+  (req, jwt) =>
+    createMcpHandler(
       (server) => {
         server.registerTool(
           "echo",
@@ -35,10 +36,10 @@ const handler = mcpHandler(
             return {
               content: [
                 {
-                  type: "text",
                   text: `Echo: ${message}${
                     jwt?.sub ? ` for user ${jwt?.sub}` : ""
                   }${org ? ` for organization ${org}` : ""}`,
+                  type: "text",
                 },
               ],
             };

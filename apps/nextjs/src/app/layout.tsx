@@ -13,8 +13,8 @@ export const metadata: Metadata = createMetadata({
   description: "The most comprehensive authentication framework for TypeScript",
   metadataBase: new URL("https://demo.better-auth.com"),
   title: {
-    template: "%s | Better Auth",
     default: "Better Auth",
+    template: "%s | Better Auth",
   },
 });
 

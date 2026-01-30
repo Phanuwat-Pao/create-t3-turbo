@@ -1,19 +1,14 @@
 "use client";
 
+import { Button } from "@acme/ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
 import { Loader2, X } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import { Button } from "@acme/ui/button";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { convertImageToBase64 } from "~/lib/utils";
 
@@ -76,7 +71,9 @@ export function SignUpForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate()) {
+      return;
+    }
 
     startTransition(async () => {
       await authClient.signUp.email({

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 
+import { Button } from "@acme/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-import { Button } from "@acme/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import { auth } from "~/lib/auth";
 
 import { GoBackBtn, SelectOrganizationBtn } from "./org-buttons";

@@ -1,6 +1,5 @@
-import { cva, type VariantProps } from "class-variance-authority"
-
-import { cn } from "@acme/ui"
+import { cn } from "@acme/ui";
+import { cva, type VariantProps } from "class-variance-authority";
 
 function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -12,7 +11,7 @@ function Empty({ className, ...props }: React.ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -25,23 +24,23 @@ function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 const emptyMediaVariants = cva(
-  "flex shrink-0 items-center justify-center mb-2 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "mb-2 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
+    defaultVariants: {
+      variant: "default",
+    },
     variants: {
       variant: {
         default: "bg-transparent",
         icon: "bg-muted text-foreground flex size-10 shrink-0 items-center justify-center rounded-lg [&_svg:not([class*='size-'])]:size-6",
       },
     },
-    defaultVariants: {
-      variant: "default",
-    },
   }
-)
+);
 
 function EmptyMedia({
   className,
@@ -52,10 +51,10 @@ function EmptyMedia({
     <div
       data-slot="empty-icon"
       data-variant={variant}
-      className={cn(emptyMediaVariants({ variant, className }))}
+      className={cn(emptyMediaVariants({ className, variant }))}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
@@ -65,7 +64,7 @@ function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("text-lg font-medium tracking-tight", className)}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
@@ -78,7 +77,7 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
@@ -91,7 +90,7 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -101,4 +100,4 @@ export {
   EmptyDescription,
   EmptyContent,
   EmptyMedia,
-}
+};

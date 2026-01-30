@@ -5,8 +5,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { getQueryClient } from "~/data/query-client";
 
-import { ThemeProvider } from "./theme-provider";
 import { Toaster } from "./sonner";
+import { ThemeProvider } from "./theme-provider";
 
 interface Props {
   children: React.ReactNode;

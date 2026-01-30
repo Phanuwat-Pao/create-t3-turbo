@@ -1,15 +1,15 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
-
-import { authClient } from "~/auth/client";
 import { Alert, AlertDescription } from "@acme/ui/alert";
 import { Button } from "@acme/ui/button";
 import { Card } from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
+import { Loader2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useTransition } from "react";
+
+import { authClient } from "~/auth/client";
 
 export default function Page() {
   const router = useRouter();

@@ -1,8 +1,5 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-
-import { ResetPasswordForm } from "~/components/forms/reset-password-form";
 import {
   Card,
   CardContent,
@@ -10,6 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { ResetPasswordForm } from "~/components/forms/reset-password-form";
 
 export default function Page() {
   const router = useRouter();

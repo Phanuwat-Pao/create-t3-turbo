@@ -10,7 +10,7 @@ interface Tab {
   content?: string | React.ReactNode;
 }
 
-export const Tabs2 = ({
+export const Tabs = ({
   tabs: propTabs,
   containerClassName,
   activeTabClassName,
@@ -23,18 +23,24 @@ export const Tabs2 = ({
   tabClassName?: string;
   contentClassName?: string;
 }) => {
-  const [active, setActive] = useState<Tab>(() => propTabs[0] ?? { title: "", value: "", content: "" });
+  const [active, setActive] = useState<Tab>(
+    () => propTabs[0] ?? { content: "", title: "", value: "" }
+  );
   const [tabs, setTabs] = useState<Tab[]>(propTabs);
 
   const moveSelectedTabToTop = (idx: number) => {
     const newTabs = [...propTabs];
     const selectedTab = newTabs.splice(idx, 1);
     const firstSelected = selectedTab[0];
-    if (!firstSelected) return;
+    if (!firstSelected) {
+      return;
+    }
     newTabs.unshift(firstSelected);
     setTabs(newTabs);
     const firstTab = newTabs[0];
-    if (firstTab) setActive(firstTab);
+    if (firstTab) {
+      setActive(firstTab);
+    }
   };
 
   const [hovering, setHovering] = useState(false);

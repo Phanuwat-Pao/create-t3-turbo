@@ -1,8 +1,7 @@
 import Ionicons from "@expo/vector-icons/AntDesign";
-import { useStore } from "@nanostores/react";
 import { router, Stack, useNavigationContainerRef } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, View } from "react-native";
+import { Alert, Image, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Button } from "~/components/ui/button";
@@ -13,7 +12,7 @@ import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
 export default function Index() {
-  const { data: isAuthenticated } = useStore(authClient.useSession);
+  const { data: isAuthenticated } = authClient.useSession();
   const navContainerRef = useNavigationContainerRef();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -113,7 +112,7 @@ export default function Index() {
                     },
                     {
                       onError: (ctx) => {
-                        alert(ctx.error.message);
+                        Alert.alert("Error", ctx.error.message);
                       },
                     }
                   );

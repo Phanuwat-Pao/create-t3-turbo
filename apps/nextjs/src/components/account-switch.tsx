@@ -1,13 +1,5 @@
 "use client";
 
-import { ChevronDown, PlusCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-import type { SessionData } from "~/data/user/session-query";
-import type { DeviceSession } from "~/lib/auth";
-
-import { authClient } from "~/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import {
@@ -17,11 +9,15 @@ import {
   CommandList,
   CommandSeparator,
 } from "@acme/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@acme/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
+import { ChevronDown, PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import type { SessionData } from "~/data/user/session-query";
+import type { DeviceSession } from "~/lib/auth";
+
+import { authClient } from "~/auth/client";
 import { getQueryClient } from "~/data/query-client";
 import { userKeys } from "~/data/user/keys";
 import { useSessionQuery } from "~/data/user/session-query";

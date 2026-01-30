@@ -1,9 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-
-import { SignUpForm } from "~/components/forms/sign-up-form";
 import {
   Card,
   CardContent,
@@ -12,6 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { SignUpForm } from "~/components/forms/sign-up-form";
 import { getCallbackURL } from "~/lib/shared";
 
 export function SignUp() {

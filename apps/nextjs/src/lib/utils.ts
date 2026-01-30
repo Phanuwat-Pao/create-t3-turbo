@@ -1,11 +1,4 @@
-import type { ClassValue } from "clsx";
-
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+export { cn } from "@acme/ui";
 
 export async function convertImageToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {

@@ -2,12 +2,12 @@
 
 import type { Organization } from "better-auth/plugins";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
+import { Button } from "@acme/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
-import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
-import { Button } from "@acme/ui/button";
 
 export function SelectOrganizationBtn({
   organization,

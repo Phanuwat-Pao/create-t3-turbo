@@ -1,13 +1,13 @@
 "use client";
 
+import { Tabs } from "@acme/ui/tabs2";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-import SignIn from "~/app/(auth)/sign-in/_components/sign-in";
-import { SignUp } from "~/app/(auth)/sign-in/_components/sign-up";
+import SignIn from "./_components/sign-in";
+import { SignUp } from "./_components/sign-up";
 import { authClient } from "~/auth/client";
-import { Tabs } from "@acme/ui/tabs2";
 import { getCallbackURL } from "~/lib/shared";
 
 export default function Page() {

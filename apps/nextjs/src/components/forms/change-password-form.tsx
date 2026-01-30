@@ -1,18 +1,13 @@
 "use client";
 
+import { Button } from "@acme/ui/button";
+import { Checkbox } from "@acme/ui/checkbox";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
+import { PasswordInput } from "@acme/ui/password-input";
 import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import * as z from "zod";
 
-import { Button } from "@acme/ui/button";
-import { Checkbox } from "@acme/ui/checkbox";
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@acme/ui/field";
-import { PasswordInput } from "@acme/ui/password-input";
 import { useChangePasswordMutation } from "~/data/user/change-password-mutation";
 
 const changePasswordSchema = z
@@ -137,9 +132,12 @@ export function ChangePasswordForm({
     []
   );
 
-  const handleRevokeSessionsChange = useCallback((checked: boolean | "indeterminate") => {
-    setRevokeOtherSessions(checked === true);
-  }, []);
+  const handleRevokeSessionsChange = useCallback(
+    (checked: boolean | "indeterminate") => {
+      setRevokeOtherSessions(checked === true);
+    },
+    []
+  );
 
   return (
     <form onSubmit={handleSubmit}>

@@ -1,20 +1,5 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  Loader2,
-  Plus,
-  RefreshCw,
-  Trash,
-  UserCircle,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Toaster, toast } from "sonner";
-
-import { authClient } from "~/auth/client";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import { Calendar } from "@acme/ui/calendar";
@@ -28,11 +13,7 @@ import {
 } from "@acme/ui/dialog";
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@acme/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
 import {
   Select,
   SelectContent,
@@ -48,6 +29,21 @@ import {
   TableHeader,
   TableRow,
 } from "@acme/ui/table";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import {
+  Calendar as CalendarIcon,
+  Loader2,
+  Plus,
+  RefreshCw,
+  Trash,
+  UserCircle,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Toaster, toast } from "sonner";
+
+import { authClient } from "~/auth/client";
 import { cn } from "~/lib/utils";
 
 export default function Page() {
@@ -465,11 +461,11 @@ function AdminDashboard() {
                         >
                           {isLoading === `ban-${user.id}` ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : user.banned ? (
+                          ) : (user.banned ? (
                             "Unban"
                           ) : (
                             "Ban"
-                          )}
+                          ))}
                         </Button>
                       </div>
                     </TableCell>

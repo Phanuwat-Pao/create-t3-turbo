@@ -1,9 +1,5 @@
 "use client";
 
-import { ArrowUpFromLine, CreditCard, RefreshCcw } from "lucide-react";
-import { useId, useState } from "react";
-
-import { SubscriptionTierLabel } from "~/components/subscription-tier";
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
@@ -18,6 +14,10 @@ import {
 import { Label } from "@acme/ui/label";
 import { RadioGroup, RadioGroupItem } from "@acme/ui/radio-group";
 import { Skeleton } from "@acme/ui/skeleton";
+import { ArrowUpFromLine, CreditCard, RefreshCcw } from "lucide-react";
+import { useId, useState } from "react";
+
+import { SubscriptionTierLabel } from "~/components/subscription-tier";
 import { useSubscriptionCancelMutation } from "~/data/subscription/subscription-cancel-mutation";
 import { useSubscriptionListQuery } from "~/data/subscription/subscription-list-query";
 import { useSubscriptionRestoreMutation } from "~/data/subscription/subscription-restore-mutation";
@@ -101,9 +101,9 @@ const SubscriptionCard = () => {
                 <span className="text-zinc-600 dark:text-zinc-500">
                   {currentSubscription.cancelAtPeriodEnd
                     ? "Cancels on:"
-                    : currentSubscription.status === "trialing"
+                    : (currentSubscription.status === "trialing"
                       ? "Trial ends:"
-                      : "Renews:"}
+                      : "Renews:")}
                 </span>
                 <span className="font-medium text-zinc-900 dark:text-zinc-100">
                   {new Date(currentSubscription.periodEnd).toLocaleDateString()}

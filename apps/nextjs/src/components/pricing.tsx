@@ -1,5 +1,8 @@
 "use client";
 
+import { Button, buttonVariants } from "@acme/ui/button";
+import { Label } from "@acme/ui/label";
+import { Switch } from "@acme/ui/switch";
 import NumberFlow from "@number-flow/react";
 import { CheckIcon } from "@radix-ui/react-icons";
 import confetti from "canvas-confetti";
@@ -8,9 +11,6 @@ import { Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { authClient } from "~/auth/client";
-import { Button, buttonVariants } from "@acme/ui/button";
-import { Label } from "@acme/ui/label";
-import { Switch } from "@acme/ui/switch";
 import { cn } from "~/lib/utils";
 
 function useMediaQuery(query: string) {
@@ -124,7 +124,7 @@ export function Pricing({
                 ? {
                     opacity: 1,
                     scale: index === 0 || index === 2 ? 0.94 : 1,
-                    x: index === 2 ? -30 : index === 0 ? 30 : 0,
+                    x: index === 2 ? -30 : (index === 0 ? 30 : 0),
                     y: plan.isPopular ? -20 : 0,
                   }
                 : {}

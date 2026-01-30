@@ -1,5 +1,7 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
+import { Button } from "@acme/ui/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -7,8 +9,6 @@ import { toast } from "sonner";
 import type { Session } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
-import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
-import { Button } from "@acme/ui/button";
 
 export function SelectAccountBtn({ session }: { session: Partial<Session> }) {
   return (

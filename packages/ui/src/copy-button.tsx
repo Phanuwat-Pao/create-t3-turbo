@@ -28,7 +28,7 @@ export default function CopyButton({ textToCopy }: CopyButtonProps) {
     try {
       await navigator.clipboard.writeText(textToCopy);
       setIsCopied(true);
-    } catch (error) {
+    } catch {
       // Failed to copy
     }
   };
