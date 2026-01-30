@@ -5,7 +5,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import * as z from "zod";
 
 import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
@@ -44,7 +44,7 @@ export function UpdateUserForm({
   const [name, setName] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (): boolean => {
+  const validate = useCallback((): boolean => {
     const result = updateUserSchema.safeParse({ name });
     if (!result.success) {
       const fieldErrors: FormErrors = {};
@@ -57,39 +57,51 @@ export function UpdateUserForm({
     }
     setErrors({});
     return true;
-  };
+  }, [name]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
 
-    try {
-      const imageBase64 = image ? await convertImageToBase64(image) : undefined;
+      try {
+        const imageBase64 = image
+          ? await convertImageToBase64(image)
+          : undefined;
 
-      updateUserMutation.mutate(
-        {
-          image: imageBase64,
-          name: name || undefined,
-        },
-        {
-          onError: (error) => {
-            onError?.(error.message);
+        updateUserMutation.mutate(
+          {
+            image: imageBase64,
+            name: name || undefined,
           },
-          onSuccess: () => {
-            setName("");
-            clearImage();
-            onSuccess?.();
-          },
-        }
-      );
-    } catch (error) {
-      onError?.(
-        error instanceof Error ? error.message : "Failed to process image"
-      );
-    }
-  };
+          {
+            onError: (error) => {
+              onError?.(error.message);
+            },
+            onSuccess: () => {
+              setName("");
+              clearImage();
+              onSuccess?.();
+            },
+          }
+        );
+      } catch (error) {
+        onError?.(
+          error instanceof Error ? error.message : "Failed to process image"
+        );
+      }
+    },
+    [validate, image, updateUserMutation, name, onError, clearImage, onSuccess]
+  );
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setName(e.target.value);
+    },
+    []
+  );
 
   return (
     <form onSubmit={handleSubmit}>
@@ -102,7 +114,7 @@ export function UpdateUserForm({
             placeholder={currentName}
             disabled={updateUserMutation.isPending}
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={handleNameChange}
           />
           {errors.name && <FieldError errors={[errors.name]} />}
         </Field>

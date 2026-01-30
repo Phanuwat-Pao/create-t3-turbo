@@ -12,7 +12,7 @@ import {
 import { Key } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -30,6 +30,52 @@ export default function SignIn() {
     setIsMounted(true);
   }, []);
 
+  const handleSuccess = useCallback(() => {
+    router.push(getCallbackURL(params));
+  }, [router, params]);
+
+  const handleGoogleSignIn = useCallback(async () => {
+    await authClient.signIn.social({
+      callbackURL: "/dashboard",
+      provider: "google",
+    });
+  }, []);
+
+  const handleGitHubSignIn = useCallback(async () => {
+    await authClient.signIn.social({
+      callbackURL: "/dashboard",
+      provider: "github",
+    });
+  }, []);
+
+  const handleMicrosoftSignIn = useCallback(async () => {
+    await authClient.signIn.social({
+      callbackURL: "/dashboard",
+      provider: "microsoft",
+    });
+  }, []);
+
+  const handleVercelSignIn = useCallback(async () => {
+    await authClient.signIn.social({
+      callbackURL: "/dashboard",
+      provider: "vercel",
+    });
+  }, []);
+
+  const handlePasskeySignIn = useCallback(async () => {
+    await authClient.signIn.passkey({
+      fetchOptions: {
+        onError(context) {
+          toast.error(`Authentication failed: ${context.error.message}`);
+        },
+        onSuccess() {
+          toast.success("Successfully signed in");
+          router.push(getCallbackURL(params));
+        },
+      },
+    });
+  }, [router, params]);
+
   return (
     <Card className="max-h-[90vh] w-full overflow-y-auto rounded-none">
       <CardHeader>
@@ -40,22 +86,14 @@ export default function SignIn() {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <SignInForm
-            onSuccess={() => router.push(getCallbackURL(params))}
-            callbackURL="/dashboard"
-          />
+          <SignInForm onSuccess={handleSuccess} callbackURL="/dashboard" />
 
           {/* OAuth Buttons - 2 per row */}
           <div className="grid grid-cols-2 gap-2">
             <Button
               variant="outline"
               className={cn("relative flex gap-2")}
-              onClick={async () => {
-                await authClient.signIn.social({
-                  callbackURL: "/dashboard",
-                  provider: "google",
-                });
-              }}
+              onClick={handleGoogleSignIn}
               aria-label="Sign in with Google"
             >
               <svg
@@ -89,12 +127,7 @@ export default function SignIn() {
             <Button
               variant="outline"
               className={cn("relative flex items-center gap-2")}
-              onClick={async () => {
-                await authClient.signIn.social({
-                  callbackURL: "/dashboard",
-                  provider: "github",
-                });
-              }}
+              onClick={handleGitHubSignIn}
               aria-label="Sign in with GitHub"
             >
               <svg
@@ -116,12 +149,7 @@ export default function SignIn() {
             <Button
               variant="outline"
               className={cn("relative flex items-center gap-2")}
-              onClick={async () => {
-                await authClient.signIn.social({
-                  callbackURL: "/dashboard",
-                  provider: "microsoft",
-                });
-              }}
+              onClick={handleMicrosoftSignIn}
               aria-label="Sign in with Microsoft"
             >
               <svg
@@ -143,12 +171,7 @@ export default function SignIn() {
             <Button
               variant="outline"
               className={cn("relative flex gap-2")}
-              onClick={async () => {
-                await authClient.signIn.social({
-                  callbackURL: "/dashboard",
-                  provider: "vercel",
-                });
-              }}
+              onClick={handleVercelSignIn}
               aria-label="Sign in with Vercel"
             >
               <svg
@@ -183,21 +206,7 @@ export default function SignIn() {
           <Button
             variant="outline"
             className={cn("relative flex w-full items-center gap-2")}
-            onClick={async () => {
-              await authClient.signIn.passkey({
-                fetchOptions: {
-                  onError(context) {
-                    toast.error(
-                      `Authentication failed: ${context.error.message}`
-                    );
-                  },
-                  onSuccess() {
-                    toast.success("Successfully signed in");
-                    router.push(getCallbackURL(params));
-                  },
-                },
-              });
-            }}
+            onClick={handlePasskeySignIn}
           >
             <Key size={16} />
             <span>Sign in with Passkey</span>

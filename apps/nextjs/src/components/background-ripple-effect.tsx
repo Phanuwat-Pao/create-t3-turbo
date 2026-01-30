@@ -2,6 +2,7 @@
 
 import {
   type default as React,
+  memo,
   useCallback,
   useMemo,
   useRef,
@@ -81,6 +82,63 @@ type CellStyle = React.CSSProperties & {
   ["--duration"]?: string;
 };
 
+interface GridCellProps {
+  rowIdx: number;
+  colIdx: number;
+  fillColor: string;
+  borderColor: string;
+  style: CellStyle;
+  isAnimating: boolean;
+  interactive: boolean;
+  onCellClick: (row: number, col: number) => void;
+}
+
+const GridCell = memo(function GridCell({
+  rowIdx,
+  colIdx,
+  fillColor,
+  borderColor,
+  style,
+  isAnimating,
+  interactive,
+  onCellClick,
+}: GridCellProps) {
+  const handleClick = useCallback(() => {
+    if (interactive) {
+      onCellClick(rowIdx, colIdx);
+    }
+  }, [interactive, onCellClick, rowIdx, colIdx]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (interactive && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        onCellClick(rowIdx, colIdx);
+      }
+    },
+    [interactive, onCellClick, rowIdx, colIdx]
+  );
+
+  return (
+    <div
+      role={interactive ? "button" : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      className={cn(
+        "cell relative border-[0.5px] opacity-50 transition-opacity duration-150 will-change-transform hover:opacity-80",
+        isAnimating && "animate-cell-ripple [animation-fill-mode:none]",
+        !interactive && "pointer-events-none"
+      )}
+      style={{
+        backgroundColor: fillColor,
+        borderColor: borderColor,
+        ...style,
+      }}
+      onClick={interactive ? handleClick : undefined}
+      onKeyDown={interactive ? handleKeyDown : undefined}
+    />
+  );
+});
+
 const DivGrid = ({
   className,
   rows = 7,
@@ -127,21 +185,16 @@ const DivGrid = ({
           : {};
 
         return (
-          <div
+          <GridCell
             key={idx}
-            className={cn(
-              "cell relative border-[0.5px] opacity-50 transition-opacity duration-150 will-change-transform hover:opacity-80",
-              clickedCell && "animate-cell-ripple [animation-fill-mode:none]",
-              !interactive && "pointer-events-none"
-            )}
-            style={{
-              backgroundColor: fillColor,
-              borderColor: borderColor,
-              ...style,
-            }}
-            onClick={
-              interactive ? () => onCellClick?.(rowIdx, colIdx) : undefined
-            }
+            rowIdx={rowIdx}
+            colIdx={colIdx}
+            fillColor={fillColor}
+            borderColor={borderColor}
+            style={style}
+            isAnimating={!!clickedCell}
+            interactive={interactive}
+            onCellClick={onCellClick}
           />
         );
       })}

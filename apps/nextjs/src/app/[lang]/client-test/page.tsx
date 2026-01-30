@@ -12,7 +12,8 @@ import {
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
 import { Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import Image from "next/image";
+import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -26,7 +27,7 @@ export default function Page() {
   const { data: session, isPending, error } = useSessionQuery();
   const signOutMutation = useSignOutMutation();
 
-  const handleLogin = async () => {
+  const handleLogin = useCallback(async () => {
     startTransition(async () => {
       await authClient.signIn.email(
         {
@@ -46,7 +47,22 @@ export default function Page() {
         }
       );
     });
-  };
+  }, [email, password]);
+
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
+    []
+  );
+
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
+    []
+  );
+
+  const handleSignOut = useCallback(
+    () => signOutMutation.mutate(),
+    [signOutMutation]
+  );
 
   return (
     <div className="container mx-auto space-y-8 py-10">
@@ -72,7 +88,7 @@ export default function Page() {
                   type="email"
                   placeholder="m@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleEmailChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -82,7 +98,7 @@ export default function Page() {
                   type="password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handlePasswordChange}
                 />
               </div>
             </div>
@@ -163,7 +179,7 @@ export default function Page() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => signOutMutation.mutate()}
+                onClick={handleSignOut}
                 disabled={signOutMutation.isPending}
               >
                 {signOutMutation.isPending ? (

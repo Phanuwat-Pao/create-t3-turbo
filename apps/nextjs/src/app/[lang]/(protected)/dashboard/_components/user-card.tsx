@@ -44,7 +44,7 @@ import {
   Trash,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
@@ -60,6 +60,50 @@ import { useRevokeSessionMutation } from "~/data/user/revoke-session-mutation";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
 
+interface SessionItemProps {
+  session: Session["session"];
+  currentSessionId: string | undefined;
+  isTerminating: boolean;
+  onRevoke: (token: string) => void;
+}
+
+const SessionItem = memo(function SessionItem({
+  session,
+  currentSessionId,
+  isTerminating,
+  onRevoke,
+}: SessionItemProps) {
+  const isCurrentSession = session.id === currentSessionId;
+
+  const handleRevoke = useCallback(() => {
+    onRevoke(session.token);
+  }, [session.token, onRevoke]);
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 text-sm font-medium text-black dark:text-white">
+        {new UAParser(session.userAgent || "").getDevice().type === "mobile" ? (
+          <MobileIcon />
+        ) : (
+          <Laptop size={16} />
+        )}
+        {new UAParser(session.userAgent || "").getOS().name ||
+          session.userAgent}
+        , {new UAParser(session.userAgent || "").getBrowser().name}
+        <button
+          type="button"
+          className="cursor-pointer text-xs text-red-500 underline opacity-80"
+          onClick={handleRevoke}
+        >
+          {isTerminating && <Loader2 size={15} className="animate-spin" />}
+          {!isTerminating && isCurrentSession && "Sign Out"}
+          {!isTerminating && !isCurrentSession && "Terminate"}
+        </button>
+      </div>
+    </div>
+  );
+});
+
 const UserCard = (props: {
   session: Session | null;
   activeSessions: Session["session"][];
@@ -74,8 +118,80 @@ const UserCard = (props: {
   const [emailVerificationPending, setEmailVerificationPending] =
     useState<boolean>(false);
   const [activeSessions, setActiveSessions] = useState(props.activeSessions);
-  const removeActiveSession = (id: string) =>
-    setActiveSessions(activeSessions.filter((session) => session.id !== id));
+  const removeActiveSession = useCallback(
+    (id: string) =>
+      setActiveSessions((prev) => prev.filter((session) => session.id !== id)),
+    []
+  );
+
+  const handleSendVerificationEmail = useCallback(async () => {
+    await authClient.sendVerificationEmail(
+      {
+        email: session?.user.email || "",
+      },
+      {
+        onError(context) {
+          toast.error(context.error.message);
+          setEmailVerificationPending(false);
+        },
+        onRequest() {
+          setEmailVerificationPending(true);
+        },
+        onSuccess() {
+          toast.success("Verification email sent successfully");
+          setEmailVerificationPending(false);
+        },
+      }
+    );
+  }, [session?.user.email]);
+
+  const handleRevokeSession = useCallback(
+    (token: string) => {
+      revokeSessionMutation.mutate(
+        { token },
+        {
+          onSuccess: () => {
+            const sessionToRemove = activeSessions.find(
+              (s) => s.token === token
+            );
+            if (sessionToRemove) {
+              removeActiveSession(sessionToRemove.id);
+              if (sessionToRemove.id === props.session?.session.id) {
+                router.push("/");
+              }
+            }
+          },
+        }
+      );
+    },
+    [
+      revokeSessionMutation,
+      activeSessions,
+      removeActiveSession,
+      props.session?.session.id,
+      router,
+    ]
+  );
+
+  const handleTwoFactorSuccess = useCallback(() => {
+    setTwoFactorDialog(false);
+  }, []);
+
+  const handleStopImpersonation = useCallback(async () => {
+    setIsSignOut(true);
+    await authClient.admin.stopImpersonating();
+    setIsSignOut(false);
+    toast.info("Impersonation stopped successfully");
+    router.push("/admin");
+  }, [router]);
+
+  const handleSignOut = useCallback(() => {
+    signOutMutation.mutate(undefined, {
+      onSuccess: () => {
+        router.push("/");
+      },
+    });
+  }, [signOutMutation, router]);
 
   return (
     <Card>
@@ -117,26 +233,7 @@ const UserCard = (props: {
                 size="sm"
                 variant="secondary"
                 className="mt-2"
-                onClick={async () => {
-                  await authClient.sendVerificationEmail(
-                    {
-                      email: session?.user.email || "",
-                    },
-                    {
-                      onError(context) {
-                        toast.error(context.error.message);
-                        setEmailVerificationPending(false);
-                      },
-                      onRequest() {
-                        setEmailVerificationPending(true);
-                      },
-                      onSuccess() {
-                        toast.success("Verification email sent successfully");
-                        setEmailVerificationPending(false);
-                      },
-                    }
-                  );
-                }}
+                onClick={handleSendVerificationEmail}
               >
                 {emailVerificationPending ? (
                   <Loader2 size={15} className="animate-spin" />
@@ -150,52 +247,19 @@ const UserCard = (props: {
         <div className="flex w-max flex-col gap-1 border-l-2 px-2">
           <p className="text-xs font-medium">Active Sessions</p>
           {activeSessions
-            .filter((session) => session.userAgent)
-            .map((session) => {
-              const isCurrentSession = session.id === props.session?.session.id;
-              const isTerminating =
-                revokeSessionMutation.isPending &&
-                revokeSessionMutation.variables?.token === session.token;
-
-              return (
-                <div key={session.id}>
-                  <div className="flex items-center gap-2 text-sm font-medium text-black dark:text-white">
-                    {new UAParser(session.userAgent || "").getDevice().type ===
-                    "mobile" ? (
-                      <MobileIcon />
-                    ) : (
-                      <Laptop size={16} />
-                    )}
-                    {new UAParser(session.userAgent || "").getOS().name ||
-                      session.userAgent}
-                    , {new UAParser(session.userAgent || "").getBrowser().name}
-                    <button
-                      type="button"
-                      className="cursor-pointer text-xs text-red-500 underline opacity-80"
-                      onClick={() => {
-                        revokeSessionMutation.mutate(
-                          { token: session.token },
-                          {
-                            onSuccess: () => {
-                              removeActiveSession(session.id);
-                              if (isCurrentSession) {
-                                router.push("/");
-                              }
-                            },
-                          }
-                        );
-                      }}
-                    >
-                      {isTerminating && (
-                        <Loader2 size={15} className="animate-spin" />
-                      )}
-                      {!isTerminating && isCurrentSession && "Sign Out"}
-                      {!isTerminating && !isCurrentSession && "Terminate"}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+            .filter((activeSession) => activeSession.userAgent)
+            .map((activeSession) => (
+              <SessionItem
+                key={activeSession.id}
+                session={activeSession}
+                currentSessionId={props.session?.session.id}
+                isTerminating={
+                  revokeSessionMutation.isPending &&
+                  revokeSessionMutation.variables?.token === activeSession.token
+                }
+                onRevoke={handleRevokeSession}
+              />
+            ))}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 border-y py-4">
           <div className="flex flex-col gap-2">
@@ -261,13 +325,9 @@ const UserCard = (props: {
                     </DialogDescription>
                   </DialogHeader>
                   {session?.user.twoFactorEnabled ? (
-                    <TwoFactorDisableForm
-                      onSuccess={() => setTwoFactorDialog(false)}
-                    />
+                    <TwoFactorDisableForm onSuccess={handleTwoFactorSuccess} />
                   ) : (
-                    <TwoFactorEnableForm
-                      onSuccess={() => setTwoFactorDialog(false)}
-                    />
+                    <TwoFactorEnableForm onSuccess={handleTwoFactorSuccess} />
                   )}
                 </DialogContent>
               </Dialog>
@@ -281,13 +341,7 @@ const UserCard = (props: {
           <Button
             className="z-10 gap-2"
             variant="secondary"
-            onClick={async () => {
-              setIsSignOut(true);
-              await authClient.admin.stopImpersonating();
-              setIsSignOut(false);
-              toast.info("Impersonation stopped successfully");
-              router.push("/admin");
-            }}
+            onClick={handleStopImpersonation}
             disabled={isSignOut}
           >
             <span className="text-sm">
@@ -305,13 +359,7 @@ const UserCard = (props: {
           <Button
             className="z-10 gap-2"
             variant="outline"
-            onClick={() => {
-              signOutMutation.mutate(undefined, {
-                onSuccess: () => {
-                  router.push("/");
-                },
-              });
-            }}
+            onClick={handleSignOut}
             disabled={signOutMutation.isPending}
           >
             <span className="text-sm">
@@ -334,6 +382,8 @@ export default UserCard;
 
 function ChangePassword() {
   const [open, setOpen] = useState<boolean>(false);
+
+  const handleSuccess = useCallback(() => setOpen(false), []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -358,7 +408,7 @@ function ChangePassword() {
           <DialogTitle>Change Password</DialogTitle>
           <DialogDescription>Change your password</DialogDescription>
         </DialogHeader>
-        <ChangePasswordForm onSuccess={() => setOpen(false)} />
+        <ChangePasswordForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
   );
@@ -367,6 +417,8 @@ function ChangePassword() {
 function EditUserDialog() {
   const { data } = useSessionQuery();
   const [open, setOpen] = useState<boolean>(false);
+
+  const handleSuccess = useCallback(() => setOpen(false), []);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -383,7 +435,7 @@ function EditUserDialog() {
         </DialogHeader>
         <UpdateUserForm
           currentName={data?.user.name}
-          onSuccess={() => setOpen(false)}
+          onSuccess={handleSuccess}
         />
       </DialogContent>
     </Dialog>
@@ -395,7 +447,7 @@ function AddPasskey() {
   const [passkeyName, setPasskeyName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddPasskey = async () => {
+  const handleAddPasskey = useCallback(async () => {
     if (!passkeyName) {
       toast.error("Passkey name is required");
       return;
@@ -411,7 +463,15 @@ function AddPasskey() {
       toast.success("Passkey added successfully. You can now use it to login.");
     }
     setIsLoading(false);
-  };
+  }, [passkeyName]);
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPasskeyName(e.target.value);
+    },
+    []
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -433,9 +493,7 @@ function AddPasskey() {
           <Input
             id="passkey-name"
             value={passkeyName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPasskeyName(e.target.value)
-            }
+            onChange={handleNameChange}
           />
         </div>
         <DialogFooter>
@@ -460,12 +518,47 @@ function AddPasskey() {
   );
 }
 
+interface PasskeyRowProps {
+  passkey: { id: string; name: string | null };
+  isDeleting: boolean;
+  onDelete: (id: string) => void;
+}
+
+const PasskeyRow = memo(function PasskeyRow({
+  passkey,
+  isDeleting,
+  onDelete,
+}: PasskeyRowProps) {
+  const handleDelete = useCallback(() => {
+    onDelete(passkey.id);
+  }, [passkey.id, onDelete]);
+
+  return (
+    <TableRow className="flex items-center justify-between">
+      <TableCell>{passkey.name || "My Passkey"}</TableCell>
+      <TableCell className="text-right">
+        <button type="button" onClick={handleDelete}>
+          {isDeleting ? (
+            <Loader2 size={15} className="animate-spin" />
+          ) : (
+            <Trash size={15} className="cursor-pointer text-red-600" />
+          )}
+        </button>
+      </TableCell>
+    </TableRow>
+  );
+});
+
 function ListPasskeys() {
   const { data } = authClient.useListPasskeys();
   const [isOpen, setIsOpen] = useState(false);
   const [passkeyName, setPasskeyName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [deletingPasskeyId, setDeletingPasskeyId] = useState<string | null>(
+    null
+  );
 
-  const handleAddPasskey = async () => {
+  const handleAddPasskey = useCallback(async () => {
     if (!passkeyName) {
       toast.error("Passkey name is required");
       return;
@@ -480,9 +573,34 @@ function ListPasskeys() {
     } else {
       toast.success("Passkey added successfully. You can now use it to login.");
     }
-  };
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeletePasskey, setIsDeletePasskey] = useState<boolean>(false);
+  }, [passkeyName]);
+
+  const handleDeletePasskey = useCallback(async (passkeyId: string) => {
+    setDeletingPasskeyId(passkeyId);
+    await authClient.passkey.deletePasskey({
+      fetchOptions: {
+        onError: (error) => {
+          toast.error(error.error.message);
+          setDeletingPasskeyId(null);
+        },
+        onSuccess: () => {
+          toast("Passkey deleted successfully");
+          setDeletingPasskeyId(null);
+        },
+      },
+      id: passkeyId,
+    });
+  }, []);
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPasskeyName(e.target.value);
+    },
+    []
+  );
+
+  const handleClose = useCallback(() => setIsOpen(false), []);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -505,44 +623,12 @@ function ListPasskeys() {
             </TableHeader>
             <TableBody>
               {data.map((passkey) => (
-                <TableRow
+                <PasskeyRow
                   key={passkey.id}
-                  className="flex items-center justify-between"
-                >
-                  <TableCell>{passkey.name || "My Passkey"}</TableCell>
-                  <TableCell className="text-right">
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        await authClient.passkey.deletePasskey({
-                          fetchOptions: {
-                            onError: (error) => {
-                              toast.error(error.error.message);
-                              setIsDeletePasskey(false);
-                            },
-                            onRequest: () => {
-                              setIsDeletePasskey(true);
-                            },
-                            onSuccess: () => {
-                              toast("Passkey deleted successfully");
-                              setIsDeletePasskey(false);
-                            },
-                          },
-                          id: passkey.id,
-                        });
-                      }}
-                    >
-                      {isDeletePasskey ? (
-                        <Loader2 size={15} className="animate-spin" />
-                      ) : (
-                        <Trash
-                          size={15}
-                          className="cursor-pointer text-red-600"
-                        />
-                      )}
-                    </button>
-                  </TableCell>
-                </TableRow>
+                  passkey={passkey}
+                  isDeleting={deletingPasskeyId === passkey.id}
+                  onDelete={handleDeletePasskey}
+                />
               ))}
             </TableBody>
           </Table>
@@ -558,9 +644,7 @@ function ListPasskeys() {
               <Input
                 id="passkey-name"
                 value={passkeyName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setPasskeyName(e.target.value)
-                }
+                onChange={handleNameChange}
                 placeholder="My Passkey"
               />
             </div>
@@ -577,7 +661,7 @@ function ListPasskeys() {
           </div>
         )}
         <DialogFooter>
-          <Button onClick={() => setIsOpen(false)}>Close</Button>
+          <Button onClick={handleClose}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

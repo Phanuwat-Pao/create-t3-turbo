@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "@acme/ui/tooltip";
 import { CheckIcon, CopyIcon } from "@radix-ui/react-icons";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -24,14 +24,14 @@ export default function CopyButton({ textToCopy }: CopyButtonProps) {
     }
   }, [isCopied]);
 
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(textToCopy);
       setIsCopied(true);
     } catch {
       // Failed to copy
     }
-  };
+  }, [textToCopy]);
 
   return (
     <TooltipProvider>

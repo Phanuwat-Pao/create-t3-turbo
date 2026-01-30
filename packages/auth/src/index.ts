@@ -60,10 +60,14 @@ export interface InitAuthOptions<
   }) => Promise<void>;
 }
 
+const noopSendEmail = async () => {
+  /* intentionally empty - no email provider configured */
+};
+
 export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
   options: InitAuthOptions<TExtraPlugins>
 ) {
-  const sendEmail = options.sendEmail ?? (async () => {});
+  const sendEmail = options.sendEmail ?? noopSendEmail;
   const appName = options.appName ?? "Better Auth App";
 
   const authOptions = {

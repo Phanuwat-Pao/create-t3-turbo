@@ -12,7 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
 import { ChevronDown, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 
 import type { DeviceSession } from "~/lib/auth";
 
@@ -20,6 +20,41 @@ import { authClient } from "~/auth/client";
 import { getQueryClient } from "~/data/query-client";
 import { userKeys } from "~/data/user/keys";
 import { type SessionData, useSessionQuery } from "~/data/user/session-query";
+
+const noop = () => {
+  /* intentionally empty */
+};
+
+interface AccountItemProps {
+  user: DeviceSession["user"];
+  sessionToken: string;
+  onSelect: (token: string) => void;
+}
+
+const AccountItem = memo(function AccountItem({
+  user,
+  sessionToken,
+  onSelect,
+}: AccountItemProps) {
+  const handleSelect = useCallback(() => {
+    onSelect(sessionToken);
+  }, [onSelect, sessionToken]);
+
+  return (
+    <CommandItem onSelect={handleSelect} className="text-sm">
+      <Avatar className="mr-2 h-5 w-5">
+        <AvatarImage src={user.image || undefined} alt={user.name} />
+        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+      </Avatar>
+      <div className="flex w-full items-center justify-between">
+        <div>
+          <p>{user.name}</p>
+          <p className="text-xs">({user.email})</p>
+        </div>
+      </div>
+    </CommandItem>
+  );
+});
 
 export default function AccountSwitcher({
   deviceSessions,
@@ -33,12 +68,34 @@ export default function AccountSwitcher({
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
+  const handleSwitchAccount = useCallback(
+    async (sessionToken: string) => {
+      try {
+        await authClient.multiSession.setActive({
+          sessionToken,
+        });
+        await queryClient.invalidateQueries({
+          queryKey: userKeys.all(),
+        });
+        setOpen(false);
+        router.refresh();
+      } catch (error) {
+        console.error("Failed to switch account:", error);
+      }
+    },
+    [queryClient, router]
+  );
+
+  const handleAddAccount = useCallback(() => {
+    router.push("/sign-in");
+    setOpen(false);
+  }, [router]);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
           aria-expanded={open}
           aria-label="Select a user"
           className="w-[250px] justify-between"
@@ -59,7 +116,7 @@ export default function AccountSwitcher({
           <CommandList>
             <CommandGroup heading="Current Account">
               <CommandItem
-                onSelect={() => {}}
+                onSelect={noop}
                 className="w-full justify-between text-sm"
                 key={currentUser?.user.id}
               >
@@ -81,39 +138,13 @@ export default function AccountSwitcher({
             <CommandGroup heading="Switch Account">
               {deviceSessions
                 .filter((s) => s.user.id !== currentUser?.user.id)
-                .map((u, i) => (
-                  <CommandItem
-                    key={i}
-                    onSelect={async () => {
-                      try {
-                        await authClient.multiSession.setActive({
-                          sessionToken: u.session.token,
-                        });
-                        await queryClient.invalidateQueries({
-                          queryKey: userKeys.all(),
-                        });
-                        setOpen(false);
-                        router.refresh();
-                      } catch (error) {
-                        console.error("Failed to switch account:", error);
-                      }
-                    }}
-                    className="text-sm"
-                  >
-                    <Avatar className="mr-2 h-5 w-5">
-                      <AvatarImage
-                        src={u.user.image || undefined}
-                        alt={u.user.name}
-                      />
-                      <AvatarFallback>{u.user.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex w-full items-center justify-between">
-                      <div>
-                        <p>{u.user.name}</p>
-                        <p className="text-xs">({u.user.email})</p>
-                      </div>
-                    </div>
-                  </CommandItem>
+                .map((u) => (
+                  <AccountItem
+                    key={u.session.token}
+                    user={u.user}
+                    sessionToken={u.session.token}
+                    onSelect={handleSwitchAccount}
+                  />
                 ))}
             </CommandGroup>
           </CommandList>
@@ -121,10 +152,7 @@ export default function AccountSwitcher({
           <CommandList>
             <CommandGroup>
               <CommandItem
-                onSelect={() => {
-                  router.push("/sign-in");
-                  setOpen(false);
-                }}
+                onSelect={handleAddAccount}
                 className="cursor-pointer text-sm"
               >
                 <PlusCircle className="mr-2 h-5 w-5" />

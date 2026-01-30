@@ -7,7 +7,7 @@ import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
 import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 
 import { authClient } from "~/auth/client";
 
@@ -19,30 +19,42 @@ export default function Page() {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
 
-    startTransition(async () => {
-      try {
-        const finalCode = userCode.trim().replaceAll("-", "").toUpperCase();
-        // Get the device authorization status
-        const response = await authClient.device({
-          query: {
-            user_code: finalCode,
-          },
-        });
+      startTransition(async () => {
+        try {
+          const finalCode = userCode.trim().replaceAll("-", "").toUpperCase();
+          // Get the device authorization status
+          const response = await authClient.device({
+            query: {
+              user_code: finalCode,
+            },
+          });
 
-        if (response.data) {
-          router.push(`/device/approve?user_code=${finalCode}`);
+          if (response.data) {
+            router.push(`/device/approve?user_code=${finalCode}`);
+          }
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error
+              ? error.message
+              : "Invalid code. Please check and try again.";
+          setError(message);
         }
-      } catch (error: any) {
-        setError(
-          error.error?.message || "Invalid code. Please check and try again."
-        );
-      }
-    });
-  };
+      });
+    },
+    [userCode, router]
+  );
+
+  const handleUserCodeChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setUserCode(e.target.value);
+    },
+    []
+  );
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -63,7 +75,7 @@ export default function Page() {
                 type="text"
                 placeholder="XXXX-XXXX"
                 value={userCode}
-                onChange={(e) => setUserCode(e.target.value)}
+                onChange={handleUserCodeChange}
                 className="text-center font-mono text-lg uppercase"
                 maxLength={9}
                 disabled={isPending}

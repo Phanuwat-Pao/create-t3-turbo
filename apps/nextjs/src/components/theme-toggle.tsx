@@ -1,15 +1,20 @@
 "use client";
 import { Button } from "@acme/ui/button";
 import { useTheme } from "next-themes";
+import { useCallback } from "react";
 
 export function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
+
+  const handleToggle = useCallback(() => {
+    setTheme(resolvedTheme === "light" ? "dark" : "light");
+  }, [setTheme, resolvedTheme]);
 
   return (
     <Button
       variant="link"
       size="icon"
-      onClick={() => setTheme(resolvedTheme === "light" ? "dark" : "light")}
+      onClick={handleToggle}
       suppressHydrationWarning
     >
       {/* Sun icon - visible in light mode */}
