@@ -1,10 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useEffect, useRef, useState } from "react";
 import * as z from "zod";
 
 import { Button } from "@acme/ui/button";
@@ -35,6 +33,9 @@ const createOrganizationSchema = z.object({
 });
 
 type CreateOrganizationFormValues = z.infer<typeof createOrganizationSchema>;
+type FormErrors = Partial<
+  Record<keyof CreateOrganizationFormValues, { message: string }>
+>;
 
 interface CreateOrganizationFormProps {
   onSuccess?: () => void;
@@ -49,96 +50,115 @@ export function CreateOrganizationForm({
   const { image, imagePreview, handleImageChange, clearImage } =
     useImagePreview();
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors, dirtyFields },
-  } = useForm<CreateOrganizationFormValues>({
-    defaultValues: {
-      name: "",
-      slug: "",
-    },
-    resolver: zodResolver(createOrganizationSchema),
-  });
-
-  const nameValue = watch("name");
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
+  const slugManuallyEdited = useRef(false);
 
   // Auto-generate slug from name if slug hasn't been manually edited
   useEffect(() => {
-    if (!dirtyFields.slug) {
-      const generatedSlug = nameValue
+    if (!slugManuallyEdited.current) {
+      const generatedSlug = name
         .trim()
         .toLowerCase()
         .replaceAll(/\s+/g, "-")
         .replaceAll(/[^a-z0-9-]/g, "");
-      setValue("slug", generatedSlug);
+      setSlug(generatedSlug);
     }
-  }, [nameValue, dirtyFields.slug, setValue]);
+  }, [name]);
 
-  const onSubmit = async (values: CreateOrganizationFormValues) => {
-    try {
-      const logoBase64 = image ? await convertImageToBase64(image) : undefined;
-
-      createMutation.mutate(
-        {
-          logo: logoBase64,
-          name: values.name,
-          slug: values.slug,
-        },
-        {
-          onError: (error) => {
-            onError?.(error.message);
-          },
-          onSuccess: () => {
-            onSuccess?.();
-          },
-        }
-      );
-    } catch (error) {
-      onError?.(
-        error instanceof Error ? error.message : "Failed to process image"
-      );
+  const validate = useCallback((): boolean => {
+    const result = createOrganizationSchema.safeParse({ name, slug });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof CreateOrganizationFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setErrors(fieldErrors);
+      return false;
     }
-  };
+    setErrors({});
+    return true;
+  }, [name, slug]);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
+
+      try {
+        const logoBase64 = image
+          ? await convertImageToBase64(image)
+          : undefined;
+
+        createMutation.mutate(
+          {
+            logo: logoBase64,
+            name,
+            slug,
+          },
+          {
+            onError: (error) => {
+              onError?.(error.message);
+            },
+            onSuccess: () => {
+              onSuccess?.();
+            },
+          }
+        );
+      } catch (error) {
+        onError?.(
+          error instanceof Error ? error.message : "Failed to process image"
+        );
+      }
+    },
+    [createMutation, image, name, onError, onSuccess, slug, validate]
+  );
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setName(e.target.value);
+    },
+    []
+  );
+
+  const handleSlugChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      slugManuallyEdited.current = true;
+      setSlug(e.target.value);
+    },
+    []
+  );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <FieldGroup>
-        <Controller
-          name="name"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="org-name">Organization Name</FieldLabel>
-              <Input
-                id="org-name"
-                placeholder="My Organization"
-                disabled={createMutation.isPending}
-                {...field}
-              />
-              <FieldError>{errors.name?.message}</FieldError>
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.name}>
+          <FieldLabel htmlFor="org-name">Organization Name</FieldLabel>
+          <Input
+            id="org-name"
+            placeholder="My Organization"
+            disabled={createMutation.isPending}
+            value={name}
+            onChange={handleNameChange}
+          />
+          {errors.name && <FieldError errors={[errors.name]} />}
+        </Field>
 
-        <Controller
-          name="slug"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="org-slug">Organization Slug</FieldLabel>
-              <Input
-                id="org-slug"
-                placeholder="my-organization"
-                disabled={createMutation.isPending}
-                {...field}
-              />
-              <FieldError>{errors.slug?.message}</FieldError>
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.slug}>
+          <FieldLabel htmlFor="org-slug">Organization Slug</FieldLabel>
+          <Input
+            id="org-slug"
+            placeholder="my-organization"
+            disabled={createMutation.isPending}
+            value={slug}
+            onChange={handleSlugChange}
+          />
+          {errors.slug && <FieldError errors={[errors.slug]} />}
+        </Field>
 
         <Field>
           <FieldLabel htmlFor="org-logo">Logo</FieldLabel>

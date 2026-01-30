@@ -1,9 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useState, useTransition } from "react";
 import QRCode from "react-qr-code";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -30,6 +28,10 @@ const otpSchema = z.object({
 
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 type OtpFormValues = z.infer<typeof otpSchema>;
+type PasswordFormErrors = Partial<
+  Record<keyof PasswordFormValues, { message: string }>
+>;
+type OtpFormErrors = Partial<Record<keyof OtpFormValues, { message: string }>>;
 
 interface TwoFactorEnableFormProps {
   onSuccess?: () => void;
@@ -39,53 +41,104 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
   const [loading, startTransition] = useTransition();
   const [totpURI, setTotpURI] = useState<string>("");
 
-  const passwordForm = useForm<PasswordFormValues>({
-    defaultValues: {
-      password: "",
-    },
-    resolver: zodResolver(passwordSchema),
-  });
+  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<PasswordFormErrors>({});
+  const [otpErrors, setOtpErrors] = useState<OtpFormErrors>({});
 
-  const otpForm = useForm<OtpFormValues>({
-    defaultValues: {
-      otp: "",
-    },
-    resolver: zodResolver(otpSchema),
-  });
+  const validatePassword = useCallback((): boolean => {
+    const result = passwordSchema.safeParse({ password });
+    if (!result.success) {
+      const fieldErrors: PasswordFormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof PasswordFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setPasswordErrors(fieldErrors);
+      return false;
+    }
+    setPasswordErrors({});
+    return true;
+  }, [password]);
 
-  const onPasswordSubmit = (data: PasswordFormValues) => {
-    startTransition(async () => {
-      await authClient.twoFactor.enable({
-        fetchOptions: {
-          onError(context) {
-            toast.error(context.error.message);
+  const validateOtp = useCallback((): boolean => {
+    const result = otpSchema.safeParse({ otp });
+    if (!result.success) {
+      const fieldErrors: OtpFormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof OtpFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setOtpErrors(fieldErrors);
+      return false;
+    }
+    setOtpErrors({});
+    return true;
+  }, [otp]);
+
+  const handlePasswordSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validatePassword()) {
+        return;
+      }
+
+      startTransition(async () => {
+        await authClient.twoFactor.enable({
+          fetchOptions: {
+            onError(context) {
+              toast.error(context.error.message);
+            },
+            onSuccess(ctx) {
+              setTotpURI(ctx.data.totpURI);
+            },
           },
-          onSuccess(ctx) {
-            setTotpURI(ctx.data.totpURI);
-          },
-        },
-        password: data.password,
+          password,
+        });
       });
-    });
-  };
+    },
+    [password, validatePassword]
+  );
 
-  const onOtpSubmit = (data: OtpFormValues) => {
-    startTransition(async () => {
-      await authClient.twoFactor.verifyTotp({
-        code: data.otp,
-        fetchOptions: {
-          onError(context) {
-            toast.error(context.error.message);
-            otpForm.reset();
+  const handleOtpSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validateOtp()) {
+        return;
+      }
+
+      startTransition(async () => {
+        await authClient.twoFactor.verifyTotp({
+          code: otp,
+          fetchOptions: {
+            onError(context) {
+              toast.error(context.error.message);
+              setOtp("");
+            },
+            onSuccess() {
+              toast.success("2FA enabled successfully");
+              onSuccess?.();
+            },
           },
-          onSuccess() {
-            toast.success("2FA enabled successfully");
-            onSuccess?.();
-          },
-        },
+        });
       });
-    });
-  };
+    },
+    [onSuccess, otp, validateOtp]
+  );
+
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+    },
+    []
+  );
+
+  const handleOtpChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setOtp(e.target.value);
+    },
+    []
+  );
 
   if (totpURI) {
     return (
@@ -97,32 +150,22 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
           <p className="text-muted-foreground text-sm">Copy URI to clipboard</p>
           <CopyButton textToCopy={totpURI} />
         </div>
-        <form
-          onSubmit={otpForm.handleSubmit(onOtpSubmit)}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleOtpSubmit} className="flex flex-col gap-4">
           <FieldGroup>
-            <Controller
-              name="otp"
-              control={otpForm.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="enable-otp">
-                    Scan the QR code with your TOTP app and enter the code
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="enable-otp"
-                    placeholder="Enter OTP code"
-                    aria-invalid={fieldState.invalid}
-                    autoComplete="one-time-code"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
+            <Field data-invalid={!!otpErrors.otp}>
+              <FieldLabel htmlFor="enable-otp">
+                Scan the QR code with your TOTP app and enter the code
+              </FieldLabel>
+              <Input
+                id="enable-otp"
+                placeholder="Enter OTP code"
+                aria-invalid={!!otpErrors.otp}
+                autoComplete="one-time-code"
+                value={otp}
+                onChange={handleOtpChange}
+              />
+              {otpErrors.otp && <FieldError errors={[otpErrors.otp]} />}
+            </Field>
           </FieldGroup>
           <Button type="submit" disabled={loading}>
             {loading ? (
@@ -137,28 +180,22 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
   }
 
   return (
-    <form
-      onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-4">
       <FieldGroup>
-        <Controller
-          name="password"
-          control={passwordForm.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="enable-password">Password</FieldLabel>
-              <PasswordInput
-                {...field}
-                id="enable-password"
-                placeholder="Enter your password"
-                aria-invalid={fieldState.invalid}
-                autoComplete="current-password"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
+        <Field data-invalid={!!passwordErrors.password}>
+          <FieldLabel htmlFor="enable-password">Password</FieldLabel>
+          <PasswordInput
+            id="enable-password"
+            placeholder="Enter your password"
+            aria-invalid={!!passwordErrors.password}
+            autoComplete="current-password"
+            value={password}
+            onChange={handlePasswordChange}
+          />
+          {passwordErrors.password && (
+            <FieldError errors={[passwordErrors.password]} />
           )}
-        />
+        </Field>
       </FieldGroup>
       <Button type="submit" disabled={loading}>
         {loading ? <Loader2 size={16} className="animate-spin" /> : "Continue"}

@@ -1,10 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -23,12 +21,13 @@ import { PasswordInput } from "@acme/ui/password-input";
 import { LastUsedIndicator } from "../last-used-indicator";
 
 const signInSchema = z.object({
-  email: z.email("Please enter a valid email address."),
+  email: z.string().email("Please enter a valid email address."),
   password: z.string().min(1, "Password is required."),
   rememberMe: z.boolean(),
 });
 
 type SignInFormValues = z.infer<typeof signInSchema>;
+type FormErrors = Partial<Record<keyof SignInFormValues, { message: string }>>;
 
 interface SignInFormProps {
   onSuccess?: () => void;
@@ -43,28 +42,41 @@ export function SignInForm({
 }: SignInFormProps) {
   const [loading, startTransition] = useTransition();
   const [isMounted, setIsMounted] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const form = useForm<SignInFormValues>({
-    defaultValues: {
-      email: "",
-      password: "",
-      rememberMe: false,
-    },
-    resolver: zodResolver(signInSchema),
-  });
+  const validate = (): boolean => {
+    const result = signInSchema.safeParse({ email, password, rememberMe });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof SignInFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
 
-  const onSubmit = (data: SignInFormValues) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
     startTransition(async () => {
       await authClient.signIn.email(
         {
           callbackURL,
-          email: data.email,
-          password: data.password,
-          rememberMe: data.rememberMe,
+          email,
+          password,
+          rememberMe,
         },
         {
           onError(context) {
@@ -80,78 +92,63 @@ export function SignInForm({
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-2">
+    <form onSubmit={handleSubmit} className="grid gap-2">
       <FieldGroup>
-        <Controller
-          name="email"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="sign-in-email">Email</FieldLabel>
-              <Input
-                {...field}
-                id="sign-in-email"
-                type="email"
-                placeholder="m@example.com"
-                aria-invalid={fieldState.invalid}
-                autoComplete="email"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
+        <Field data-invalid={!!errors.email}>
+          <FieldLabel htmlFor="sign-in-email">Email</FieldLabel>
+          <Input
+            id="sign-in-email"
+            type="email"
+            placeholder="m@example.com"
+            aria-invalid={!!errors.email}
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          {errors.email && <FieldError errors={[errors.email]} />}
+        </Field>
+        <Field data-invalid={!!errors.password}>
+          <div className="flex items-center">
+            <FieldLabel htmlFor="sign-in-password">Password</FieldLabel>
+            <Link
+              href="/forget-password"
+              className="text-foreground ml-auto inline-block text-sm underline"
+            >
+              Forgot your password?
+            </Link>
+          </div>
+          {showPasswordToggle ? (
+            <PasswordInput
+              id="sign-in-password"
+              placeholder="Password"
+              aria-invalid={!!errors.password}
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          ) : (
+            <Input
+              id="sign-in-password"
+              type="password"
+              placeholder="password"
+              aria-invalid={!!errors.password}
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           )}
-        />
-        <Controller
-          name="password"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <div className="flex items-center">
-                <FieldLabel htmlFor="sign-in-password">Password</FieldLabel>
-                <Link
-                  href="/forget-password"
-                  className="text-foreground ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              {showPasswordToggle ? (
-                <PasswordInput
-                  {...field}
-                  id="sign-in-password"
-                  placeholder="Password"
-                  aria-invalid={fieldState.invalid}
-                  autoComplete="current-password"
-                />
-              ) : (
-                <Input
-                  {...field}
-                  id="sign-in-password"
-                  type="password"
-                  placeholder="password"
-                  aria-invalid={fieldState.invalid}
-                  autoComplete="current-password"
-                />
-              )}
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="rememberMe"
-          control={form.control}
-          render={({ field }) => (
-            <Field orientation="horizontal">
-              <Checkbox
-                id="sign-in-remember"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-              <FieldLabel htmlFor="sign-in-remember" className="font-normal">
-                Remember me
-              </FieldLabel>
-            </Field>
-          )}
-        />
+          {errors.password && <FieldError errors={[errors.password]} />}
+        </Field>
+        <Field orientation="horizontal">
+          <Checkbox
+            id="sign-in-remember"
+            checked={rememberMe}
+            onCheckedChange={(checked) => setRememberMe(checked === true)}
+          />
+          <FieldLabel htmlFor="sign-in-remember" className="font-normal">
+            Remember me
+          </FieldLabel>
+        </Field>
       </FieldGroup>
       <Button type="submit" className="relative w-full" disabled={loading}>
         {loading ? <Loader2 size={16} className="animate-spin" /> : "Login"}

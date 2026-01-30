@@ -1,8 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
 import * as z from "zod";
 
 import { Button } from "@acme/ui/button";
@@ -32,6 +31,9 @@ const changePasswordSchema = z
   });
 
 type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+type FormErrors = Partial<
+  Record<keyof ChangePasswordFormValues, { message: string }>
+>;
 
 interface ChangePasswordFormProps {
   onSuccess?: () => void;
@@ -44,118 +46,158 @@ export function ChangePasswordForm({
 }: ChangePasswordFormProps) {
   const changePasswordMutation = useChangePasswordMutation();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ChangePasswordFormValues>({
-    defaultValues: {
-      confirmPassword: "",
-      currentPassword: "",
-      newPassword: "",
-      revokeOtherSessions: false,
-    },
-    resolver: zodResolver(changePasswordSchema),
-  });
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const onSubmit = (values: ChangePasswordFormValues) => {
-    changePasswordMutation.mutate(
-      {
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-        revokeOtherSessions: values.revokeOtherSessions,
-      },
-      {
-        onError: (error) => {
-          onError?.(error.message);
-        },
-        onSuccess: () => {
-          reset();
-          onSuccess?.();
-        },
+  const validate = useCallback((): boolean => {
+    const result = changePasswordSchema.safeParse({
+      confirmPassword,
+      currentPassword,
+      newPassword,
+      revokeOtherSessions,
+    });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof ChangePasswordFormValues;
+        fieldErrors[field] = { message: issue.message };
       }
-    );
-  };
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  }, [confirmPassword, currentPassword, newPassword, revokeOtherSessions]);
+
+  const resetForm = useCallback(() => {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setRevokeOtherSessions(false);
+    setErrors({});
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
+
+      changePasswordMutation.mutate(
+        {
+          currentPassword,
+          newPassword,
+          revokeOtherSessions,
+        },
+        {
+          onError: (error) => {
+            onError?.(error.message);
+          },
+          onSuccess: () => {
+            resetForm();
+            onSuccess?.();
+          },
+        }
+      );
+    },
+    [
+      changePasswordMutation,
+      currentPassword,
+      newPassword,
+      onError,
+      onSuccess,
+      resetForm,
+      revokeOtherSessions,
+      validate,
+    ]
+  );
+
+  const handleCurrentPasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setCurrentPassword(e.target.value);
+    },
+    []
+  );
+
+  const handleNewPasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNewPassword(e.target.value);
+    },
+    []
+  );
+
+  const handleConfirmPasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setConfirmPassword(e.target.value);
+    },
+    []
+  );
+
+  const handleRevokeSessionsChange = useCallback((checked: boolean | "indeterminate") => {
+    setRevokeOtherSessions(checked === true);
+  }, []);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <FieldGroup>
-        <Controller
-          name="currentPassword"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="current-password">
-                Current Password
-              </FieldLabel>
-              <PasswordInput
-                id="current-password"
-                autoComplete="current-password"
-                placeholder="Current password"
-                disabled={changePasswordMutation.isPending}
-                {...field}
-              />
-              <FieldError>{errors.currentPassword?.message}</FieldError>
-            </Field>
+        <Field data-invalid={!!errors.currentPassword}>
+          <FieldLabel htmlFor="current-password">Current Password</FieldLabel>
+          <PasswordInput
+            id="current-password"
+            autoComplete="current-password"
+            placeholder="Current password"
+            disabled={changePasswordMutation.isPending}
+            value={currentPassword}
+            onChange={handleCurrentPasswordChange}
+          />
+          {errors.currentPassword && (
+            <FieldError errors={[errors.currentPassword]} />
           )}
-        />
+        </Field>
 
-        <Controller
-          name="newPassword"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="new-password">New Password</FieldLabel>
-              <PasswordInput
-                id="new-password"
-                autoComplete="new-password"
-                placeholder="New password"
-                disabled={changePasswordMutation.isPending}
-                {...field}
-              />
-              <FieldError>{errors.newPassword?.message}</FieldError>
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.newPassword}>
+          <FieldLabel htmlFor="new-password">New Password</FieldLabel>
+          <PasswordInput
+            id="new-password"
+            autoComplete="new-password"
+            placeholder="New password"
+            disabled={changePasswordMutation.isPending}
+            value={newPassword}
+            onChange={handleNewPasswordChange}
+          />
+          {errors.newPassword && <FieldError errors={[errors.newPassword]} />}
+        </Field>
 
-        <Controller
-          name="confirmPassword"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm Password
-              </FieldLabel>
-              <PasswordInput
-                id="confirm-password"
-                autoComplete="new-password"
-                placeholder="Confirm password"
-                disabled={changePasswordMutation.isPending}
-                {...field}
-              />
-              <FieldError>{errors.confirmPassword?.message}</FieldError>
-            </Field>
+        <Field data-invalid={!!errors.confirmPassword}>
+          <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+          <PasswordInput
+            id="confirm-password"
+            autoComplete="new-password"
+            placeholder="Confirm password"
+            disabled={changePasswordMutation.isPending}
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
+          />
+          {errors.confirmPassword && (
+            <FieldError errors={[errors.confirmPassword]} />
           )}
-        />
+        </Field>
 
-        <Controller
-          name="revokeOtherSessions"
-          control={control}
-          render={({ field }) => (
-            <div className="flex items-center gap-2">
-              <Checkbox
-                id="revoke-sessions"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                disabled={changePasswordMutation.isPending}
-              />
-              <label htmlFor="revoke-sessions" className="text-sm">
-                Sign out from other devices
-              </label>
-            </div>
-          )}
-        />
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="revoke-sessions"
+            checked={revokeOtherSessions}
+            onCheckedChange={handleRevokeSessionsChange}
+            disabled={changePasswordMutation.isPending}
+          />
+          <label htmlFor="revoke-sessions" className="text-sm">
+            Sign out from other devices
+          </label>
+        </div>
 
         <Button type="submit" disabled={changePasswordMutation.isPending}>
           {changePasswordMutation.isPending ? (

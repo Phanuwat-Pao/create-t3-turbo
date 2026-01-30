@@ -1,9 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2, Mail } from "lucide-react";
-import { useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useState, useTransition } from "react";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
@@ -24,6 +22,7 @@ const otpSchema = z.object({
 });
 
 type OtpFormValues = z.infer<typeof otpSchema>;
+type FormErrors = Partial<Record<keyof OtpFormValues, { message: string }>>;
 
 interface TwoFactorEmailOtpFormProps {
   onSuccess?: () => void;
@@ -40,37 +39,62 @@ export function TwoFactorEmailOtpForm({
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [message, setMessage] = useState("");
+  const [code, setCode] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const form = useForm<OtpFormValues>({
-    defaultValues: {
-      code: "",
-    },
-    resolver: zodResolver(otpSchema),
-  });
+  const validate = useCallback((): boolean => {
+    const result = otpSchema.safeParse({ code });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof OtpFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  }, [code]);
 
-  const handleSendOtp = () => {
+  const handleSendOtp = useCallback(() => {
     startTransition(async () => {
       await authClient.twoFactor.sendOtp();
       setIsOtpSent(true);
       setMessage(`OTP sent to ${userEmail}`);
     });
-  };
+  }, [userEmail]);
 
-  const onSubmit = (data: OtpFormValues) => {
-    startTransition(async () => {
-      const res = await authClient.twoFactor.verifyOtp({
-        code: data.code,
-      });
-      if (res.data) {
-        setIsVerified(true);
-        setMessage("OTP validated successfully");
-        onSuccess?.();
-      } else {
-        onError?.("Invalid OTP");
-        form.setError("code", { message: "Invalid OTP" });
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
       }
-    });
-  };
+
+      startTransition(async () => {
+        const res = await authClient.twoFactor.verifyOtp({
+          code,
+        });
+        if (res.data) {
+          setIsVerified(true);
+          setMessage("OTP validated successfully");
+          onSuccess?.();
+        } else {
+          onError?.("Invalid OTP");
+          setErrors({ code: { message: "Invalid OTP" } });
+        }
+      });
+    },
+    [code, onError, onSuccess, validate]
+  );
+
+  const handleCodeChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setCode(e.target.value);
+    },
+    []
+  );
 
   if (isVerified) {
     return (
@@ -98,36 +122,29 @@ export function TwoFactorEmailOtpForm({
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4">
       <FieldGroup>
-        <Controller
-          name="code"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="email-otp-code">
-                One-Time Password
-              </FieldLabel>
-              {message && (
-                <p className="text-muted-foreground flex items-center gap-1 py-1 text-sm">
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  {message}
-                </p>
-              )}
-              <Input
-                {...field}
-                id="email-otp-code"
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                placeholder="Enter 6-digit OTP"
-                aria-invalid={fieldState.invalid}
-                autoComplete="one-time-code"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
+        <Field data-invalid={!!errors.code}>
+          <FieldLabel htmlFor="email-otp-code">One-Time Password</FieldLabel>
+          {message && (
+            <p className="text-muted-foreground flex items-center gap-1 py-1 text-sm">
+              <CheckCircle2 className="h-4 w-4 text-green-500" />
+              {message}
+            </p>
           )}
-        />
+          <Input
+            id="email-otp-code"
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="Enter 6-digit OTP"
+            aria-invalid={!!errors.code}
+            autoComplete="one-time-code"
+            value={code}
+            onChange={handleCodeChange}
+          />
+          {errors.code && <FieldError errors={[errors.code]} />}
+        </Field>
       </FieldGroup>
       <Button type="submit" className="w-full" disabled={loading || isVerified}>
         {loading ? (

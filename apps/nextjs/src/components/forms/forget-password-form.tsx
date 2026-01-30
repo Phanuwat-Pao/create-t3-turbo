@@ -1,9 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useState, useTransition } from "react";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
@@ -17,10 +15,13 @@ import {
 import { Input } from "@acme/ui/input";
 
 const forgetPasswordSchema = z.object({
-  email: z.email("Please enter a valid email address."),
+  email: z.string().email("Please enter a valid email address."),
 });
 
 type ForgetPasswordFormValues = z.infer<typeof forgetPasswordSchema>;
+type FormErrors = Partial<
+  Record<keyof ForgetPasswordFormValues, { message: string }>
+>;
 
 interface ForgetPasswordFormProps {
   onSuccess?: () => void;
@@ -34,19 +35,32 @@ export function ForgetPasswordForm({
   redirectTo = "/reset-password",
 }: ForgetPasswordFormProps) {
   const [loading, startTransition] = useTransition();
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const form = useForm<ForgetPasswordFormValues>({
-    defaultValues: {
-      email: "",
-    },
-    resolver: zodResolver(forgetPasswordSchema),
-  });
+  const validate = (): boolean => {
+    const result = forgetPasswordSchema.safeParse({ email });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof ForgetPasswordFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
 
-  const onSubmit = (data: ForgetPasswordFormValues) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
     startTransition(async () => {
       try {
         await authClient.requestPasswordReset({
-          email: data.email,
+          email,
           redirectTo,
         });
         onSuccess?.();
@@ -57,26 +71,21 @@ export function ForgetPasswordForm({
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4">
       <FieldGroup>
-        <Controller
-          name="email"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="forget-email">Email</FieldLabel>
-              <Input
-                {...field}
-                id="forget-email"
-                type="email"
-                placeholder="Enter your email"
-                aria-invalid={fieldState.invalid}
-                autoComplete="email"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.email}>
+          <FieldLabel htmlFor="forget-email">Email</FieldLabel>
+          <Input
+            id="forget-email"
+            type="email"
+            placeholder="Enter your email"
+            aria-invalid={!!errors.email}
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          {errors.email && <FieldError errors={[errors.email]} />}
+        </Field>
       </FieldGroup>
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? (

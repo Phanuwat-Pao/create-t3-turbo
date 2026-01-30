@@ -1,62 +1,57 @@
-"use client";
+"use client"
 
-import { cn } from "@acme/ui";
-import { DashIcon } from "@radix-ui/react-icons";
-import { OTPInput, OTPInputContext } from "input-otp";
-import * as React from "react";
+import * as React from "react"
+import { OTPInput, OTPInputContext } from "@acme/ui/input-otp"
+import { MinusIcon } from "lucide-react"
 
-const InputOTP = ({
-  ref,
+import { cn } from "@acme/ui"
+
+function InputOTP({
   className,
   containerClassName,
   ...props
-}: React.ComponentPropsWithoutRef<typeof OTPInput> & {
-  ref?: React.RefObject<React.ElementRef<typeof OTPInput>>;
-}) => (
-  <OTPInput
-    ref={ref}
-    containerClassName={cn(
-      "flex items-center gap-2 has-disabled:opacity-50",
-      containerClassName
-    )}
-    className={cn("disabled:cursor-not-allowed", className)}
-    {...props}
-  />
-);
-InputOTP.displayName = "InputOTP";
+}: React.ComponentProps<typeof OTPInput> & {
+  containerClassName?: string
+}) {
+  return (
+    <OTPInput
+      data-slot="input-otp"
+      containerClassName={cn(
+        "flex items-center gap-2 has-disabled:opacity-50",
+        containerClassName
+      )}
+      className={cn("disabled:cursor-not-allowed", className)}
+      {...props}
+    />
+  )
+}
 
-const InputOTPGroup = ({
-  ref,
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
-  ref?: React.RefObject<React.ElementRef<"div">>;
-}) => (
-  <div ref={ref} className={cn("flex items-center", className)} {...props} />
-);
-InputOTPGroup.displayName = "InputOTPGroup";
+function InputOTPGroup({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="input-otp-group"
+      className={cn("flex items-center", className)}
+      {...props}
+    />
+  )
+}
 
-const InputOTPSlot = ({
-  ref,
+function InputOTPSlot({
   index,
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
-  ref?: React.RefObject<React.ElementRef<"div">>;
-  index: number;
-}) => {
-  const inputOTPContext = React.useContext(OTPInputContext);
-  const slot = inputOTPContext.slots[index];
-  const char = slot?.char;
-  const hasFakeCaret = slot?.hasFakeCaret;
-  const isActive = slot?.isActive;
+}: React.ComponentProps<"div"> & {
+  index: number
+}) {
+  const inputOTPContext = React.useContext(OTPInputContext)
+  const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
 
   return (
     <div
-      ref={ref}
+      data-slot="input-otp-slot"
+      data-active={isActive}
       className={cn(
-        "border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm shadow-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
-        isActive && "ring-ring z-10 ring-1",
+        "data-[active=true]:border-ring data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40 aria-invalid:border-destructive data-[active=true]:aria-invalid:border-destructive dark:bg-input/30 border-input relative flex h-9 w-9 items-center justify-center border-y border-r text-sm shadow-xs transition-all outline-none first:rounded-l-md first:border-l last:rounded-r-md data-[active=true]:z-10 data-[active=true]:ring-[3px]",
         className
       )}
       {...props}
@@ -68,20 +63,15 @@ const InputOTPSlot = ({
         </div>
       )}
     </div>
-  );
-};
-InputOTPSlot.displayName = "InputOTPSlot";
+  )
+}
 
-const InputOTPSeparator = ({
-  ref,
-  ...props
-}: React.ComponentPropsWithoutRef<"div"> & {
-  ref?: React.RefObject<React.ElementRef<"div">>;
-}) => (
-  <div ref={ref} role="separator" {...props}>
-    <DashIcon />
-  </div>
-);
-InputOTPSeparator.displayName = "InputOTPSeparator";
+function InputOTPSeparator({ ...props }: React.ComponentProps<"div">) {
+  return (
+    <div data-slot="input-otp-separator" role="separator" {...props}>
+      <MinusIcon />
+    </div>
+  )
+}
 
-export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator };
+export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator }

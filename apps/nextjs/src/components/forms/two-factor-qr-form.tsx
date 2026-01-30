@@ -1,9 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useState, useTransition } from "react";
 import QRCode from "react-qr-code";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -24,6 +22,9 @@ const passwordSchema = z.object({
 });
 
 type PasswordFormValues = z.infer<typeof passwordSchema>;
+type FormErrors = Partial<
+  Record<keyof PasswordFormValues, { message: string }>
+>;
 
 interface TwoFactorQrFormProps {
   onSuccess?: (totpURI: string) => void;
@@ -32,30 +33,55 @@ interface TwoFactorQrFormProps {
 export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
   const [loading, startTransition] = useTransition();
   const [totpURI, setTotpURI] = useState<string>("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const form = useForm<PasswordFormValues>({
-    defaultValues: {
-      password: "",
+  const validate = useCallback((): boolean => {
+    const result = passwordSchema.safeParse({ password });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof PasswordFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  }, [password]);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
+
+      startTransition(async () => {
+        await authClient.twoFactor.getTotpUri(
+          { password },
+          {
+            onError(context) {
+              toast.error(context.error.message);
+            },
+            onSuccess(context) {
+              setTotpURI(context.data.totpURI);
+              onSuccess?.(context.data.totpURI);
+            },
+          }
+        );
+      });
     },
-    resolver: zodResolver(passwordSchema),
-  });
+    [onSuccess, password, validate]
+  );
 
-  const onSubmit = (data: PasswordFormValues) => {
-    startTransition(async () => {
-      await authClient.twoFactor.getTotpUri(
-        { password: data.password },
-        {
-          onError(context) {
-            toast.error(context.error.message);
-          },
-          onSuccess(context) {
-            setTotpURI(context.data.totpURI);
-            onSuccess?.(context.data.totpURI);
-          },
-        }
-      );
-    });
-  };
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPassword(e.target.value);
+    },
+    []
+  );
 
   if (totpURI) {
     return (
@@ -72,28 +98,20 @@ export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
   }
 
   return (
-    <form
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <FieldGroup>
-        <Controller
-          name="password"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="qr-password">Password</FieldLabel>
-              <PasswordInput
-                {...field}
-                id="qr-password"
-                placeholder="Enter your password"
-                aria-invalid={fieldState.invalid}
-                autoComplete="current-password"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.password}>
+          <FieldLabel htmlFor="qr-password">Password</FieldLabel>
+          <PasswordInput
+            id="qr-password"
+            placeholder="Enter your password"
+            aria-invalid={!!errors.password}
+            autoComplete="current-password"
+            value={password}
+            onChange={handlePasswordChange}
+          />
+          {errors.password && <FieldError errors={[errors.password]} />}
+        </Field>
       </FieldGroup>
       <Button type="submit" disabled={loading}>
         {loading ? (

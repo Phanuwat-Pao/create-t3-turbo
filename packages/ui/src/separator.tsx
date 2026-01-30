@@ -1,9 +1,11 @@
-"use client";
+"use client"
 
-import { cn } from "@acme/ui";
-import { Separator as SeparatorPrimitive } from "radix-ui";
+import * as React from "react"
+import * as SeparatorPrimitive from "@radix-ui/react-separator"
 
-export function Separator({
+import { cn } from "@acme/ui"
+
+function Separator({
   className,
   orientation = "horizontal",
   decorative = true,
@@ -20,5 +22,7 @@ export function Separator({
       )}
       {...props}
     />
-  );
+  )
 }
+
+export { Separator }

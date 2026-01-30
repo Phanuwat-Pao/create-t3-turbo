@@ -1,9 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -28,6 +26,9 @@ const resetPasswordSchema = z
   });
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+type FormErrors = Partial<
+  Record<keyof ResetPasswordFormValues, { message: string }>
+>;
 
 interface ResetPasswordFormProps {
   token: string;
@@ -39,19 +40,32 @@ export function ResetPasswordForm({
   onSuccess,
 }: ResetPasswordFormProps) {
   const [loading, startTransition] = useTransition();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const form = useForm<ResetPasswordFormValues>({
-    defaultValues: {
-      confirmPassword: "",
-      password: "",
-    },
-    resolver: zodResolver(resetPasswordSchema),
-  });
+  const validate = (): boolean => {
+    const result = resetPasswordSchema.safeParse({ confirmPassword, password });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof ResetPasswordFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
 
-  const onSubmit = (data: ResetPasswordFormValues) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
     startTransition(async () => {
       const res = await authClient.resetPassword({
-        newPassword: data.password,
+        newPassword: password,
         token,
       });
       if (res.error) {
@@ -64,44 +78,36 @@ export function ResetPasswordForm({
   };
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4">
       <FieldGroup>
-        <Controller
-          name="password"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="reset-password">New password</FieldLabel>
-              <PasswordInput
-                {...field}
-                id="reset-password"
-                placeholder="Enter new password"
-                aria-invalid={fieldState.invalid}
-                autoComplete="new-password"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
+        <Field data-invalid={!!errors.password}>
+          <FieldLabel htmlFor="reset-password">New password</FieldLabel>
+          <PasswordInput
+            id="reset-password"
+            placeholder="Enter new password"
+            aria-invalid={!!errors.password}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {errors.password && <FieldError errors={[errors.password]} />}
+        </Field>
+        <Field data-invalid={!!errors.confirmPassword}>
+          <FieldLabel htmlFor="reset-confirm-password">
+            Confirm password
+          </FieldLabel>
+          <PasswordInput
+            id="reset-confirm-password"
+            placeholder="Confirm new password"
+            aria-invalid={!!errors.confirmPassword}
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          {errors.confirmPassword && (
+            <FieldError errors={[errors.confirmPassword]} />
           )}
-        />
-        <Controller
-          name="confirmPassword"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="reset-confirm-password">
-                Confirm password
-              </FieldLabel>
-              <PasswordInput
-                {...field}
-                id="reset-confirm-password"
-                placeholder="Confirm new password"
-                aria-invalid={fieldState.invalid}
-                autoComplete="new-password"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        </Field>
       </FieldGroup>
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? (

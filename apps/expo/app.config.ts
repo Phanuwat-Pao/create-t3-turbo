@@ -35,10 +35,13 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
     name: "expo",
     newArchEnabled: true,
     orientation: "portrait",
+
     plugins: [
       "expo-router",
       "expo-secure-store",
       "expo-web-browser",
+      "expo-updates",
+      ["expo-font"],
       [
         "expo-splash-screen",
         {
@@ -50,6 +53,68 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
           image: "./assets/icon-light.png",
         },
       ],
+      [
+        "expo-sqlite",
+        {
+          enableFTS: true,
+          useSQLCipher: true,
+          // android: {
+          //   // Override the shared configuration for Android
+          //   enableFTS: false,
+          //   useSQLCipher: false,
+          // },
+          // ios: {
+          //   // You can also override the shared configurations for iOS
+          //   customBuildFlags: [
+          //     "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1",
+          //   ],
+          // },
+        },
+      ],
+      [
+        "expo-image-picker",
+        {
+          photosPermission:
+            "The app accesses your photos to let you share them with your friends.",
+        },
+      ],
+      [
+        "expo-video",
+        {
+          supportsBackgroundPlayback: true,
+          supportsPictureInPicture: true,
+        },
+      ],
+      [
+        "expo-audio",
+        {
+          microphonePermission:
+            "Allow $(PRODUCT_NAME) to access your microphone.",
+        },
+      ],
+      [
+        "expo-localization",
+        {
+          supportedLocales: {
+            android: ["th", "en"],
+            ios: ["th", "en"],
+          },
+        },
+      ],
+      [
+        "expo-notifications",
+        {
+          color: "#ffffff",
+          defaultChannel: "default",
+          enableBackgroundRemoteNotifications: false,
+          // icon: "./local/assets/notification_icon.png",
+          // sounds: [
+          //   "./local/assets/notification_sound.wav",
+          //   "./local/assets/notification_sound_other.wav",
+          // ],
+        },
+      ],
+      ["expo-asset"],
     ],
     scheme: "expo",
     slug: "expo",

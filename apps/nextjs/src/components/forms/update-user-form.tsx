@@ -1,9 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
-import { Controller, useForm } from "react-hook-form";
+import { useState } from "react";
 import * as z from "zod";
 
 import { Button } from "@acme/ui/button";
@@ -28,6 +27,9 @@ const updateUserSchema = z.object({
 });
 
 type UpdateUserFormValues = z.infer<typeof updateUserSchema>;
+type FormErrors = Partial<
+  Record<keyof UpdateUserFormValues, { message: string }>
+>;
 
 interface UpdateUserFormProps {
   currentName?: string;
@@ -44,34 +46,42 @@ export function UpdateUserForm({
   const { image, imagePreview, handleImageChange, clearImage } =
     useImagePreview();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors },
-  } = useForm<UpdateUserFormValues>({
-    defaultValues: {
-      name: "",
-    },
-    resolver: zodResolver(updateUserSchema),
-  });
+  const [name, setName] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const onSubmit = async (values: UpdateUserFormValues) => {
+  const validate = (): boolean => {
+    const result = updateUserSchema.safeParse({ name });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof UpdateUserFormValues;
+        fieldErrors[field] = { message: issue.message };
+      }
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
     try {
       const imageBase64 = image ? await convertImageToBase64(image) : undefined;
 
       updateUserMutation.mutate(
         {
           image: imageBase64,
-          name: values.name || undefined,
+          name: name || undefined,
         },
         {
           onError: (error) => {
             onError?.(error.message);
           },
           onSuccess: () => {
-            reset();
+            setName("");
             clearImage();
             onSuccess?.();
           },
@@ -84,28 +94,21 @@ export function UpdateUserForm({
     }
   };
 
-  const nameValue = watch("name");
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <FieldGroup>
-        <Controller
-          name="name"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input
-                id="name"
-                type="text"
-                placeholder={currentName}
-                disabled={updateUserMutation.isPending}
-                {...field}
-              />
-              <FieldError>{errors.name?.message}</FieldError>
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.name}>
+          <FieldLabel htmlFor="name">Full Name</FieldLabel>
+          <Input
+            id="name"
+            type="text"
+            placeholder={currentName}
+            disabled={updateUserMutation.isPending}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          {errors.name && <FieldError errors={[errors.name]} />}
+        </Field>
 
         <Field>
           <FieldLabel htmlFor="image">Profile Image</FieldLabel>
@@ -142,7 +145,7 @@ export function UpdateUserForm({
 
         <Button
           type="submit"
-          disabled={updateUserMutation.isPending || (!image && !nameValue)}
+          disabled={updateUserMutation.isPending || (!image && !name)}
         >
           {updateUserMutation.isPending ? (
             <Loader2 size={15} className="animate-spin" />

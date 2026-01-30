@@ -1,9 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useState, useTransition } from "react";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
@@ -24,6 +22,7 @@ const totpSchema = z.object({
 });
 
 type TotpFormValues = z.infer<typeof totpSchema>;
+type FormErrors = Partial<Record<keyof TotpFormValues, { message: string }>>;
 
 interface TwoFactorTotpFormProps {
   onSuccess?: () => void;
@@ -36,28 +35,53 @@ export function TwoFactorTotpForm({
 }: TwoFactorTotpFormProps) {
   const [loading, startTransition] = useTransition();
   const [isVerified, setIsVerified] = useState(false);
+  const [code, setCode] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const form = useForm<TotpFormValues>({
-    defaultValues: {
-      code: "",
-    },
-    resolver: zodResolver(totpSchema),
-  });
-
-  const onSubmit = (data: TotpFormValues) => {
-    startTransition(async () => {
-      const res = await authClient.twoFactor.verifyTotp({
-        code: data.code,
-      });
-      if (res.data?.token) {
-        setIsVerified(true);
-        onSuccess?.();
-      } else {
-        onError?.("Invalid TOTP code");
-        form.setError("code", { message: "Invalid TOTP code" });
+  const validate = useCallback((): boolean => {
+    const result = totpSchema.safeParse({ code });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof TotpFormValues;
+        fieldErrors[field] = { message: issue.message };
       }
-    });
-  };
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  }, [code]);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
+
+      startTransition(async () => {
+        const res = await authClient.twoFactor.verifyTotp({
+          code,
+        });
+        if (res.data?.token) {
+          setIsVerified(true);
+          onSuccess?.();
+        } else {
+          onError?.("Invalid TOTP code");
+          setErrors({ code: { message: "Invalid TOTP code" } });
+        }
+      });
+    },
+    [code, onError, onSuccess, validate]
+  );
+
+  const handleCodeChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setCode(e.target.value);
+    },
+    []
+  );
 
   if (isVerified) {
     return (
@@ -69,28 +93,23 @@ export function TwoFactorTotpForm({
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+    <form onSubmit={handleSubmit} className="grid gap-4">
       <FieldGroup>
-        <Controller
-          name="code"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="totp-code">TOTP Code</FieldLabel>
-              <Input
-                {...field}
-                id="totp-code"
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                placeholder="Enter 6-digit code"
-                aria-invalid={fieldState.invalid}
-                autoComplete="one-time-code"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.code}>
+          <FieldLabel htmlFor="totp-code">TOTP Code</FieldLabel>
+          <Input
+            id="totp-code"
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="Enter 6-digit code"
+            aria-invalid={!!errors.code}
+            autoComplete="one-time-code"
+            value={code}
+            onChange={handleCodeChange}
+          />
+          {errors.code && <FieldError errors={[errors.code]} />}
+        </Field>
       </FieldGroup>
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? <Loader2 size={16} className="animate-spin" /> : "Verify"}

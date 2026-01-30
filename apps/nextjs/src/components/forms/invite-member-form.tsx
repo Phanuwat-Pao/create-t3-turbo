@@ -1,8 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useState } from "react";
 import * as z from "zod";
 
 import type { OrganizationRole } from "~/lib/auth";
@@ -30,13 +29,16 @@ const ORGANIZATION_ROLES = {
 } as const satisfies Record<string, OrganizationRole>;
 
 const inviteMemberSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.string().email("Please enter a valid email address"),
   role: z.enum(["admin", "member"], {
-    error: "Please select a role",
+    message: "Please select a role",
   }),
 });
 
 type InviteMemberFormValues = z.infer<typeof inviteMemberSchema>;
+type FormErrors = Partial<
+  Record<keyof InviteMemberFormValues, { message: string }>
+>;
 
 interface InviteMemberFormProps {
   onSuccess?: () => void;
@@ -49,85 +51,101 @@ export function InviteMemberForm({
 }: InviteMemberFormProps) {
   const inviteMutation = useInviteMemberMutation();
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<InviteMemberFormValues>({
-    defaultValues: {
-      email: "",
-      role: "member",
-    },
-    resolver: zodResolver(inviteMemberSchema),
-  });
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<"admin" | "member">("member");
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const onSubmit = (values: InviteMemberFormValues) => {
-    inviteMutation.mutate(
-      {
-        email: values.email,
-        role: values.role as OrganizationRole,
-      },
-      {
-        onError: (error) => {
-          onError?.(error.message);
-        },
-        onSuccess: () => {
-          reset();
-          onSuccess?.();
-        },
+  const validate = useCallback((): boolean => {
+    const result = inviteMemberSchema.safeParse({ email, role });
+    if (!result.success) {
+      const fieldErrors: FormErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof InviteMemberFormValues;
+        fieldErrors[field] = { message: issue.message };
       }
-    );
-  };
+      setErrors(fieldErrors);
+      return false;
+    }
+    setErrors({});
+    return true;
+  }, [email, role]);
+
+  const resetForm = useCallback(() => {
+    setEmail("");
+    setRole("member");
+    setErrors({});
+  }, []);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
+
+      inviteMutation.mutate(
+        {
+          email,
+          role: role as OrganizationRole,
+        },
+        {
+          onError: (error) => {
+            onError?.(error.message);
+          },
+          onSuccess: () => {
+            resetForm();
+            onSuccess?.();
+          },
+        }
+      );
+    },
+    [email, inviteMutation, onError, onSuccess, resetForm, role, validate]
+  );
+
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setEmail(e.target.value);
+    },
+    []
+  );
+
+  const handleRoleChange = useCallback((value: string) => {
+    setRole(value as "admin" | "member");
+  }, []);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <FieldGroup>
-        <Controller
-          name="email"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="invite-email">Email</FieldLabel>
-              <Input
-                id="invite-email"
-                type="email"
-                placeholder="member@example.com"
-                disabled={inviteMutation.isPending}
-                {...field}
-              />
-              <FieldError>{errors.email?.message}</FieldError>
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.email}>
+          <FieldLabel htmlFor="invite-email">Email</FieldLabel>
+          <Input
+            id="invite-email"
+            type="email"
+            placeholder="member@example.com"
+            disabled={inviteMutation.isPending}
+            value={email}
+            onChange={handleEmailChange}
+          />
+          {errors.email && <FieldError errors={[errors.email]} />}
+        </Field>
 
-        <Controller
-          name="role"
-          control={control}
-          render={({ field }) => (
-            <Field>
-              <FieldLabel htmlFor="invite-role">Role</FieldLabel>
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-                disabled={inviteMutation.isPending}
-              >
-                <SelectTrigger id="invite-role">
-                  <SelectValue placeholder="Select a role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ORGANIZATION_ROLES.ADMIN}>
-                    Admin
-                  </SelectItem>
-                  <SelectItem value={ORGANIZATION_ROLES.MEMBER}>
-                    Member
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FieldError>{errors.role?.message}</FieldError>
-            </Field>
-          )}
-        />
+        <Field data-invalid={!!errors.role}>
+          <FieldLabel htmlFor="invite-role">Role</FieldLabel>
+          <Select
+            value={role}
+            onValueChange={handleRoleChange}
+            disabled={inviteMutation.isPending}
+          >
+            <SelectTrigger id="invite-role">
+              <SelectValue placeholder="Select a role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ORGANIZATION_ROLES.ADMIN}>Admin</SelectItem>
+              <SelectItem value={ORGANIZATION_ROLES.MEMBER}>Member</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.role && <FieldError errors={[errors.role]} />}
+        </Field>
 
         <Button type="submit" disabled={inviteMutation.isPending}>
           {inviteMutation.isPending ? (
