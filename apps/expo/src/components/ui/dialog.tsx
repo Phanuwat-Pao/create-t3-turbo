@@ -1,5 +1,6 @@
-import * as DialogPrimitive from "@rn-primitives/dialog";
 import type { ReactNode } from "react";
+
+import * as DialogPrimitive from "@rn-primitives/dialog";
 import * as React from "react";
 import { type ViewProps, Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";

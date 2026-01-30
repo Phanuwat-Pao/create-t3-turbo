@@ -51,11 +51,6 @@ import { UAParser } from "ua-parser-js";
 import type { Session } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
-
-// Extended user type with twoFactor plugin fields
-type ExtendedUser = Session["user"] & { twoFactorEnabled?: boolean };
-// Extended session type with admin plugin fields
-type ExtendedSessionData = Session["session"] & { impersonatedBy?: string };
 import { ChangePasswordForm } from "~/components/forms/change-password-form";
 import { TwoFactorDisableForm } from "~/components/forms/two-factor-disable-form";
 import { TwoFactorEnableForm } from "~/components/forms/two-factor-enable-form";
@@ -64,6 +59,11 @@ import { UpdateUserForm } from "~/components/forms/update-user-form";
 import { useRevokeSessionMutation } from "~/data/user/revoke-session-mutation";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
+
+// Extended user type with twoFactor plugin fields
+type ExtendedUser = Session["user"] & { twoFactorEnabled?: boolean };
+// Extended session type with admin plugin fields
+type ExtendedSessionData = Session["session"] & { impersonatedBy?: string };
 
 interface SessionItemProps {
   session: Session["session"];
@@ -300,7 +300,9 @@ const UserCard = (props: {
                 <DialogTrigger asChild>
                   <Button
                     variant={
-                      (session?.user as ExtendedUser)?.twoFactorEnabled ? "destructive" : "outline"
+                      (session?.user as ExtendedUser)?.twoFactorEnabled
+                        ? "destructive"
+                        : "outline"
                     }
                     className="gap-2"
                   >
@@ -672,4 +674,3 @@ function ListPasskeys() {
     </Dialog>
   );
 }
-

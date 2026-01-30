@@ -19,7 +19,13 @@ const handler = mcpHandler(
   },
   (req, jwt) =>
     createMcpHandler(
-      (server: { registerTool: (name: string, schema: unknown, handler: (input: { message: string }) => Promise<unknown>) => void }) => {
+      (server: {
+        registerTool: (
+          name: string,
+          schema: unknown,
+          handler: (input: { message: string }) => Promise<unknown>
+        ) => void;
+      }) => {
         server.registerTool(
           "echo",
           {
