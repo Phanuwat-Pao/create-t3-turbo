@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "~/auth/client";
 
 import { organizationKeys } from "./keys";
 
@@ -17,7 +17,9 @@ export async function createOrganization(params: OrganizationCreateParams) {
     name: params.name,
     slug: params.slug,
   });
-  if (error) {throw new Error(error.message);}
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }

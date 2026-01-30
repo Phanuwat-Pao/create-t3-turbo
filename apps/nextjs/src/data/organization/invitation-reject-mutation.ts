@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "~/auth/client";
 
 import { getQueryClient } from "../query-client";
 import { organizationKeys } from "./keys";
@@ -14,7 +14,9 @@ export async function inviteReject(params: InviteRejectParams) {
   const { data, error } = await authClient.organization.rejectInvitation({
     invitationId: params.invitationId,
   });
-  if (error) {throw new Error(error.message);}
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }

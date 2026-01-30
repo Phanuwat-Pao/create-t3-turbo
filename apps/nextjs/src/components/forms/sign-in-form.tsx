@@ -8,17 +8,17 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { authClient } from "~/auth/client";
+import { Button } from "@acme/ui/button";
+import { Checkbox } from "@acme/ui/checkbox";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/ui/password-input";
-import { authClient } from "@/lib/auth-client";
+} from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
+import { PasswordInput } from "@acme/ui/password-input";
 
 import { LastUsedIndicator } from "../last-used-indicator";
 

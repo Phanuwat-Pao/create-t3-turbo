@@ -3,12 +3,13 @@ import type React from "react";
 
 import { cva } from "class-variance-authority";
 
-import { cn } from "@/lib/utils";
+import { cn } from "~/lib/utils";
 
 const VALID_TIERS = ["free", "plus", "pro"] as const;
 type Tier = (typeof VALID_TIERS)[number];
 
-const isValidTier = (tier: string | undefined): tier is Tier => VALID_TIERS.includes(tier as Tier);
+const isValidTier = (tier: string | undefined): tier is Tier =>
+  VALID_TIERS.includes(tier as Tier);
 
 const tierVariants = cva(
   "inline-flex items-center px-3 py-1 text-xs font-semibold ring-1 transition-all duration-300 ease-in-out ring-inset",

@@ -1,34 +1,22 @@
 import type { Metadata, Viewport } from "next";
 
 import { cn } from "@acme/ui";
-import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
-import { Toaster } from "@acme/ui/toast";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { env } from "~/env";
-import { ORPCReactProvider } from "~/rpc/react";
+import { BackgroundRippleEffect } from "~/components/background-ripple-effect";
+import Header from "~/components/header";
+import Providers from "~/components/providers";
+import { createMetadata } from "~/lib/metadata";
 import "~/app/styles.css";
 
-export const metadata: Metadata = {
-  description: "Simple monorepo with shared backend for web & mobile apps",
-  metadataBase: new URL(
-    env.VERCEL_ENV === "production"
-      ? "https://turbo.t3.gg"
-      : "http://localhost:3000"
-  ),
-  openGraph: {
-    description: "Simple monorepo with shared backend for web & mobile apps",
-    siteName: "Create T3 Turbo",
-    title: "Create T3 Turbo",
-    url: "https://create-t3-turbo.vercel.app",
+export const metadata: Metadata = createMetadata({
+  description: "The most comprehensive authentication framework for TypeScript",
+  metadataBase: new URL("https://demo.better-auth.com"),
+  title: {
+    template: "%s | Better Auth",
+    default: "Better Auth",
   },
-  title: "Create T3 Turbo",
-  twitter: {
-    card: "summary_large_image",
-    creator: "@jullerino",
-    site: "@jullerino",
-  },
-};
+});
 
 export const viewport: Viewport = {
   themeColor: [
@@ -46,9 +34,16 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 });
 
-export default function RootLayout(props: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
+      </head>
       <body
         className={cn(
           "bg-background text-foreground min-h-screen font-sans antialiased",
@@ -56,13 +51,22 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           geistMono.variable
         )}
       >
-        <ThemeProvider>
-          <ORPCReactProvider>{props.children}</ORPCReactProvider>
-          <div className="absolute right-4 bottom-4">
-            <ThemeToggle />
+        <Providers>
+          <div className="relative mt-14 min-h-[calc(100vh-3.5rem)] w-full">
+            {/* Site Header */}
+            <Header />
+
+            {/* Background Ripple Effect */}
+            <div className="absolute inset-0 z-0">
+              <BackgroundRippleEffect />
+            </div>
+
+            {/* Content */}
+            <div className="relative z-10 mx-auto w-full max-w-4xl p-6">
+              {children}
+            </div>
           </div>
-          <Toaster />
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

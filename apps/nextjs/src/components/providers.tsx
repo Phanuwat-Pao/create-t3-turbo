@@ -3,10 +3,10 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import { getQueryClient } from "@/data/query-client";
+import { getQueryClient } from "~/data/query-client";
 
 import { ThemeProvider } from "./theme-provider";
-import { Toaster } from "./ui/sonner";
+import { Toaster } from "./sonner";
 
 interface Props {
   children: React.ReactNode;

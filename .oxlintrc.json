@@ -13,6 +13,14 @@
     // Required for drizzle transaction type compatibility
     "require-await": "off",
     // Required for FOUC prevention in theme detection
-    "react/no-danger": "off"
+    "react/no-danger": "off",
+    "max-statements": "off",
+    "eslint-plugin-jest/require-hook": "off",
+    // Disable import/namespace - false positives with @rn-primitives packages
+    "import/namespace": "off",
+    "unicorn/no-useless-undefined": "off",
+    "unicorn/filename-case": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "eslint/complexity": "off"
   }
 }

@@ -7,17 +7,17 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
+import { authClient } from "~/auth/client";
+import { Button } from "@acme/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { useImagePreview } from "@/hooks/use-image-preview";
-import { authClient } from "@/lib/auth-client";
-import { convertImageToBase64 } from "@/lib/utils";
+} from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
+import { useImagePreview } from "~/hooks/use-image-preview";
+import { convertImageToBase64 } from "~/lib/utils";
 
 const signUpSchema = z
   .object({
@@ -49,9 +49,9 @@ export function SignUpForm({
 
   const form = useForm<SignUpFormValues>({
     defaultValues: {
+      email: "",
       firstName: "",
       lastName: "",
-      email: "",
       password: "",
       passwordConfirmation: "",
     },

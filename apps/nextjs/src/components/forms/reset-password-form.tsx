@@ -7,15 +7,15 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
+import { authClient } from "~/auth/client";
+import { Button } from "@acme/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { PasswordInput } from "@/components/ui/password-input";
-import { authClient } from "@/lib/auth-client";
+} from "@acme/ui/field";
+import { PasswordInput } from "@acme/ui/password-input";
 
 const resetPasswordSchema = z
   .object({
@@ -42,8 +42,8 @@ export function ResetPasswordForm({
 
   const form = useForm<ResetPasswordFormValues>({
     defaultValues: {
-      password: "",
       confirmPassword: "",
+      password: "",
     },
     resolver: zodResolver(resetPasswordSchema),
   });

@@ -6,17 +6,17 @@ import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { useUpdateUserMutation } from "@/data/user/update-user-mutation";
-import { useImagePreview } from "@/hooks/use-image-preview";
-import { convertImageToBase64 } from "@/lib/utils";
+} from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
+import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
+import { useImagePreview } from "~/hooks/use-image-preview";
+import { convertImageToBase64 } from "~/lib/utils";
 
 const updateUserSchema = z.object({
   name: z

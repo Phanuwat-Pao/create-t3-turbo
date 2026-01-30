@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "~/auth/client";
 
 import { organizationKeys } from "./keys";
 
@@ -14,14 +14,17 @@ export async function getInvitation(params: GetInvitationParams) {
       id: params.invitationId,
     },
   });
-  if (error) {throw new Error(error.message);}
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }
 export type InvitationData = Awaited<ReturnType<typeof getInvitation>>;
 
-export const useInvitationQuery = (invitationId: string) => useQuery({
-    queryKey: organizationKeys.invitationDetail(invitationId),
-    queryFn: async () => await getInvitation({ invitationId }),
+export const useInvitationQuery = (invitationId: string) =>
+  useQuery({
     enabled: !!invitationId,
+    queryFn: async () => await getInvitation({ invitationId }),
+    queryKey: organizationKeys.invitationDetail(invitationId),
   });

@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "~/auth/client";
 
 import { subscriptionKeys } from "./keys";
 
 export async function restoreSubscription() {
   const { data, error } = await authClient.subscription.restore();
-  if (error) {throw new Error(error.message);}
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }

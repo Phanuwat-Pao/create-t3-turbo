@@ -5,16 +5,16 @@ import { Loader2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@acme/ui/button";
+import { Checkbox } from "@acme/ui/checkbox";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { PasswordInput } from "@/components/ui/password-input";
-import { useChangePasswordMutation } from "@/data/user/change-password-mutation";
+} from "@acme/ui/field";
+import { PasswordInput } from "@acme/ui/password-input";
+import { useChangePasswordMutation } from "~/data/user/change-password-mutation";
 
 const changePasswordSchema = z
   .object({
@@ -51,9 +51,9 @@ export function ChangePasswordForm({
     formState: { errors },
   } = useForm<ChangePasswordFormValues>({
     defaultValues: {
+      confirmPassword: "",
       currentPassword: "",
       newPassword: "",
-      confirmPassword: "",
       revokeOtherSessions: false,
     },
     resolver: zodResolver(changePasswordSchema),

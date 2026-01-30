@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "~/auth/client";
 
 import { userKeys } from "./keys";
 
@@ -11,7 +11,9 @@ interface RevokeSessionParams {
 
 export async function revokeSession(params: RevokeSessionParams) {
   const { data, error } = await authClient.revokeSession(params);
-  if (error) {throw new Error(error.message);}
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import type { OrganizationRole } from "@/lib/auth";
+import type { OrganizationRole } from "~/lib/auth";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "~/auth/client";
 
 import { organizationKeys } from "./keys";
 
@@ -17,7 +17,9 @@ export async function inviteMember(params: InviteMemberParams) {
     email: params.email,
     role: params.role,
   });
-  if (error) {throw new Error(error.message);}
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return data;
 }

@@ -4,27 +4,27 @@ import { ChevronDown, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import type { SessionData } from "@/data/user/session-query";
-import type { DeviceSession } from "@/lib/auth";
+import type { SessionData } from "~/data/user/session-query";
+import type { DeviceSession } from "~/lib/auth";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { authClient } from "~/auth/client";
+import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
+import { Button } from "@acme/ui/button";
 import {
   Command,
   CommandGroup,
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
+} from "@acme/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { getQueryClient } from "@/data/query-client";
-import { userKeys } from "@/data/user/keys";
-import { useSessionQuery } from "@/data/user/session-query";
-import { authClient } from "@/lib/auth-client";
+} from "@acme/ui/popover";
+import { getQueryClient } from "~/data/query-client";
+import { userKeys } from "~/data/user/keys";
+import { useSessionQuery } from "~/data/user/session-query";
 
 export default function AccountSwitcher({
   deviceSessions,

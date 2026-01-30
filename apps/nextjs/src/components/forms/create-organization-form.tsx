@@ -7,17 +7,17 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { useOrganizationCreateMutation } from "@/data/organization/organization-create-mutation";
-import { useImagePreview } from "@/hooks/use-image-preview";
-import { convertImageToBase64 } from "@/lib/utils";
+} from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
+import { useOrganizationCreateMutation } from "~/data/organization/organization-create-mutation";
+import { useImagePreview } from "~/hooks/use-image-preview";
+import { convertImageToBase64 } from "~/lib/utils";
 
 const createOrganizationSchema = z.object({
   name: z

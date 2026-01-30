@@ -5,24 +5,24 @@ import { Loader2 } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import type { OrganizationRole } from "@/lib/auth";
+import type { OrganizationRole } from "~/lib/auth";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@acme/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+} from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useInviteMemberMutation } from "@/data/organization/invitation-member-mutation";
+} from "@acme/ui/select";
+import { useInviteMemberMutation } from "~/data/organization/invitation-member-mutation";
 
 const ORGANIZATION_ROLES = {
   ADMIN: "admin",

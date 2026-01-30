@@ -7,11 +7,11 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { authClient } from "@/lib/auth-client";
-import { cn } from "@/lib/utils";
+import { authClient } from "~/auth/client";
+import { Button, buttonVariants } from "@acme/ui/button";
+import { Label } from "@acme/ui/label";
+import { Switch } from "@acme/ui/switch";
+import { cn } from "~/lib/utils";
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(false);
@@ -123,7 +123,7 @@ export function Pricing({
               isDesktop
                 ? {
                     opacity: 1,
-                    scale: index === 0 || index === 2 ? 0.94 : 1.0,
+                    scale: index === 0 || index === 2 ? 0.94 : 1,
                     x: index === 2 ? -30 : index === 0 ? 30 : 0,
                     y: plan.isPopular ? -20 : 0,
                   }

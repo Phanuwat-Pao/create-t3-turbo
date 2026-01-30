@@ -6,15 +6,15 @@ import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
+import { authClient } from "~/auth/client";
+import { Button } from "@acme/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
+} from "@acme/ui/field";
+import { Input } from "@acme/ui/input";
 
 const forgetPasswordSchema = z.object({
   email: z.email("Please enter a valid email address."),
