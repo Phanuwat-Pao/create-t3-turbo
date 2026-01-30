@@ -11,7 +11,7 @@ import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
-const logoImage = require("../../assets/images/logo.png") as number;
+import logoImage from "../../assets/images/logo.png";
 
 export default function Index() {
   const { data: isAuthenticated } = authClient.useSession();

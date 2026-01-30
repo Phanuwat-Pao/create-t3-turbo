@@ -8,7 +8,7 @@ import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/lib/auth-client";
 
-const logoImage = require("../../assets/images/logo.png") as number;
+import logoImage from "../../assets/images/logo.png";
 
 export default function SignUp() {
   const router = useRouter();

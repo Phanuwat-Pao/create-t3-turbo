@@ -80,7 +80,6 @@ const Button = React.forwardRef<
         buttonVariants({ className, size, variant })
       )}
       ref={ref}
-      role="button"
       {...props}
     />
   </TextClassContext.Provider>

@@ -12,7 +12,6 @@ import {
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
 import { Loader2 } from "lucide-react";
-import Image from "next/image";
 import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -128,18 +127,21 @@ export default function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isPending ? (
+            {isPending && (
               <div className="flex justify-center py-4">
                 <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
               </div>
-            ) : error ? (
+            )}
+            {!isPending && error && (
               <div className="bg-destructive/10 text-destructive rounded-md p-4">
                 Error: {error.message}
               </div>
-            ) : session ? (
+            )}
+            {!isPending && !error && session && (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
                   {session.user.image ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={session.user.image}
                       alt="Profile"
@@ -168,7 +170,8 @@ export default function Page() {
                   </pre>
                 </div>
               </div>
-            ) : (
+            )}
+            {!isPending && !error && !session && (
               <div className="text-muted-foreground py-8 text-center">
                 <p>Sign in to view your session information</p>
               </div>

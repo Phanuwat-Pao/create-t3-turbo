@@ -1,10 +1,13 @@
 export { cn } from "@acme/ui";
 
 export async function convertImageToBase64(file: File): Promise<string> {
-  return await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.addEventListener("loadend", () => resolve(reader.result as string));
-    reader.addEventListener("error", () => reject(reader.error));
-    reader.readAsDataURL(file);
-  });
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = "";
+  for (const byte of bytes) {
+    binary += String.fromCodePoint(byte);
+  }
+  const base64 = btoa(binary);
+  const mimeType = file.type || "application/octet-stream";
+  return `data:${mimeType};base64,${base64}`;
 }

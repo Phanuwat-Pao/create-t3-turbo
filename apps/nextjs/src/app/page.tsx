@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import Link from "next/link";
 
 import EntryButton from "~/components/entry-button";
 import { auth } from "~/lib/auth";
@@ -95,7 +96,7 @@ export default async function HomePage() {
             </div>
             <div className="flex flex-wrap justify-center gap-2">
               {features.map((feature) => (
-                <a
+                <Link
                   className="text-muted-foreground hover:text-foreground hover:border-foreground flex cursor-pointer items-center gap-1 border-b pb-1 text-xs transition-all duration-150 ease-in-out"
                   key={feature.name}
                   href={feature.link}
@@ -103,7 +104,7 @@ export default async function HomePage() {
                   rel="noreferrer"
                 >
                   {feature.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
