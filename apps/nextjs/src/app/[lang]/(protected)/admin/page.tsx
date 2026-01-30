@@ -50,8 +50,8 @@ interface User {
   id: string;
   email: string;
   name: string;
-  role: string | null | undefined;
-  banned: boolean;
+  role?: string | null;
+  banned: boolean | null;
 }
 
 interface UserRowProps {
@@ -319,7 +319,7 @@ function AdminDashboard() {
             userId: user.id,
           },
           {
-            onError(context) {
+            onError(context: { error: { message?: string } }) {
               toast.error(context.error.message || "Failed to unban user");
               setIsLoading(undefined);
             },
@@ -561,7 +561,7 @@ function AdminDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users?.map((user) => (
+                {users?.map((user: User) => (
                   <UserRow
                     key={user.id}
                     user={user}

@@ -51,7 +51,7 @@ export default async function AuthorizePage({
     throw redirect("/sign-in");
   });
 
-  const organization = session?.session?.activeOrganizationId
+  const organization = (session?.session as { activeOrganizationId?: string } | undefined)?.activeOrganizationId
     ? await auth.api.getFullOrganization({
         headers: _headers,
       })

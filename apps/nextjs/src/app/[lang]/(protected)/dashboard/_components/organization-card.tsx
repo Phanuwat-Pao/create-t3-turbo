@@ -73,7 +73,7 @@ interface MemberItemProps {
   member: {
     id: string;
     role: OrganizationRole;
-    user: { name: string | null; image: string | null | undefined };
+    user: { name: string | null; image?: string | null };
   };
   currentMember: { id: string; role: OrganizationRole } | undefined;
   isRemoving: boolean;
@@ -189,7 +189,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
 
   const session = sessionData || props.session;
   const currentMember = activeOrganization?.members?.find(
-    (member) => member.userId === session?.user.id
+    (member: { userId: string }) => member.userId === session?.user.id
   );
 
   const handleSelectPersonal = useCallback(() => {
@@ -241,7 +241,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
               <DropdownMenuItem className="py-1" onClick={handleSelectPersonal}>
                 <p className="sm text-sm">Personal</p>
               </DropdownMenuItem>
-              {organizations?.map((org) => (
+              {organizations?.map((org: { id: string; name: string }) => (
                 <OrganizationDropdownItem
                   key={org.id}
                   orgId={org.id}
@@ -281,7 +281,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
               Members
             </p>
             <div className="flex flex-col gap-2">
-              {activeOrganization?.members?.map((member) => (
+              {activeOrganization?.members?.map((member: MemberItemProps["member"]) => (
                 <MemberItem
                   key={member.id}
                   member={member}
@@ -319,8 +319,8 @@ const OrganizationCard = (props: { session: Session | null }) => {
             <div className="flex flex-col gap-2">
               <AnimatePresence>
                 {activeOrganization?.invitations
-                  ?.filter((invitation) => invitation.status === "pending")
-                  .map((invitation) => (
+                  ?.filter((invitation: { status: string }) => invitation.status === "pending")
+                  .map((invitation: InvitationItemProps["invitation"]) => (
                     <InvitationItem
                       key={invitation.id}
                       invitation={invitation}
@@ -334,7 +334,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
                   ))}
               </AnimatePresence>
               {activeOrganization?.invitations?.filter(
-                (invitation) => invitation.status === "pending"
+                (invitation: { status: string }) => invitation.status === "pending"
               ).length === 0 && (
                 <motion.p
                   className="text-muted-foreground text-sm"

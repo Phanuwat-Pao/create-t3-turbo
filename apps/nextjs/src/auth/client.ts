@@ -1,4 +1,4 @@
-import { oAuthProviderClient } from "@better-auth/oauth-provider/client";
+import { oauthProviderClient } from "@better-auth/oauth-provider/client";
 import { passkeyClient } from "@better-auth/passkey/client";
 import {
   adminClient,
@@ -46,6 +46,6 @@ export const authClient = createAuthClient({
     deviceAuthorizationClient(),
     lastLoginMethodClient(),
     passkeyClient(),
-    oAuthProviderClient(),
+    oauthProviderClient(),
   ],
 });

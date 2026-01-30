@@ -81,7 +81,7 @@ export function SignUpForm({
           callbackURL,
           email,
           fetchOptions: {
-            onError: (ctx) => {
+            onError: (ctx: { error: { message: string } }) => {
               toast.error(ctx.error.message);
             },
             onSuccess: async () => {

@@ -18,7 +18,7 @@ export default function Page() {
   useEffect(() => {
     authClient.oneTap({
       fetchOptions: {
-        onError: ({ error }) => {
+        onError: ({ error }: { error: { message?: string } }) => {
           toast.error(error.message || "An error occurred");
         },
         onSuccess: () => {

@@ -35,7 +35,7 @@ export default function Page() {
           password,
         },
         {
-          onError: (ctx) => {
+          onError: (ctx: { error: { message: string } }) => {
             toast.error(ctx.error.message);
           },
           onSuccess: () => {

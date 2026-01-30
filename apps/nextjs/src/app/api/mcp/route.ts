@@ -1,4 +1,5 @@
 import { mcpHandler } from "@better-auth/oauth-provider";
+// @ts-expect-error mcp-handler package may not be installed
 import { createMcpHandler } from "mcp-handler";
 import { type NextRequest, NextResponse } from "next/server";
 import * as z from "zod";
@@ -18,7 +19,7 @@ const handler = mcpHandler(
   },
   (req, jwt) =>
     createMcpHandler(
-      (server) => {
+      (server: { registerTool: (name: string, schema: unknown, handler: (input: { message: string }) => Promise<unknown>) => void }) => {
         server.registerTool(
           "echo",
           {
@@ -27,7 +28,7 @@ const handler = mcpHandler(
               message: z.string(),
             },
           },
-          async ({ message }) => {
+          async ({ message }: { message: string }) => {
             const baseUrl =
               process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
             const org = jwt?.[`${baseUrl}/org`];

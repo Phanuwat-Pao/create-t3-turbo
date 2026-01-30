@@ -51,7 +51,7 @@ export function TwoFactorDisableForm({ onSuccess }: TwoFactorDisableFormProps) {
       startTransition(async () => {
         await authClient.twoFactor.disable({
           fetchOptions: {
-            onError(context) {
+            onError(context: { error: { message: string } }) {
               toast.error(context.error.message);
             },
             onSuccess() {

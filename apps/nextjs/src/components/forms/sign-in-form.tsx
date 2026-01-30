@@ -77,7 +77,7 @@ export function SignInForm({
             rememberMe,
           },
           {
-            onError(context) {
+            onError(context: { error: { message: string } }) {
               toast.error(context.error.message);
             },
             onSuccess() {

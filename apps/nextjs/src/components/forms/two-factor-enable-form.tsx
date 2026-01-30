@@ -81,10 +81,10 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
       startTransition(async () => {
         await authClient.twoFactor.enable({
           fetchOptions: {
-            onError(context) {
+            onError(context: { error: { message: string } }) {
               toast.error(context.error.message);
             },
-            onSuccess(ctx) {
+            onSuccess(ctx: { data: { totpURI: string } }) {
               setTotpURI(ctx.data.totpURI);
             },
           },
@@ -106,7 +106,7 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
         await authClient.twoFactor.verifyTotp({
           code: otp,
           fetchOptions: {
-            onError(context) {
+            onError(context: { error: { message: string } }) {
               toast.error(context.error.message);
               setOtp("");
             },

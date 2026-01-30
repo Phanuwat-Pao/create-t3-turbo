@@ -135,7 +135,7 @@ const UserCard = (props: {
         email: session?.user.email || "",
       },
       {
-        onError(context) {
+        onError(context: { error: { message: string } }) {
           toast.error(context.error.message);
           setEmailVerificationPending(false);
         },
@@ -627,7 +627,7 @@ function ListPasskeys() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((passkey) => (
+              {data.map((passkey: PasskeyRowProps["passkey"]) => (
                 <PasskeyRow
                   key={passkey.id}
                   passkey={passkey}

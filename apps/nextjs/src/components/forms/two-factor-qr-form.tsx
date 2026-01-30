@@ -57,10 +57,10 @@ export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
         await authClient.twoFactor.getTotpUri(
           { password },
           {
-            onError(context) {
+            onError(context: { error: { message: string } }) {
               toast.error(context.error.message);
             },
-            onSuccess(context) {
+            onSuccess(context: { data: { totpURI: string } }) {
               setTotpURI(context.data.totpURI);
               onSuccess?.(context.data.totpURI);
             },
