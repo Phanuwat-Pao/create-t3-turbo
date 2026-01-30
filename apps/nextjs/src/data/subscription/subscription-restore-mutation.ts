@@ -1,30 +1,32 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 import { authClient } from "@/lib/auth-client";
+
 import { subscriptionKeys } from "./keys";
 
 export async function restoreSubscription() {
-	const { data, error } = await authClient.subscription.restore();
-	if (error) throw new Error(error.message);
+  const { data, error } = await authClient.subscription.restore();
+  if (error) {throw new Error(error.message);}
 
-	return data;
+  return data;
 }
 export type SubscriptionRestoreData = Awaited<
-	ReturnType<typeof restoreSubscription>
+  ReturnType<typeof restoreSubscription>
 >;
 
 export const useSubscriptionRestoreMutation = () => {
-	const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-	return useMutation({
-		mutationFn: restoreSubscription,
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: subscriptionKeys.all(),
-			});
-		},
-		onError: (error) => {
-			toast.error(error.message || "Failed to restore subscription");
-		},
-	});
+  return useMutation({
+    mutationFn: restoreSubscription,
+    onError: (error) => {
+      toast.error(error.message || "Failed to restore subscription");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: subscriptionKeys.all(),
+      });
+    },
+  });
 };
