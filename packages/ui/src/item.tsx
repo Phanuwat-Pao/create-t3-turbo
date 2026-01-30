@@ -43,8 +43,8 @@ const itemVariants = cva(
       },
       variant: {
         default: "bg-transparent",
-        outline: "border-border",
         muted: "bg-muted/50",
+        outline: "border-border",
       },
     },
   }

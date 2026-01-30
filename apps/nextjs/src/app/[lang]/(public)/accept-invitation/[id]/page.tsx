@@ -80,11 +80,11 @@ export default function Page() {
           <CardHeader>
             <CardTitle>Organization Invitation</CardTitle>
             <CardDescription>
-              You've been invited to join an organization
+              You&apos;ve been invited to join an organization
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {invitation.status === "accepted" ? (
+            {invitation.status === "accepted" && (
               <div className="space-y-4">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                   <CheckIcon className="h-8 w-8 text-green-600" />
@@ -93,11 +93,12 @@ export default function Page() {
                   Welcome to {invitation.organizationName}!
                 </h2>
                 <p className="text-center">
-                  You've successfully joined the organization. We're excited to
-                  have you on board!
+                  You&apos;ve successfully joined the organization. We&apos;re
+                  excited to have you on board!
                 </p>
               </div>
-            ) : (invitation.status === "rejected" ? (
+            )}
+            {invitation.status === "rejected" && (
               <div className="space-y-4">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
                   <XIcon className="h-8 w-8 text-red-600" />
@@ -106,11 +107,12 @@ export default function Page() {
                   Invitation Declined
                 </h2>
                 <p className="text-center">
-                  You&lsquo;ve declined the invitation to join{" "}
+                  You&apos;ve declined the invitation to join{" "}
                   {invitation.organizationName}.
                 </p>
               </div>
-            ) : (
+            )}
+            {invitation.status === "pending" && (
               <div className="space-y-4">
                 <p>
                   <strong>{invitation.inviterEmail}</strong> has invited you to
@@ -121,7 +123,7 @@ export default function Page() {
                   <strong>{invitation.email}</strong>.
                 </p>
               </div>
-            ))}
+            )}
           </CardContent>
           {invitation.status === "pending" && (
             <CardFooter className="flex justify-between">
@@ -188,9 +190,9 @@ function InvitationError() {
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground mb-4 text-sm">
-          The invitation you're trying to access is either invalid or you don't
-          have the correct permissions. Please check your email for a valid
-          invitation or contact the person who sent it.
+          The invitation you&apos;re trying to access is either invalid or you
+          don&apos;t have the correct permissions. Please check your email for a
+          valid invitation or contact the person who sent it.
         </p>
       </CardContent>
       <CardFooter>

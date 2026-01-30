@@ -1,8 +1,6 @@
-import type { SvgProps } from "react-native-svg";
+import Svg, { type SvgProps, Path } from "react-native-svg";
 
-import Svg, { Path } from "react-native-svg";
-
-export function GoogleIcon(props: SvgProps) {
+export function GoogleIcon(_props: SvgProps) {
   return (
     <Svg width="1em" height="1em" viewBox="0 0 128 128">
       <Path

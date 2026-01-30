@@ -1,8 +1,7 @@
+import { Button } from "@acme/ui/button";
 import Link from "next/link";
 
 import type { Session } from "~/lib/auth";
-
-import { Button } from "@acme/ui/button";
 
 interface Props {
   session: Session | null;

@@ -170,13 +170,15 @@ const OrganizationCard = (props: { session: Session | null }) => {
                             });
                           }}
                         >
-                          {isRemoving ? (
+                          {isRemoving && (
                             <Loader2 className="animate-spin" size={16} />
-                          ) : (currentMember?.id === member.id ? (
-                            "Leave"
-                          ) : (
-                            "Remove"
-                          ))}
+                          )}
+                          {!isRemoving &&
+                            currentMember?.id === member.id &&
+                            "Leave"}
+                          {!isRemoving &&
+                            currentMember?.id !== member.id &&
+                            "Remove"}
                         </Button>
                       )}
                   </div>

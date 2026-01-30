@@ -37,7 +37,14 @@ export default function ForgetPassword() {
         <View className="w-full gap-2">
           <Button
             onPress={() => {
-              (authClient as unknown as { forgetPassword: (opts: { email: string; redirectTo: string }) => void }).forgetPassword({
+              (
+                authClient as unknown as {
+                  forgetPassword: (opts: {
+                    email: string;
+                    redirectTo: string;
+                  }) => void;
+                }
+              ).forgetPassword({
                 email,
                 redirectTo: "/reset-password",
               });

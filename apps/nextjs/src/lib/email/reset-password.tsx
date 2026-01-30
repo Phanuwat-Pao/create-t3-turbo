@@ -38,8 +38,8 @@ export const ResetPasswordEmail = ({
             </Text>
             <Text className="text-[14px] leading-[24px] text-black">
               We received a request to reset your password for your Better Auth
-              account. If you didn't make this request, you can safely ignore
-              this email.
+              account. If you didn&apos;t make this request, you can safely
+              ignore this email.
             </Text>
             <Section className="mt-[32px] mb-[32px] text-center">
               <Button
@@ -57,8 +57,8 @@ export const ResetPasswordEmail = ({
             </Text>
             <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
             <Text className="text-[12px] leading-[24px] text-[#666666]">
-              If you didn't request a password reset, please ignore this email
-              or contact support if you have concerns.
+              If you didn&apos;t request a password reset, please ignore this
+              email or contact support if you have concerns.
             </Text>
           </Container>
         </Body>

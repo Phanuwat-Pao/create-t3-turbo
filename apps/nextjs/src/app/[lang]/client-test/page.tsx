@@ -106,11 +106,9 @@ export default function Page() {
           <CardHeader>
             <CardTitle>Session Information</CardTitle>
             <CardDescription>
-              {isPending
-                ? "Loading session..."
-                : (session
-                  ? "You are currently logged in"
-                  : "You are not logged in")}
+              {isPending && "Loading session..."}
+              {!isPending && session && "You are currently logged in"}
+              {!isPending && !session && "You are not logged in"}
             </CardDescription>
           </CardHeader>
           <CardContent>

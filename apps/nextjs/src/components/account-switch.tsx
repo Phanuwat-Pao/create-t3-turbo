@@ -14,13 +14,12 @@ import { ChevronDown, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import type { SessionData } from "~/data/user/session-query";
 import type { DeviceSession } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
 import { getQueryClient } from "~/data/query-client";
 import { userKeys } from "~/data/user/keys";
-import { useSessionQuery } from "~/data/user/session-query";
+import { type SessionData, useSessionQuery } from "~/data/user/session-query";
 
 export default function AccountSwitcher({
   deviceSessions,

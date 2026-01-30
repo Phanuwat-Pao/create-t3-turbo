@@ -55,6 +55,7 @@ export const Tabs = ({
       >
         {propTabs.map((tab, idx) => (
           <button
+            type="button"
             key={tab.title}
             onClick={() => {
               moveSelectedTabToTop(idx);

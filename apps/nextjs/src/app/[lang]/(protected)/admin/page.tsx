@@ -459,13 +459,15 @@ function AdminDashboard() {
                           }}
                           disabled={isLoading?.startsWith("ban")}
                         >
-                          {isLoading === `ban-${user.id}` ? (
+                          {isLoading === `ban-${user.id}` && (
                             <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (user.banned ? (
-                            "Unban"
-                          ) : (
-                            "Ban"
-                          ))}
+                          )}
+                          {isLoading !== `ban-${user.id}` &&
+                            user.banned &&
+                            "Unban"}
+                          {isLoading !== `ban-${user.id}` &&
+                            !user.banned &&
+                            "Ban"}
                         </Button>
                       </div>
                     </TableCell>

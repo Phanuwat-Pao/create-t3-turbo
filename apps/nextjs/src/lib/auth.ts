@@ -4,7 +4,7 @@ export { auth, getSession } from "~/auth/server";
 export type { Session } from "@acme/auth";
 
 // Device session type for multi-session support
-export type DeviceSession = {
+export interface DeviceSession {
   id: string;
   userId: string;
   token: string;
@@ -13,7 +13,7 @@ export type DeviceSession = {
   updatedAt: Date;
   ipAddress?: string | null;
   userAgent?: string | null;
-};
+}
 
 // Organization role type
 export type OrganizationRole = "owner" | "admin" | "member";

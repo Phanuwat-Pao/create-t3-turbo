@@ -11,19 +11,21 @@ import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const logoImage = require("../../assets/images/logo.png") as number;
+
 export default function Index() {
   const { data: isAuthenticated } = authClient.useSession();
   const navContainerRef = useNavigationContainerRef();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const isNavReady = navContainerRef.isReady();
   useEffect(() => {
-    if (isAuthenticated) {
-      if (navContainerRef.isReady()) {
-        router.push("/dashboard");
-      }
+    if (isAuthenticated && isNavReady) {
+      router.push("/dashboard");
     }
-  }, [isAuthenticated, navContainerRef.isReady()]);
+  }, [isAuthenticated, isNavReady]);
 
   return (
     <SafeAreaView className="bg-background">
@@ -32,7 +34,7 @@ export default function Index() {
         <Card className="bg-muted/70 z-50 mx-6 backdrop-blur-lg">
           <CardHeader className="flex items-center justify-center gap-8">
             <Image
-              source={require("../../assets/images/logo.png")}
+              source={logoImage}
               style={{
                 height: 40,
                 width: 40,
@@ -78,18 +80,14 @@ export default function Index() {
               placeholder="Email Address"
               className="rounded-b-none border-b-0"
               value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-              }}
+              onChangeText={setEmail}
             />
             <Input
               placeholder="Password"
               className="rounded-t-none"
               secureTextEntry
               value={password}
-              onChangeText={(text) => {
-                setPassword(text);
-              }}
+              onChangeText={setPassword}
             />
           </View>
           <CardFooter>
@@ -121,7 +119,7 @@ export default function Index() {
                 <Text>Continue</Text>
               </Button>
               <Text className="mt-2 text-center">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Text
                   className="underline"
                   onPress={() => {

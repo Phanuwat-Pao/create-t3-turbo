@@ -1,8 +1,6 @@
-import type { NextRequest } from "next/server";
-
 import { mcpHandler } from "@better-auth/oauth-provider";
 import { createMcpHandler } from "mcp-handler";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import * as z from "zod";
 
 const baseUrl = process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
@@ -12,9 +10,9 @@ const baseUrl = process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
  */
 const handler = mcpHandler(
   {
-    jwksUrl: baseUrl + "/api/auth/jwks",
+    jwksUrl: `${baseUrl}/api/auth/jwks`,
     verifyOptions: {
-      audience: baseUrl + "/api/mcp",
+      audience: `${baseUrl}/api/mcp`,
       issuer: baseUrl,
     },
   },
@@ -32,7 +30,7 @@ const handler = mcpHandler(
           async ({ message }) => {
             const baseUrl =
               process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
-            const org = jwt?.[baseUrl + "/org"];
+            const org = jwt?.[`${baseUrl}/org`];
             return {
               content: [
                 {
@@ -81,7 +79,7 @@ function withCors(handler: Function) {
 
 export const GET = withCors(handler);
 export const POST = withCors(handler);
-export async function OPTIONS(req: NextRequest): Promise<NextResponse> {
+export async function OPTIONS(_req: NextRequest): Promise<NextResponse> {
   const headers = new Headers();
   addCorsHeaders(headers);
   return new NextResponse(null, {

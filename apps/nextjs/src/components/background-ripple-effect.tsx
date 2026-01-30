@@ -1,7 +1,6 @@
 "use client";
-import type React from "react";
 
-import { useMemo, useRef, useState } from "react";
+import { type default as React, useMemo, useRef, useState } from "react";
 
 import { cn } from "~/lib/utils";
 

@@ -5,10 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
-import SignIn from "./_components/sign-in";
-import { SignUp } from "./_components/sign-up";
 import { authClient } from "~/auth/client";
 import { getCallbackURL } from "~/lib/shared";
+
+import SignIn from "./_components/sign-in";
+import { SignUp } from "./_components/sign-up";
 
 export default function Page() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function Page() {
         },
       },
     });
-  }, []);
+  }, [router, params]);
 
   return (
     <div className="w-full">

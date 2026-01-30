@@ -188,7 +188,7 @@ export default function SignIn() {
                 fetchOptions: {
                   onError(context) {
                     toast.error(
-                      "Authentication failed: " + context.error.message
+                      `Authentication failed: ${context.error.message}`
                     );
                   },
                   onSuccess() {

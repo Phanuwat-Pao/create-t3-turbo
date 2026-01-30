@@ -1,8 +1,7 @@
 import type { TextRef, ViewRef } from "@rn-primitives/types";
-import type { TextProps, ViewProps } from "react-native";
 
 import * as React from "react";
-import { Text, View } from "react-native";
+import { type TextProps, type ViewProps, Text, View } from "react-native";
 
 import { TextClassContext } from "~/components/ui/text";
 import { cn } from "~/lib/utils";

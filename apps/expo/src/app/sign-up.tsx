@@ -74,7 +74,7 @@ export default function SignUp() {
                   onError: (ctx) => {
                     Alert.alert("Error", ctx.error.message);
                   },
-                  onSuccess: (ctx) => {
+                  onSuccess: () => {
                     router.push("/dashboard");
                   },
                 }

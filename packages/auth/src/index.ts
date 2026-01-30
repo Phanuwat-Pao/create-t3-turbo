@@ -1,5 +1,3 @@
-import type { Organization } from "better-auth/plugins";
-
 import { db } from "@acme/db/client";
 import { expo } from "@better-auth/expo";
 import {
@@ -10,6 +8,7 @@ import {
 } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
+  type Organization,
   admin,
   bearer,
   customSession,

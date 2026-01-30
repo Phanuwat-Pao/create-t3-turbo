@@ -111,8 +111,8 @@ const UserCard = (props: {
             <AlertTitle>Verify Your Email Address</AlertTitle>
             <AlertDescription className="text-muted-foreground">
               Please verify your email address. Check your inbox for the
-              verification email. If you haven't received the email, click the
-              button below to resend.
+              verification email. If you haven&apos;t received the email, click
+              the button below to resend.
               <Button
                 size="sm"
                 variant="secondary"
@@ -127,7 +127,7 @@ const UserCard = (props: {
                         toast.error(context.error.message);
                         setEmailVerificationPending(false);
                       },
-                      onRequest(context) {
+                      onRequest() {
                         setEmailVerificationPending(true);
                       },
                       onSuccess() {
@@ -170,6 +170,7 @@ const UserCard = (props: {
                       session.userAgent}
                     , {new UAParser(session.userAgent || "").getBrowser().name}
                     <button
+                      type="button"
                       className="cursor-pointer text-xs text-red-500 underline opacity-80"
                       onClick={() => {
                         revokeSessionMutation.mutate(
@@ -185,13 +186,11 @@ const UserCard = (props: {
                         );
                       }}
                     >
-                      {isTerminating ? (
+                      {isTerminating && (
                         <Loader2 size={15} className="animate-spin" />
-                      ) : (isCurrentSession ? (
-                        "Sign Out"
-                      ) : (
-                        "Terminate"
-                      ))}
+                      )}
+                      {!isTerminating && isCurrentSession && "Sign Out"}
+                      {!isTerminating && !isCurrentSession && "Terminate"}
                     </button>
                   </div>
                 </div>
@@ -513,6 +512,7 @@ function ListPasskeys() {
                   <TableCell>{passkey.name || "My Passkey"}</TableCell>
                   <TableCell className="text-right">
                     <button
+                      type="button"
                       onClick={async () => {
                         await authClient.passkey.deletePasskey({
                           fetchOptions: {

@@ -47,7 +47,7 @@ export default async function AuthorizePage({
         client_id,
       },
     }),
-  ]).catch((error) => {
+  ]).catch((_error) => {
     throw redirect("/sign-in");
   });
 

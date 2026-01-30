@@ -15,7 +15,7 @@ import { Label } from "@acme/ui/label";
 import { RadioGroup, RadioGroupItem } from "@acme/ui/radio-group";
 import { Skeleton } from "@acme/ui/skeleton";
 import { ArrowUpFromLine, CreditCard, RefreshCcw } from "lucide-react";
-import { useId, useState } from "react";
+import { useCallback, useId, useState } from "react";
 
 import { SubscriptionTierLabel } from "~/components/subscription-tier";
 import { useSubscriptionCancelMutation } from "~/data/subscription/subscription-cancel-mutation";
@@ -99,11 +99,13 @@ const SubscriptionCard = () => {
             {currentSubscription.periodEnd && (
               <div className="flex items-center justify-between">
                 <span className="text-zinc-600 dark:text-zinc-500">
-                  {currentSubscription.cancelAtPeriodEnd
-                    ? "Cancels on:"
-                    : (currentSubscription.status === "trialing"
-                      ? "Trial ends:"
-                      : "Renews:")}
+                  {currentSubscription.cancelAtPeriodEnd && "Cancels on:"}
+                  {!currentSubscription.cancelAtPeriodEnd &&
+                    currentSubscription.status === "trialing" &&
+                    "Trial ends:"}
+                  {!currentSubscription.cancelAtPeriodEnd &&
+                    currentSubscription.status !== "trialing" &&
+                    "Renews:"}
                 </span>
                 <span className="font-medium text-zinc-900 dark:text-zinc-100">
                   {new Date(currentSubscription.periodEnd).toLocaleDateString()}
@@ -118,6 +120,30 @@ const SubscriptionCard = () => {
 };
 export default SubscriptionCard;
 
+function getButtonText(
+  selectedPlan: string,
+  currentPlan?: string,
+  isTrial?: boolean,
+  cancelAtPeriodEnd?: boolean
+) {
+  if (selectedPlan === currentPlan?.toLowerCase()) {
+    if (isTrial) {
+      return "Upgrade";
+    }
+    if (cancelAtPeriodEnd) {
+      return "Resume Plan";
+    }
+    return "Current Plan";
+  }
+  if (selectedPlan === "plus") {
+    return currentPlan ? "Downgrade" : "Upgrade";
+  }
+  if (selectedPlan === "pro") {
+    return "Upgrade";
+  }
+  return "Contact us";
+}
+
 function ChangePlanDialog(props: {
   currentPlan?: string;
   isTrial?: boolean;
@@ -129,6 +155,32 @@ function ChangePlanDialog(props: {
   const upgradeMutation = useSubscriptionUpgradeMutation();
   const cancelMutation = useSubscriptionCancelMutation();
   const restoreMutation = useSubscriptionRestoreMutation();
+
+  const handleUpgradeClick = useCallback(() => {
+    if (selectedPlan === "enterprise") {
+      window.open("https://www.better-auth.com/enterprise", "_blank");
+      return;
+    }
+    // Resume if canceling and selecting same plan
+    if (
+      props.cancelAtPeriodEnd &&
+      selectedPlan === props.currentPlan?.toLowerCase()
+    ) {
+      restoreMutation.mutate();
+      return;
+    }
+    upgradeMutation.mutate(selectedPlan);
+  }, [
+    selectedPlan,
+    props.cancelAtPeriodEnd,
+    props.currentPlan,
+    restoreMutation,
+    upgradeMutation,
+  ]);
+
+  const handleCancelClick = useCallback(() => {
+    cancelMutation.mutate("/dashboard");
+  }, [cancelMutation]);
 
   return (
     <Dialog>
@@ -160,7 +212,7 @@ function ChangePlanDialog(props: {
           </div>
           <DialogHeader>
             <DialogTitle className="text-left">
-              {!props.currentPlan ? "Upgrade" : "Change"} your plan
+              {props.currentPlan ? "Change" : "Upgrade"} your plan
             </DialogTitle>
             <DialogDescription className="text-left">
               Pick one of the following plans.
@@ -173,7 +225,7 @@ function ChangePlanDialog(props: {
             className="gap-2"
             defaultValue="2"
             value={selectedPlan}
-            onValueChange={(value) => setSelectedPlan(value)}
+            onValueChange={setSelectedPlan}
           >
             <div className="relative flex w-full items-center gap-2 rounded-lg border border-zinc-300 bg-zinc-50 px-4 py-3 has-data-[state=checked]:border-zinc-500 has-data-[state=checked]:bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-950/50 dark:has-data-[state=checked]:border-zinc-600 dark:has-data-[state=checked]:bg-zinc-900">
               <RadioGroupItem
@@ -245,8 +297,8 @@ function ChangePlanDialog(props: {
 
           <div className="space-y-3">
             <p className="text-center text-xs text-zinc-600 dark:text-zinc-500">
-              note: all upgrades take effect immediately and you'll be charged
-              the new amount on your next billing cycle.
+              note: all upgrades take effect immediately and you&apos;ll be
+              charged the new amount on your next billing cycle.
             </p>
           </div>
 
@@ -261,38 +313,14 @@ function ChangePlanDialog(props: {
                 upgradeMutation.isPending ||
                 restoreMutation.isPending
               }
-              onClick={() => {
-                if (selectedPlan === "enterprise") {
-                  window.open(
-                    "https://www.better-auth.com/enterprise",
-                    "_blank"
-                  );
-                  return;
-                }
-                // Resume if canceling and selecting same plan
-                if (
-                  props.cancelAtPeriodEnd &&
-                  selectedPlan === props.currentPlan?.toLowerCase()
-                ) {
-                  restoreMutation.mutate();
-                  return;
-                }
-                upgradeMutation.mutate(selectedPlan);
-              }}
+              onClick={handleUpgradeClick}
             >
-              {selectedPlan === props.currentPlan?.toLowerCase()
-                ? props.isTrial
-                  ? "Upgrade"
-                  : props.cancelAtPeriodEnd
-                    ? "Resume Plan"
-                    : "Current Plan"
-                : selectedPlan === "plus"
-                  ? !props.currentPlan
-                    ? "Upgrade"
-                    : "Downgrade"
-                  : selectedPlan === "pro"
-                    ? "Upgrade"
-                    : "Contact us"}
+              {getButtonText(
+                selectedPlan,
+                props.currentPlan,
+                props.isTrial,
+                props.cancelAtPeriodEnd
+              )}
             </Button>
             {props.currentPlan && !props.cancelAtPeriodEnd && (
               <Button
@@ -300,9 +328,7 @@ function ChangePlanDialog(props: {
                 variant="destructive"
                 className="w-full"
                 disabled={cancelMutation.isPending}
-                onClick={() => {
-                  cancelMutation.mutate("/dashboard");
-                }}
+                onClick={handleCancelClick}
               >
                 Cancel Plan
               </Button>
