@@ -11,11 +11,13 @@ import {
 } from "@acme/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 import { TwoFactorTotpForm } from "~/components/forms/two-factor-totp-form";
 
 export default function Page() {
   const router = useRouter();
+  const handleSuccess = useCallback(() => router.push("/dashboard"), [router]);
 
   return (
     <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
@@ -27,7 +29,7 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <TwoFactorTotpForm onSuccess={() => router.push("/dashboard")} />
+          <TwoFactorTotpForm onSuccess={handleSuccess} />
         </CardContent>
         <CardFooter className="text-muted-foreground gap-2 text-sm">
           <Link href="/two-factor/otp">

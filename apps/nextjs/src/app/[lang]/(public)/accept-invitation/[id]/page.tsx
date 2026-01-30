@@ -13,7 +13,7 @@ import { Skeleton } from "@acme/ui/skeleton";
 import { AlertCircle, CheckIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { useInviteAcceptMutation } from "~/data/organization/invitation-accept-mutation";
 import { useInvitationQuery } from "~/data/organization/invitation-query";
@@ -30,7 +30,7 @@ export default function Page() {
   const acceptMutation = useInviteAcceptMutation();
   const rejectMutation = useInviteRejectMutation();
 
-  const handleAccept = () => {
+  const handleAccept = useCallback(() => {
     acceptMutation.mutate(
       { invitationId: params.id },
       {
@@ -40,9 +40,9 @@ export default function Page() {
         },
       }
     );
-  };
+  }, [acceptMutation, params.id, router]);
 
-  const handleReject = () => {
+  const handleReject = useCallback(() => {
     rejectMutation.mutate(
       { invitationId: params.id },
       {
@@ -52,7 +52,7 @@ export default function Page() {
         },
       }
     );
-  };
+  }, [rejectMutation, params.id, router]);
 
   if (isLoading || isRedirecting) {
     return (

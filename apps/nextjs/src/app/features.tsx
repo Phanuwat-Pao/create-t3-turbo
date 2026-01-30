@@ -23,10 +23,12 @@ const Card = ({
   children?: React.ReactNode;
 }) => {
   const [hovered, setHovered] = React.useState(false);
+  const handleMouseEnter = React.useCallback(() => setHovered(true), []);
+  const handleMouseLeave = React.useCallback(() => setHovered(false), []);
   return (
     <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className="group/canvas-card relative mx-auto flex h-72 w-full max-w-sm items-center justify-center border border-black/20 p-4 dark:border-white/20"
     >
       <Icon className="absolute -top-3 -left-3 h-6 w-6 text-black dark:text-white" />

@@ -4,7 +4,7 @@ import { Button } from "@acme/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
 import { PasswordInput } from "@acme/ui/password-input";
 import { Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -39,7 +39,7 @@ export function ResetPasswordForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (): boolean => {
+  const validate = useCallback((): boolean => {
     const result = resetPasswordSchema.safeParse({ confirmPassword, password });
     if (!result.success) {
       const fieldErrors: FormErrors = {};
@@ -52,27 +52,41 @@ export function ResetPasswordForm({
     }
     setErrors({});
     return true;
-  };
+  }, [confirmPassword, password]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    }
-
-    startTransition(async () => {
-      const res = await authClient.resetPassword({
-        newPassword: password,
-        token,
-      });
-      if (res.error) {
-        toast.error(res.error.message);
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validate()) {
         return;
       }
-      toast.success("Password reset successfully");
-      onSuccess?.();
-    });
-  };
+
+      startTransition(async () => {
+        const res = await authClient.resetPassword({
+          newPassword: password,
+          token,
+        });
+        if (res.error) {
+          toast.error(res.error.message);
+          return;
+        }
+        toast.success("Password reset successfully");
+        onSuccess?.();
+      });
+    },
+    [validate, password, token, onSuccess]
+  );
+
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
+    []
+  );
+
+  const handleConfirmPasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setConfirmPassword(e.target.value),
+    []
+  );
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
@@ -85,7 +99,7 @@ export function ResetPasswordForm({
             aria-invalid={!!errors.password}
             autoComplete="new-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
           />
           {errors.password && <FieldError errors={[errors.password]} />}
         </Field>
@@ -99,7 +113,7 @@ export function ResetPasswordForm({
             aria-invalid={!!errors.confirmPassword}
             autoComplete="new-password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={handleConfirmPasswordChange}
           />
           {errors.confirmPassword && (
             <FieldError errors={[errors.confirmPassword]} />

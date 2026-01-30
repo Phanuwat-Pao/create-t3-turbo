@@ -4,7 +4,7 @@ import { Button } from "@acme/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 import { Loader2 } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
@@ -33,7 +33,7 @@ export function ForgetPasswordForm({
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (): boolean => {
+  const validate = useCallback((): boolean => {
     const result = forgetPasswordSchema.safeParse({ email });
     if (!result.success) {
       const fieldErrors: FormErrors = {};
@@ -46,26 +46,34 @@ export function ForgetPasswordForm({
     }
     setErrors({});
     return true;
-  };
+  }, [email]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        await authClient.requestPasswordReset({
-          email,
-          redirectTo,
-        });
-        onSuccess?.();
-      } catch {
-        onError?.("An error occurred. Please try again.");
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
       }
-    });
-  };
+
+      startTransition(async () => {
+        try {
+          await authClient.requestPasswordReset({
+            email,
+            redirectTo,
+          });
+          onSuccess?.();
+        } catch {
+          onError?.("An error occurred. Please try again.");
+        }
+      });
+    },
+    [validate, email, redirectTo, onSuccess, onError]
+  );
+
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
+    []
+  );
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
@@ -79,7 +87,7 @@ export function ForgetPasswordForm({
             aria-invalid={!!errors.email}
             autoComplete="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
           />
           {errors.email && <FieldError errors={[errors.email]} />}
         </Field>

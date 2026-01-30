@@ -4,19 +4,19 @@ export function createMetadata(override: Metadata): Metadata {
   return {
     ...override,
     openGraph: {
-      title: override.title ?? undefined,
       description: override.description ?? undefined,
-      url: "https://demo.better-auth.com",
       images: "https://demo.better-auth.com/og.png",
       siteName: "Better Auth",
+      title: override.title ?? undefined,
+      url: "https://demo.better-auth.com",
       ...override.openGraph,
     },
     twitter: {
       card: "summary_large_image",
       creator: "@beakcru",
-      title: override.title ?? undefined,
       description: override.description ?? undefined,
       images: "https://demo.better-auth.com/og.png",
+      title: override.title ?? undefined,
       ...override.twitter,
     },
   };
@@ -25,4 +25,4 @@ export function createMetadata(override: Metadata): Metadata {
 export const baseUrl =
   process.env.NODE_ENV === "development"
     ? new URL("http://localhost:3000")
-    : new URL(`https://${process.env.VERCEL_URL!}`);
+    : new URL(`https://${process.env.VERCEL_URL ?? "demo.better-auth.com"}`);

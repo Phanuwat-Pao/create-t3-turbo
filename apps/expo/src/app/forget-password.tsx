@@ -1,6 +1,6 @@
 import Icons from "@expo/vector-icons/AntDesign";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { View } from "react-native";
 
 import { Button } from "~/components/ui/button";
@@ -17,6 +17,22 @@ import { authClient } from "~/utils/auth";
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState("");
+
+  const handleSendEmail = useCallback(() => {
+    (
+      authClient as unknown as {
+        forgetPassword: (opts: { email: string; redirectTo: string }) => void;
+      }
+    ).forgetPassword({
+      email,
+      redirectTo: "/reset-password",
+    });
+  }, [email]);
+
+  const handleBack = useCallback(() => {
+    router.push("/");
+  }, []);
+
   return (
     <Card className="w-10/12">
       <CardHeader>
@@ -30,34 +46,20 @@ export default function ForgetPassword() {
           autoCapitalize="none"
           placeholder="Email"
           value={email}
-          onChangeText={(text) => setEmail(text)}
+          onChangeText={setEmail}
         />
       </View>
       <CardFooter>
         <View className="w-full gap-2">
           <Button
-            onPress={() => {
-              (
-                authClient as unknown as {
-                  forgetPassword: (opts: {
-                    email: string;
-                    redirectTo: string;
-                  }) => void;
-                }
-              ).forgetPassword({
-                email,
-                redirectTo: "/reset-password",
-              });
-            }}
+            onPress={handleSendEmail}
             className="w-full"
             variant="default"
           >
             <Text>Send Email</Text>
           </Button>
           <Button
-            onPress={() => {
-              router.push("/");
-            }}
+            onPress={handleBack}
             className="w-full flex-row items-center gap-4"
             variant="outline"
           >

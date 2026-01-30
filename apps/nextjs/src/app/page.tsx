@@ -76,7 +76,7 @@ export default async function HomePage() {
               href="https://better-auth.com"
               target="_blank"
               className="italic underline"
-              rel="noopener"
+              rel="noreferrer"
             >
               better-auth.
             </a>{" "}
@@ -99,7 +99,8 @@ export default async function HomePage() {
                   className="text-muted-foreground hover:text-foreground hover:border-foreground flex cursor-pointer items-center gap-1 border-b pb-1 text-xs transition-all duration-150 ease-in-out"
                   key={feature.name}
                   href={feature.link}
-                  rel="noopener"
+                  target="_blank"
+                  rel="noreferrer"
                 >
                   {feature.name}
                 </a>

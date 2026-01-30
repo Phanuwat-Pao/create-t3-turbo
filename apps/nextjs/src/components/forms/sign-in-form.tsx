@@ -7,7 +7,7 @@ import { Input } from "@acme/ui/input";
 import { PasswordInput } from "@acme/ui/password-input";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -46,7 +46,7 @@ export function SignInForm({
     setIsMounted(true);
   }, []);
 
-  const validate = (): boolean => {
+  const validate = useCallback((): boolean => {
     const result = signInSchema.safeParse({ email, password, rememberMe });
     if (!result.success) {
       const fieldErrors: FormErrors = {};
@@ -59,34 +59,52 @@ export function SignInForm({
     }
     setErrors({});
     return true;
-  };
+  }, [email, password, rememberMe]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    }
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
 
-    startTransition(async () => {
-      await authClient.signIn.email(
-        {
-          callbackURL,
-          email,
-          password,
-          rememberMe,
-        },
-        {
-          onError(context) {
-            toast.error(context.error.message);
+      startTransition(async () => {
+        await authClient.signIn.email(
+          {
+            callbackURL,
+            email,
+            password,
+            rememberMe,
           },
-          onSuccess() {
-            toast.success("Successfully signed in");
-            onSuccess?.();
-          },
-        }
-      );
-    });
-  };
+          {
+            onError(context) {
+              toast.error(context.error.message);
+            },
+            onSuccess() {
+              toast.success("Successfully signed in");
+              onSuccess?.();
+            },
+          }
+        );
+      });
+    },
+    [validate, callbackURL, email, password, rememberMe, onSuccess]
+  );
+
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
+    []
+  );
+
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
+    []
+  );
+
+  const handleRememberMeChange = useCallback(
+    (checked: boolean | "indeterminate") => setRememberMe(checked === true),
+    []
+  );
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-2">
@@ -100,7 +118,7 @@ export function SignInForm({
             aria-invalid={!!errors.email}
             autoComplete="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
           />
           {errors.email && <FieldError errors={[errors.email]} />}
         </Field>
@@ -121,7 +139,7 @@ export function SignInForm({
               aria-invalid={!!errors.password}
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
             />
           ) : (
             <Input
@@ -131,7 +149,7 @@ export function SignInForm({
               aria-invalid={!!errors.password}
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
             />
           )}
           {errors.password && <FieldError errors={[errors.password]} />}
@@ -140,7 +158,7 @@ export function SignInForm({
           <Checkbox
             id="sign-in-remember"
             checked={rememberMe}
-            onCheckedChange={(checked) => setRememberMe(checked === true)}
+            onCheckedChange={handleRememberMeChange}
           />
           <FieldLabel htmlFor="sign-in-remember" className="font-normal">
             Remember me

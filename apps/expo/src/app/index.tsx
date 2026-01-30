@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/AntDesign";
 import { router, Stack, useNavigationContainerRef } from "expo-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert, Image, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -11,7 +11,6 @@ import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const logoImage = require("../../assets/images/logo.png") as number;
 
 export default function Index() {
@@ -26,6 +25,42 @@ export default function Index() {
       router.push("/dashboard");
     }
   }, [isAuthenticated, isNavReady]);
+
+  const handleGoogleSignIn = useCallback(() => {
+    authClient.signIn.social({
+      callbackURL: "/dashboard",
+      provider: "google",
+    });
+  }, []);
+
+  const handleGitHubSignIn = useCallback(() => {
+    authClient.signIn.social({
+      callbackURL: "/dashboard",
+      provider: "github",
+    });
+  }, []);
+
+  const handleForgetPassword = useCallback(() => {
+    router.push("/forget-password");
+  }, []);
+
+  const handleEmailSignIn = useCallback(() => {
+    authClient.signIn.email(
+      {
+        email,
+        password,
+      },
+      {
+        onError: (ctx) => {
+          Alert.alert("Error", ctx.error.message);
+        },
+      }
+    );
+  }, [email, password]);
+
+  const handleCreateAccount = useCallback(() => {
+    router.push("/sign-up");
+  }, []);
 
   return (
     <SafeAreaView className="bg-background">
@@ -44,12 +79,7 @@ export default function Index() {
           </CardHeader>
           <View className="flex gap-2 px-6">
             <Button
-              onPress={() => {
-                authClient.signIn.social({
-                  callbackURL: "/dashboard",
-                  provider: "google",
-                });
-              }}
+              onPress={handleGoogleSignIn}
               variant="secondary"
               className="bg-background/50 flex flex-row items-center gap-2"
             >
@@ -59,12 +89,7 @@ export default function Index() {
             <Button
               variant="secondary"
               className="bg-background/50 flex flex-row items-center gap-2"
-              onPress={() => {
-                authClient.signIn.social({
-                  callbackURL: "/dashboard",
-                  provider: "github",
-                });
-              }}
+              onPress={handleGitHubSignIn}
             >
               <Ionicons name="github" size={16} />
               <Text>Sign In with GitHub</Text>
@@ -95,37 +120,16 @@ export default function Index() {
               <Button
                 variant="link"
                 className="w-full"
-                onPress={() => {
-                  router.push("/forget-password");
-                }}
+                onPress={handleForgetPassword}
               >
                 <Text className="text-center underline">Forget Password?</Text>
               </Button>
-              <Button
-                onPress={() => {
-                  authClient.signIn.email(
-                    {
-                      email,
-                      password,
-                    },
-                    {
-                      onError: (ctx) => {
-                        Alert.alert("Error", ctx.error.message);
-                      },
-                    }
-                  );
-                }}
-              >
+              <Button onPress={handleEmailSignIn}>
                 <Text>Continue</Text>
               </Button>
               <Text className="mt-2 text-center">
                 Don&apos;t have an account?{" "}
-                <Text
-                  className="underline"
-                  onPress={() => {
-                    router.push("/sign-up");
-                  }}
-                >
+                <Text className="underline" onPress={handleCreateAccount}>
                   Create Account
                 </Text>
               </Text>

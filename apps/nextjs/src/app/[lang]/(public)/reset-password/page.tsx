@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 import { ResetPasswordForm } from "~/components/forms/reset-password-form";
 
@@ -15,6 +16,10 @@ export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
+
+  const handleSuccess = useCallback(() => {
+    router.push("/sign-in");
+  }, [router]);
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
@@ -26,10 +31,7 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ResetPasswordForm
-            token={token}
-            onSuccess={() => router.push("/sign-in")}
-          />
+          <ResetPasswordForm token={token} onSuccess={handleSuccess} />
         </CardContent>
       </Card>
     </div>

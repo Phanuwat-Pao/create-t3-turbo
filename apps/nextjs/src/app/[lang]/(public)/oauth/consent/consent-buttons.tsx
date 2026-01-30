@@ -3,44 +3,44 @@
 import { Button } from "@acme/ui/button";
 import { CardFooter } from "@acme/ui/card";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
 
 export function ConsentBtns() {
   const [loading, setLoading] = useState(false);
+
+  const handleAuthorize = useCallback(async () => {
+    setLoading(true);
+    const res = await authClient.oauth2.consent({
+      accept: true,
+    });
+    setLoading(false);
+    if (res.data?.redirect && res.data?.uri) {
+      window.location.href = res.data?.uri;
+      return;
+    }
+    toast.error("Failed to authorize");
+  }, []);
+
+  const handleCancel = useCallback(async () => {
+    const res = await authClient.oauth2.consent({
+      accept: false,
+    });
+    if (res.data?.redirect && res.data?.uri) {
+      window.location.href = res.data?.uri;
+      return;
+    }
+    toast.error("Failed to cancel");
+  }, []);
+
   return (
     <CardFooter className="flex items-center gap-2">
-      <Button
-        onClick={async () => {
-          setLoading(true);
-          const res = await authClient.oauth2.consent({
-            accept: true,
-          });
-          setLoading(false);
-          if (res.data?.redirect && res.data?.uri) {
-            window.location.href = res.data?.uri;
-            return;
-          }
-          toast.error("Failed to authorize");
-        }}
-      >
+      <Button onClick={handleAuthorize}>
         {loading ? <Loader2 size={15} className="animate-spin" /> : "Authorize"}
       </Button>
-      <Button
-        variant="outline"
-        onClick={async () => {
-          const res = await authClient.oauth2.consent({
-            accept: false,
-          });
-          if (res.data?.redirect && res.data?.uri) {
-            window.location.href = res.data?.uri;
-            return;
-          }
-          toast.error("Failed to cancel");
-        }}
-      >
+      <Button variant="outline" onClick={handleCancel}>
         Cancel
       </Button>
     </CardFooter>

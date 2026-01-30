@@ -16,8 +16,10 @@ function makeQueryClient() {
           query.state.status === "pending",
       },
       queries: {
-        staleTime: 3 * 60 * 1000, // 3 min
-        gcTime: 6 * 60 * 1000, // 6 min
+        // 3 minutes
+        staleTime: 3 * 60 * 1000,
+        // 6 minutes
+        gcTime: 6 * 60 * 1000,
         retry: 0,
       },
     },

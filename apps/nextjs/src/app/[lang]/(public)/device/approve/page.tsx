@@ -5,7 +5,7 @@ import { Button } from "@acme/ui/button";
 import { Card } from "@acme/ui/card";
 import { Check, Loader2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 
 import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
@@ -19,7 +19,7 @@ export default function Page() {
   const [isDenyPending, startDenyTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const handleApprove = () => {
+  const handleApprove = useCallback(() => {
     if (!userCode) {
       return;
     }
@@ -32,13 +32,14 @@ export default function Page() {
           userCode,
         });
         router.push("/device/success");
-      } catch (error: any) {
-        setError(error.error?.message || "Failed to approve device");
+      } catch (error: unknown) {
+        const errorObj = error as { error?: { message?: string } };
+        setError(errorObj.error?.message ?? "Failed to approve device");
       }
     });
-  };
+  }, [userCode, router]);
 
-  const handleDeny = () => {
+  const handleDeny = useCallback(() => {
     if (!userCode) {
       return;
     }
@@ -51,11 +52,12 @@ export default function Page() {
           userCode,
         });
         router.push("/device/denied");
-      } catch (error: any) {
-        setError(error.error?.message || "Failed to deny device");
+      } catch (error: unknown) {
+        const errorObj = error as { error?: { message?: string } };
+        setError(errorObj.error?.message ?? "Failed to deny device");
       }
     });
-  };
+  }, [userCode, router]);
 
   if (!session) {
     return null;

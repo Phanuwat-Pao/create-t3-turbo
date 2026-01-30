@@ -17,6 +17,11 @@ const PasswordInput = ({
   const disabled =
     props.value === "" || props.value === undefined || props.disabled;
 
+  const toggleShowPassword = React.useCallback(
+    () => setShowPassword((prev) => !prev),
+    []
+  );
+
   return (
     <div className="relative">
       <Input
@@ -31,7 +36,7 @@ const PasswordInput = ({
         variant="ghost"
         size="sm"
         className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-        onClick={() => setShowPassword((prev) => !prev)}
+        onClick={toggleShowPassword}
         disabled={disabled}
       >
         {showPassword && !disabled ? (

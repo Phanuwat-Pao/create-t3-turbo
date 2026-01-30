@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/AntDesign";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { View } from "react-native";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -16,6 +16,17 @@ export default function Dashboard() {
       router.push("/");
     }
   }, [session, isPending]);
+
+  const handleSignOut = useCallback(async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/");
+        },
+      },
+    });
+  }, []);
+
   return (
     <Card className="w-10/12">
       <CardHeader>
@@ -49,15 +60,7 @@ export default function Dashboard() {
           variant="secondary"
           className="flex-row items-center gap-2"
           size="sm"
-          onPress={async () => {
-            await authClient.signOut({
-              fetchOptions: {
-                onSuccess: () => {
-                  router.push("/");
-                },
-              },
-            });
-          }}
+          onPress={handleSignOut}
         >
           <Ionicons name="logout" size={14} color="black" />
           <Text>Sign Out</Text>

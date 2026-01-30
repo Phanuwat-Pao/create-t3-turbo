@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 import { toast } from "sonner";
 
 import type { Session } from "~/lib/auth";
@@ -11,36 +12,38 @@ import type { Session } from "~/lib/auth";
 import { authClient } from "~/auth/client";
 
 export function SelectAccountBtn({ session }: { session: Partial<Session> }) {
+  const handleClick = useCallback(async () => {
+    try {
+      if (!session.session?.token) {
+        toast.error("No session");
+        return;
+      }
+      const { data: active, error: activeError } =
+        await authClient.multiSession.setActive({
+          sessionToken: session.session.token,
+        });
+      if (activeError || !active?.session) {
+        toast.error(activeError?.message ?? "Failed to set active session");
+        return;
+      }
+      const { data, error } = await authClient.oauth2.continue({
+        selected: true,
+      });
+      if (error || !active?.session || !data.redirect || !data?.uri) {
+        toast.error(error?.message ?? "Failed to continue");
+        return;
+      }
+      window.location.href = data.uri;
+    } catch (error) {
+      toast.error(String(error));
+    }
+  }, [session.session?.token]);
+
   return (
     <Button
       className="h-12 w-full gap-2"
       variant="outline"
-      onClick={async () => {
-        try {
-          if (!session.session?.token) {
-            toast.error("No session");
-            return;
-          }
-          const { data: active, error: activeError } =
-            await authClient.multiSession.setActive({
-              sessionToken: session.session.token,
-            });
-          if (activeError || !active?.session) {
-            toast.error(activeError?.message ?? "Failed to set active session");
-            return;
-          }
-          const { data, error } = await authClient.oauth2.continue({
-            selected: true,
-          });
-          if (error || !active?.session || !data.redirect || !data?.uri) {
-            toast.error(error?.message ?? "Failed to continue");
-            return;
-          }
-          window.location.href = data.uri;
-        } catch (error) {
-          toast.error(String(error));
-        }
-      }}
+      onClick={handleClick}
     >
       <Avatar className="mr-2 h-5 w-5">
         <AvatarImage

@@ -1,8 +1,18 @@
 "use client";
 
-import { type default as React, useMemo, useRef, useState } from "react";
+import {
+  type default as React,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { cn } from "~/lib/utils";
+
+const noop = () => {
+  /* intentionally empty */
+};
 
 export const BackgroundRippleEffect = ({
   rows = 8,
@@ -19,6 +29,11 @@ export const BackgroundRippleEffect = ({
   } | null>(null);
   const [rippleKey, setRippleKey] = useState(0);
   const ref = useRef<HTMLDivElement | null>(null);
+
+  const handleCellClick = useCallback((row: number, col: number) => {
+    setClickedCell({ col, row });
+    setRippleKey((k) => k + 1);
+  }, []);
 
   return (
     <div
@@ -40,10 +55,7 @@ export const BackgroundRippleEffect = ({
           borderColor="var(--cell-border-color)"
           fillColor="var(--cell-fill-color)"
           clickedCell={clickedCell}
-          onCellClick={(row, col) => {
-            setClickedCell({ col, row });
-            setRippleKey((k) => k + 1);
-          }}
+          onCellClick={handleCellClick}
           interactive
         />
       </div>
@@ -55,7 +67,8 @@ interface DivGridProps {
   className?: string;
   rows: number;
   cols: number;
-  cellSize: number; // in pixels
+  // in pixels
+  cellSize: number;
   borderColor: string;
   fillColor: string;
   clickedCell: { row: number; col: number } | null;
@@ -76,7 +89,7 @@ const DivGrid = ({
   borderColor = "#3f3f46",
   fillColor = "rgba(14,165,233,0.3)",
   clickedCell = null,
-  onCellClick = () => {},
+  onCellClick = noop,
   interactive = true,
 }: DivGridProps) => {
   const cells = useMemo(
@@ -101,8 +114,10 @@ const DivGrid = ({
         const distance = clickedCell
           ? Math.hypot(clickedCell.row - rowIdx, clickedCell.col - colIdx)
           : 0;
-        const delay = clickedCell ? Math.max(0, distance * 55) : 0; // ms
-        const duration = 200 + distance * 80; // ms
+        // delay in ms
+        const delay = clickedCell ? Math.max(0, distance * 55) : 0;
+        // duration in ms
+        const duration = 200 + distance * 80;
 
         const style: CellStyle = clickedCell
           ? {

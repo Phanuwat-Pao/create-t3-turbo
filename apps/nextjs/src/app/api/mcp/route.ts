@@ -69,7 +69,7 @@ function addCorsHeaders(headers: Headers) {
   }
 }
 
-function withCors(handler: Function) {
+function withCors(handler: (req: Request) => Promise<Response>) {
   return async (req: Request) => {
     const res = await handler(req);
     addCorsHeaders(res.headers);

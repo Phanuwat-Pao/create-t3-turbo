@@ -12,12 +12,13 @@ import {
 } from "@acme/ui/card";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { ForgetPasswordForm } from "~/components/forms/forget-password-form";
 
 export default function Page() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const handleSuccess = useCallback(() => setIsSubmitted(true), []);
 
   if (isSubmitted) {
     return (
@@ -60,7 +61,7 @@ export default function Page() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ForgetPasswordForm onSuccess={() => setIsSubmitted(true)} />
+          <ForgetPasswordForm onSuccess={handleSuccess} />
         </CardContent>
         <CardFooter className="flex justify-center">
           <Link href="/sign-in">

@@ -10,6 +10,7 @@ import {
 } from "@acme/ui/card";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 import { SignUpForm } from "~/components/forms/sign-up-form";
 import { getCallbackURL } from "~/lib/shared";
@@ -17,6 +18,11 @@ import { getCallbackURL } from "~/lib/shared";
 export function SignUp() {
   const router = useRouter();
   const params = useSearchParams();
+  const callbackURL = getCallbackURL(params);
+
+  const handleSuccess = useCallback(() => {
+    router.push(callbackURL);
+  }, [router, callbackURL]);
 
   return (
     <Card className="w-full rounded-md rounded-t-none">
@@ -27,10 +33,7 @@ export function SignUp() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <SignUpForm
-          onSuccess={() => router.push(getCallbackURL(params))}
-          callbackURL={getCallbackURL(params)}
-        />
+        <SignUpForm onSuccess={handleSuccess} callbackURL={callbackURL} />
       </CardContent>
       <CardFooter>
         <div className="flex w-full justify-center border-t pt-4">

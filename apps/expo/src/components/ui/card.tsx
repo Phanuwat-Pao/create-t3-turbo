@@ -34,8 +34,7 @@ CardHeader.displayName = "CardHeader";
 const CardTitle = React.forwardRef<TextRef, TextProps>(
   ({ className, ...props }, ref) => (
     <Text
-      role="heading"
-      aria-level={3}
+      accessibilityRole="header"
       ref={ref}
       className={cn(
         "text-card-foreground text-2xl leading-none font-semibold tracking-tight",

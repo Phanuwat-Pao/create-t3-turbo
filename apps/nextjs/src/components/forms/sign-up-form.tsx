@@ -4,7 +4,7 @@ import { Button } from "@acme/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
 import { Loader2, X } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -48,7 +48,7 @@ export function SignUpForm({
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (): boolean => {
+  const validate = useCallback((): boolean => {
     const result = signUpSchema.safeParse({
       email,
       firstName,
@@ -67,33 +67,71 @@ export function SignUpForm({
     }
     setErrors({});
     return true;
-  };
+  }, [email, firstName, lastName, password, passwordConfirmation]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) {
-      return;
-    }
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!validate()) {
+        return;
+      }
 
-    startTransition(async () => {
-      await authClient.signUp.email({
-        callbackURL,
-        email,
-        fetchOptions: {
-          onError: (ctx) => {
-            toast.error(ctx.error.message);
+      startTransition(async () => {
+        await authClient.signUp.email({
+          callbackURL,
+          email,
+          fetchOptions: {
+            onError: (ctx) => {
+              toast.error(ctx.error.message);
+            },
+            onSuccess: async () => {
+              toast.success("Successfully signed up");
+              onSuccess?.();
+            },
           },
-          onSuccess: async () => {
-            toast.success("Successfully signed up");
-            onSuccess?.();
-          },
-        },
-        image: image ? await convertImageToBase64(image) : "",
-        name: `${firstName} ${lastName}`,
-        password,
+          image: image ? await convertImageToBase64(image) : "",
+          name: `${firstName} ${lastName}`,
+          password,
+        });
       });
-    });
-  };
+    },
+    [
+      validate,
+      callbackURL,
+      email,
+      image,
+      firstName,
+      lastName,
+      password,
+      onSuccess,
+    ]
+  );
+
+  const handleFirstNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value),
+    []
+  );
+
+  const handleLastNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value),
+    []
+  );
+
+  const handleEmailChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
+    []
+  );
+
+  const handlePasswordChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
+    []
+  );
+
+  const handlePasswordConfirmationChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) =>
+      setPasswordConfirmation(e.target.value),
+    []
+  );
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-2">
@@ -107,7 +145,7 @@ export function SignUpForm({
               aria-invalid={!!errors.firstName}
               autoComplete="given-name"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={handleFirstNameChange}
             />
             {errors.firstName && <FieldError errors={[errors.firstName]} />}
           </Field>
@@ -119,7 +157,7 @@ export function SignUpForm({
               aria-invalid={!!errors.lastName}
               autoComplete="family-name"
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={handleLastNameChange}
             />
             {errors.lastName && <FieldError errors={[errors.lastName]} />}
           </Field>
@@ -133,7 +171,7 @@ export function SignUpForm({
             aria-invalid={!!errors.email}
             autoComplete="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
           />
           {errors.email && <FieldError errors={[errors.email]} />}
         </Field>
@@ -147,7 +185,7 @@ export function SignUpForm({
               aria-invalid={!!errors.password}
               autoComplete="new-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
             />
             {errors.password && <FieldError errors={[errors.password]} />}
           </Field>
@@ -162,7 +200,7 @@ export function SignUpForm({
               aria-invalid={!!errors.passwordConfirmation}
               autoComplete="new-password"
               value={passwordConfirmation}
-              onChange={(e) => setPasswordConfirmation(e.target.value)}
+              onChange={handlePasswordConfirmationChange}
             />
             {errors.passwordConfirmation && (
               <FieldError errors={[errors.passwordConfirmation]} />
