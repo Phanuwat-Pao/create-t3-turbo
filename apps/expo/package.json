@@ -47,7 +47,7 @@
     "expo-video": "^3.0.15",
     "expo-web-browser": "~15.0.10",
     "i18next": "^25.1.0",
-    "lucide-react-native": "^0.475.0",
+    "lucide-react-native": "^0.563.0",
     "nativewind": "5.0.0-preview.2",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",

@@ -33,6 +33,7 @@
     "@tanstack/react-form": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@tanstack/react-query-devtools": "^5.76.0",
+    "@vercel/otel": "^2.1.0",
     "better-auth": "catalog:",
     "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
