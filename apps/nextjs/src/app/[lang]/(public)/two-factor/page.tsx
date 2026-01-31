@@ -1,44 +1,16 @@
-"use client";
+import type { Locale } from "~/i18n/i18n-config";
 
-import { Button } from "@acme/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@acme/ui/card";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { getDictionary } from "~/i18n/get-dictionary";
 
-import { TwoFactorTotpForm } from "~/components/forms/two-factor-totp-form";
+import { TwoFactorTotpClient } from "./_components/two-factor-totp-client";
 
-export default function Page() {
-  const router = useRouter();
-  const handleSuccess = useCallback(() => router.push("/dashboard"), [router]);
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-  return (
-    <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>TOTP Verification</CardTitle>
-          <CardDescription>
-            Enter your 6-digit TOTP code to authenticate
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <TwoFactorTotpForm onSuccess={handleSuccess} />
-        </CardContent>
-        <CardFooter className="text-muted-foreground gap-2 text-sm">
-          <Link href="/two-factor/otp">
-            <Button variant="link" size="sm">
-              Switch to Email Verification
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-    </main>
-  );
+export default async function Page({ params }: PageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+
+  return <TwoFactorTotpClient dict={dict} />;
 }

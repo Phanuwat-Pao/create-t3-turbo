@@ -48,6 +48,7 @@ import { memo, useCallback, useState } from "react";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
 import type { Session } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
@@ -70,6 +71,7 @@ interface SessionItemProps {
   currentSessionId: string | undefined;
   isTerminating: boolean;
   onRevoke: (token: string) => void;
+  dict: Dictionary;
 }
 
 const SessionItem = memo(function SessionItem({
@@ -77,6 +79,7 @@ const SessionItem = memo(function SessionItem({
   currentSessionId,
   isTerminating,
   onRevoke,
+  dict,
 }: SessionItemProps) {
   const isCurrentSession = session.id === currentSessionId;
 
@@ -101,8 +104,12 @@ const SessionItem = memo(function SessionItem({
           onClick={handleRevoke}
         >
           {isTerminating && <Loader2 size={15} className="animate-spin" />}
-          {!isTerminating && isCurrentSession && "Sign Out"}
-          {!isTerminating && !isCurrentSession && "Terminate"}
+          {!isTerminating &&
+            isCurrentSession &&
+            dict.dashboard.sessions.signOut}
+          {!isTerminating &&
+            !isCurrentSession &&
+            dict.dashboard.sessions.terminate}
         </button>
       </div>
     </div>
@@ -112,7 +119,9 @@ const SessionItem = memo(function SessionItem({
 const UserCard = (props: {
   session: Session | null;
   activeSessions: Session["session"][];
+  dict: Dictionary;
 }) => {
+  const { dict } = props;
   const router = useRouter();
   const signOutMutation = useSignOutMutation();
   const revokeSessionMutation = useRevokeSessionMutation();
@@ -143,12 +152,12 @@ const UserCard = (props: {
           setEmailVerificationPending(true);
         },
         onSuccess() {
-          toast.success("Verification email sent successfully");
+          toast.success(dict.dashboard.emailVerification.sentSuccess);
           setEmailVerificationPending(false);
         },
       }
     );
-  }, [session?.user.email]);
+  }, [session?.user.email, dict]);
 
   const handleRevokeSession = useCallback(
     (token: string) => {
@@ -186,7 +195,6 @@ const UserCard = (props: {
     setIsSignOut(true);
     await authClient.admin.stopImpersonating();
     setIsSignOut(false);
-    toast.info("Impersonation stopped successfully");
     router.push("/admin");
   }, [router]);
 
@@ -201,7 +209,7 @@ const UserCard = (props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>User</CardTitle>
+        <CardTitle>{dict.dashboard.user.title}</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-8">
         <div className="flex flex-col gap-2">
@@ -210,7 +218,7 @@ const UserCard = (props: {
               <Avatar className="hidden h-9 w-9 sm:flex">
                 <AvatarImage
                   src={session?.user.image || undefined}
-                  alt="Avatar"
+                  alt={dict.dashboard.user.avatarAlt}
                   className="object-cover"
                 />
                 <AvatarFallback>{session?.user.name.charAt(0)}</AvatarFallback>
@@ -224,16 +232,14 @@ const UserCard = (props: {
                 <p className="text-sm">{session?.user.email}</p>
               </div>
             </div>
-            <EditUserDialog />
+            <EditUserDialog dict={dict} />
           </div>
         </div>{" "}
         {session?.user.emailVerified ? null : (
           <Alert>
-            <AlertTitle>Verify Your Email Address</AlertTitle>
+            <AlertTitle>{dict.dashboard.emailVerification.title}</AlertTitle>
             <AlertDescription className="text-muted-foreground">
-              Please verify your email address. Check your inbox for the
-              verification email. If you haven&apos;t received the email, click
-              the button below to resend.
+              {dict.dashboard.emailVerification.description}
               <Button
                 size="sm"
                 variant="secondary"
@@ -243,14 +249,14 @@ const UserCard = (props: {
                 {emailVerificationPending ? (
                   <Loader2 size={15} className="animate-spin" />
                 ) : (
-                  "Resend Verification Email"
+                  dict.dashboard.emailVerification.resendButton
                 )}
               </Button>
             </AlertDescription>
           </Alert>
         )}
         <div className="flex w-max flex-col gap-1 border-l-2 px-2">
-          <p className="text-xs font-medium">Active Sessions</p>
+          <p className="text-xs font-medium">{dict.dashboard.sessions.title}</p>
           {activeSessions
             .filter((activeSession) => activeSession.userAgent)
             .map((activeSession) => (
@@ -263,33 +269,38 @@ const UserCard = (props: {
                   revokeSessionMutation.variables?.token === activeSession.token
                 }
                 onRevoke={handleRevokeSession}
+                dict={dict}
               />
             ))}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 border-y py-4">
           <div className="flex flex-col gap-2">
-            <p className="text-sm">Passkeys</p>
+            <p className="text-sm">{dict.dashboard.passkeys.title}</p>
             <div className="flex flex-wrap gap-2">
-              <AddPasskey />
-              <ListPasskeys />
+              <AddPasskey dict={dict} />
+              <ListPasskeys dict={dict} />
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-sm">Two Factor</p>
+            <p className="text-sm">{dict.dashboard.twoFactor.title}</p>
             <div className="flex gap-2">
               {!!(session?.user as ExtendedUser)?.twoFactorEnabled && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <QrCode size={16} />
-                      <span className="text-xs md:text-sm">Scan QR Code</span>
+                      <span className="text-xs md:text-sm">
+                        {dict.dashboard.twoFactor.scanQrCode}
+                      </span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="w-11/12 sm:max-w-[425px]">
                     <DialogHeader>
-                      <DialogTitle>Scan QR Code</DialogTitle>
+                      <DialogTitle>
+                        {dict.dashboard.twoFactor.scanQrCode}
+                      </DialogTitle>
                       <DialogDescription>
-                        Scan the QR code with your TOTP app
+                        {dict.dashboard.twoFactor.scanQrDescription}
                       </DialogDescription>
                     </DialogHeader>
                     <TwoFactorQrForm />
@@ -313,8 +324,8 @@ const UserCard = (props: {
                     )}
                     <span className="text-xs md:text-sm">
                       {(session?.user as ExtendedUser)?.twoFactorEnabled
-                        ? "Disable 2FA"
-                        : "Enable 2FA"}
+                        ? dict.dashboard.twoFactor.disable
+                        : dict.dashboard.twoFactor.enable}
                     </span>
                   </Button>
                 </DialogTrigger>
@@ -322,13 +333,13 @@ const UserCard = (props: {
                   <DialogHeader>
                     <DialogTitle>
                       {(session?.user as ExtendedUser)?.twoFactorEnabled
-                        ? "Disable 2FA"
-                        : "Enable 2FA"}
+                        ? dict.dashboard.twoFactor.disable
+                        : dict.dashboard.twoFactor.enable}
                     </DialogTitle>
                     <DialogDescription>
                       {(session?.user as ExtendedUser)?.twoFactorEnabled
-                        ? "Disable the second factor authentication from your account"
-                        : "Enable 2FA to secure your account"}
+                        ? dict.dashboard.twoFactor.disableDescription
+                        : dict.dashboard.twoFactor.enableDescription}
                     </DialogDescription>
                   </DialogHeader>
                   {(session?.user as ExtendedUser)?.twoFactorEnabled ? (
@@ -343,7 +354,7 @@ const UserCard = (props: {
         </div>
       </CardContent>
       <CardFooter className="items-center justify-between gap-2">
-        <ChangePassword />
+        <ChangePassword dict={dict} />
         {(session?.session as ExtendedSessionData)?.impersonatedBy ? (
           <Button
             className="z-10 gap-2"
@@ -357,7 +368,7 @@ const UserCard = (props: {
               ) : (
                 <div className="flex items-center gap-2">
                   <StopCircle size={16} color="red" />
-                  Stop Impersonation
+                  {dict.dashboard.user.stopImpersonation}
                 </div>
               )}
             </span>
@@ -375,7 +386,7 @@ const UserCard = (props: {
               ) : (
                 <div className="flex items-center gap-2">
                   <LogOut size={16} />
-                  Sign Out
+                  {dict.dashboard.user.signOut}
                 </div>
               )}
             </span>
@@ -387,7 +398,7 @@ const UserCard = (props: {
 };
 export default UserCard;
 
-function ChangePassword() {
+function ChangePassword({ dict }: { dict: Dictionary }) {
   const [open, setOpen] = useState<boolean>(false);
 
   const handleSuccess = useCallback(() => setOpen(false), []);
@@ -407,21 +418,25 @@ function ChangePassword() {
               d="M2.5 18.5v-1h19v1zm.535-5.973l-.762-.442l.965-1.693h-1.93v-.884h1.93l-.965-1.642l.762-.443L4 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L4 10.835zm8 0l-.762-.442l.966-1.693H9.308v-.884h1.93l-.965-1.642l.762-.443L12 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L12 10.835zm8 0l-.762-.442l.966-1.693h-1.931v-.884h1.93l-.965-1.642l.762-.443L20 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L20 10.835z"
             />
           </svg>
-          <span className="text-muted-foreground text-sm">Change Password</span>
+          <span className="text-muted-foreground text-sm">
+            {dict.dashboard.changePassword.title}
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
-          <DialogDescription>Change your password</DialogDescription>
+          <DialogTitle>{dict.dashboard.changePassword.title}</DialogTitle>
+          <DialogDescription>
+            {dict.dashboard.changePassword.description}
+          </DialogDescription>
         </DialogHeader>
-        <ChangePasswordForm onSuccess={handleSuccess} />
+        <ChangePasswordForm onSuccess={handleSuccess} dict={dict} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function EditUserDialog() {
+function EditUserDialog({ dict }: { dict: Dictionary }) {
   const { data } = useSessionQuery();
   const [open, setOpen] = useState<boolean>(false);
 
@@ -432,31 +447,34 @@ function EditUserDialog() {
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2" variant="default">
           <Edit size={13} />
-          Edit User
+          {dict.dashboard.user.editUser}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit User</DialogTitle>
-          <DialogDescription>Edit user information</DialogDescription>
+          <DialogTitle>{dict.dashboard.user.editUser}</DialogTitle>
+          <DialogDescription>
+            {dict.dashboard.user.editUserDescription}
+          </DialogDescription>
         </DialogHeader>
         <UpdateUserForm
           currentName={data?.user.name}
           onSuccess={handleSuccess}
+          dict={dict}
         />
       </DialogContent>
     </Dialog>
   );
 }
 
-function AddPasskey() {
+function AddPasskey({ dict }: { dict: Dictionary }) {
   const [isOpen, setIsOpen] = useState(false);
   const [passkeyName, setPasskeyName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAddPasskey = useCallback(async () => {
     if (!passkeyName) {
-      toast.error("Passkey name is required");
+      toast.error(dict.dashboard.passkeys.nameRequired);
       return;
     }
     setIsLoading(true);
@@ -467,10 +485,10 @@ function AddPasskey() {
       toast.error(res?.error.message);
     } else {
       setIsOpen(false);
-      toast.success("Passkey added successfully. You can now use it to login.");
+      toast.success(dict.dashboard.passkeys.addedSuccess);
     }
     setIsLoading(false);
-  }, [passkeyName]);
+  }, [passkeyName, dict]);
 
   const handleNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -484,19 +502,20 @@ function AddPasskey() {
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2 text-xs md:text-sm">
           <Plus size={15} />
-          Add New Passkey
+          {dict.dashboard.passkeys.addNew}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Passkey</DialogTitle>
+          <DialogTitle>{dict.dashboard.passkeys.addNew}</DialogTitle>
           <DialogDescription>
-            Create a new passkey to securely access your account without a
-            password.
+            {dict.dashboard.passkeys.addNewDescription}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-2">
-          <Label htmlFor="passkey-name">Passkey Name</Label>
+          <Label htmlFor="passkey-name">
+            {dict.dashboard.passkeys.nameLabel}
+          </Label>
           <Input
             id="passkey-name"
             value={passkeyName}
@@ -515,7 +534,7 @@ function AddPasskey() {
             ) : (
               <>
                 <Fingerprint className="mr-2 h-4 w-4" />
-                Create Passkey
+                {dict.dashboard.passkeys.createButton}
               </>
             )}
           </Button>
@@ -529,12 +548,14 @@ interface PasskeyRowProps {
   passkey: { id: string; name?: string | null };
   isDeleting: boolean;
   onDelete: (id: string) => void;
+  dict: Dictionary;
 }
 
 const PasskeyRow = memo(function PasskeyRow({
   passkey,
   isDeleting,
   onDelete,
+  dict,
 }: PasskeyRowProps) {
   const handleDelete = useCallback(() => {
     onDelete(passkey.id);
@@ -542,7 +563,9 @@ const PasskeyRow = memo(function PasskeyRow({
 
   return (
     <TableRow className="flex items-center justify-between">
-      <TableCell>{passkey.name || "My Passkey"}</TableCell>
+      <TableCell>
+        {passkey.name || dict.dashboard.passkeys.defaultName}
+      </TableCell>
       <TableCell className="text-right">
         <button type="button" onClick={handleDelete}>
           {isDeleting ? (
@@ -556,7 +579,7 @@ const PasskeyRow = memo(function PasskeyRow({
   );
 });
 
-function ListPasskeys() {
+function ListPasskeys({ dict }: { dict: Dictionary }) {
   const { data } = authClient.useListPasskeys();
   const [isOpen, setIsOpen] = useState(false);
   const [passkeyName, setPasskeyName] = useState("");
@@ -567,7 +590,7 @@ function ListPasskeys() {
 
   const handleAddPasskey = useCallback(async () => {
     if (!passkeyName) {
-      toast.error("Passkey name is required");
+      toast.error(dict.dashboard.passkeys.nameRequired);
       return;
     }
     setIsLoading(true);
@@ -578,26 +601,29 @@ function ListPasskeys() {
     if (res?.error) {
       toast.error(res?.error.message);
     } else {
-      toast.success("Passkey added successfully. You can now use it to login.");
+      toast.success(dict.dashboard.passkeys.addedSuccess);
     }
-  }, [passkeyName]);
+  }, [passkeyName, dict]);
 
-  const handleDeletePasskey = useCallback(async (passkeyId: string) => {
-    setDeletingPasskeyId(passkeyId);
-    await authClient.passkey.deletePasskey({
-      fetchOptions: {
-        onError: (error: { error: { message: string } }) => {
-          toast.error(error.error.message);
-          setDeletingPasskeyId(null);
+  const handleDeletePasskey = useCallback(
+    async (passkeyId: string) => {
+      setDeletingPasskeyId(passkeyId);
+      await authClient.passkey.deletePasskey({
+        fetchOptions: {
+          onError: (error: { error: { message: string } }) => {
+            toast.error(error.error.message);
+            setDeletingPasskeyId(null);
+          },
+          onSuccess: () => {
+            toast(dict.dashboard.passkeys.deletedSuccess);
+            setDeletingPasskeyId(null);
+          },
         },
-        onSuccess: () => {
-          toast("Passkey deleted successfully");
-          setDeletingPasskeyId(null);
-        },
-      },
-      id: passkeyId,
-    });
-  }, []);
+        id: passkeyId,
+      });
+    },
+    [dict]
+  );
 
   const handleNameChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -613,19 +639,24 @@ function ListPasskeys() {
       <DialogTrigger asChild>
         <Button variant="outline" className="text-xs md:text-sm">
           <Fingerprint className="mr-2 h-4 w-4" />
-          <span>Passkeys {data?.length ? `[${data?.length}]` : ""}</span>
+          <span>
+            {dict.dashboard.passkeys.title}{" "}
+            {data?.length ? `[${data?.length}]` : ""}
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Passkeys</DialogTitle>
-          <DialogDescription>List of passkeys</DialogDescription>
+          <DialogTitle>{dict.dashboard.passkeys.listTitle}</DialogTitle>
+          <DialogDescription>
+            {dict.dashboard.passkeys.listDescription}
+          </DialogDescription>
         </DialogHeader>
         {data?.length ? (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
+                <TableHead>{dict.common.name}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -635,24 +666,27 @@ function ListPasskeys() {
                   passkey={passkey}
                   isDeleting={deletingPasskeyId === passkey.id}
                   onDelete={handleDeletePasskey}
+                  dict={dict}
                 />
               ))}
             </TableBody>
           </Table>
         ) : (
-          <p className="text-muted-foreground text-sm">No passkeys found</p>
+          <p className="text-muted-foreground text-sm">
+            {dict.dashboard.passkeys.noPasskeys}
+          </p>
         )}
         {!data?.length && (
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-2">
               <Label htmlFor="passkey-name" className="text-sm">
-                New Passkey
+                {dict.dashboard.passkeys.newPasskey}
               </Label>
               <Input
                 id="passkey-name"
                 value={passkeyName}
                 onChange={handleNameChange}
-                placeholder="My Passkey"
+                placeholder={dict.dashboard.passkeys.defaultName}
               />
             </div>
             <Button type="submit" onClick={handleAddPasskey} className="w-full">
@@ -661,14 +695,14 @@ function ListPasskeys() {
               ) : (
                 <>
                   <Fingerprint className="mr-2 h-4 w-4" />
-                  Create Passkey
+                  {dict.dashboard.passkeys.createButton}
                 </>
               )}
             </Button>
           </div>
         )}
         <DialogFooter>
-          <Button onClick={handleClose}>Close</Button>
+          <Button onClick={handleClose}>{dict.common.close}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

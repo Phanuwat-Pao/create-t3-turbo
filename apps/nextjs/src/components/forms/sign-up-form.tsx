@@ -8,34 +8,29 @@ import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { authClient } from "~/auth/client";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { convertImageToBase64 } from "~/lib/utils";
 
-const signUpSchema = z
-  .object({
-    email: z.string().email("Please enter a valid email address."),
-    firstName: z.string().min(1, "First name is required."),
-    lastName: z.string().min(1, "Last name is required."),
-    password: z.string().min(8, "Password must be at least 8 characters."),
-    passwordConfirmation: z.string().min(1, "Please confirm your password."),
-  })
-  .refine((data) => data.password === data.passwordConfirmation, {
-    message: "Passwords do not match.",
-    path: ["passwordConfirmation"],
-  });
-
-type SignUpFormValues = z.infer<typeof signUpSchema>;
-type FormErrors = Partial<Record<keyof SignUpFormValues, { message: string }>>;
+type SignUpFormErrors = Partial<
+  Record<
+    "email" | "firstName" | "lastName" | "password" | "passwordConfirmation",
+    { message: string }
+  >
+>;
 
 interface SignUpFormProps {
   onSuccess?: () => void;
   callbackURL?: string;
+  dict: Dictionary;
 }
 
 export function SignUpForm({
   onSuccess,
   callbackURL = "/dashboard",
+  dict,
 }: SignUpFormProps) {
   const [loading, startTransition] = useTransition();
   const { image, imagePreview, handleImageChange, clearImage } =
@@ -46,7 +41,22 @@ export function SignUpForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<SignUpFormErrors>({});
+
+  const signUpSchema = z
+    .object({
+      email: z.string().email(dict.validation.emailRequired),
+      firstName: z.string().min(1, dict.validation.firstNameRequired),
+      lastName: z.string().min(1, dict.validation.lastNameRequired),
+      password: z.string().min(8, dict.validation.passwordMinLength),
+      passwordConfirmation: z
+        .string()
+        .min(1, dict.validation.confirmPasswordRequired),
+    })
+    .refine((data) => data.password === data.passwordConfirmation, {
+      message: dict.validation.passwordsDoNotMatch,
+      path: ["passwordConfirmation"],
+    });
 
   const validate = useCallback((): boolean => {
     const result = signUpSchema.safeParse({
@@ -57,9 +67,9 @@ export function SignUpForm({
       passwordConfirmation,
     });
     if (!result.success) {
-      const fieldErrors: FormErrors = {};
+      const fieldErrors: SignUpFormErrors = {};
       for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof SignUpFormValues;
+        const field = issue.path[0] as keyof SignUpFormErrors;
         fieldErrors[field] = { message: issue.message };
       }
       setErrors(fieldErrors);
@@ -67,7 +77,14 @@ export function SignUpForm({
     }
     setErrors({});
     return true;
-  }, [email, firstName, lastName, password, passwordConfirmation]);
+  }, [
+    email,
+    firstName,
+    lastName,
+    password,
+    passwordConfirmation,
+    signUpSchema,
+  ]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -85,7 +102,7 @@ export function SignUpForm({
               toast.error(ctx.error.message);
             },
             onSuccess: async () => {
-              toast.success("Successfully signed up");
+              toast.success(dict.auth.signUp.successMessage);
               onSuccess?.();
             },
           },
@@ -104,6 +121,7 @@ export function SignUpForm({
       lastName,
       password,
       onSuccess,
+      dict,
     ]
   );
 
@@ -138,10 +156,12 @@ export function SignUpForm({
       <FieldGroup>
         <div className="grid grid-cols-2 gap-4">
           <Field data-invalid={!!errors.firstName}>
-            <FieldLabel htmlFor="sign-up-first-name">First name</FieldLabel>
+            <FieldLabel htmlFor="sign-up-first-name">
+              {dict.auth.signUp.firstNameLabel}
+            </FieldLabel>
             <Input
               id="sign-up-first-name"
-              placeholder="Max"
+              placeholder={dict.auth.signUp.firstNamePlaceholder}
               aria-invalid={!!errors.firstName}
               autoComplete="given-name"
               value={firstName}
@@ -150,10 +170,12 @@ export function SignUpForm({
             {errors.firstName && <FieldError errors={[errors.firstName]} />}
           </Field>
           <Field data-invalid={!!errors.lastName}>
-            <FieldLabel htmlFor="sign-up-last-name">Last name</FieldLabel>
+            <FieldLabel htmlFor="sign-up-last-name">
+              {dict.auth.signUp.lastNameLabel}
+            </FieldLabel>
             <Input
               id="sign-up-last-name"
-              placeholder="Robinson"
+              placeholder={dict.auth.signUp.lastNamePlaceholder}
               aria-invalid={!!errors.lastName}
               autoComplete="family-name"
               value={lastName}
@@ -163,11 +185,13 @@ export function SignUpForm({
           </Field>
         </div>
         <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="sign-up-email">Email</FieldLabel>
+          <FieldLabel htmlFor="sign-up-email">
+            {dict.auth.signUp.emailLabel}
+          </FieldLabel>
           <Input
             id="sign-up-email"
             type="email"
-            placeholder="m@example.com"
+            placeholder={dict.auth.signUp.emailPlaceholder}
             aria-invalid={!!errors.email}
             autoComplete="email"
             value={email}
@@ -177,11 +201,13 @@ export function SignUpForm({
         </Field>
         <div className="grid grid-cols-2 gap-4">
           <Field data-invalid={!!errors.password}>
-            <FieldLabel htmlFor="sign-up-password">Password</FieldLabel>
+            <FieldLabel htmlFor="sign-up-password">
+              {dict.auth.signUp.passwordLabel}
+            </FieldLabel>
             <Input
               id="sign-up-password"
               type="password"
-              placeholder="Password"
+              placeholder={dict.auth.signUp.passwordPlaceholder}
               aria-invalid={!!errors.password}
               autoComplete="new-password"
               value={password}
@@ -191,12 +217,12 @@ export function SignUpForm({
           </Field>
           <Field data-invalid={!!errors.passwordConfirmation}>
             <FieldLabel htmlFor="sign-up-password-confirmation">
-              Confirm Password
+              {dict.auth.signUp.confirmPasswordLabel}
             </FieldLabel>
             <Input
               id="sign-up-password-confirmation"
               type="password"
-              placeholder="Confirm Password"
+              placeholder={dict.auth.signUp.confirmPasswordPlaceholder}
               aria-invalid={!!errors.passwordConfirmation}
               autoComplete="new-password"
               value={passwordConfirmation}
@@ -209,7 +235,7 @@ export function SignUpForm({
         </div>
         <Field>
           <FieldLabel htmlFor="sign-up-image">
-            Profile Image (optional)
+            {dict.auth.signUp.profileImageLabel}
           </FieldLabel>
           <div className="flex items-end gap-4">
             {imagePreview && (
@@ -217,7 +243,7 @@ export function SignUpForm({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imagePreview}
-                  alt="Profile preview"
+                  alt={dict.auth.signUp.profileImageAlt}
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -241,7 +267,7 @@ export function SignUpForm({
         {loading ? (
           <Loader2 size={16} className="animate-spin" />
         ) : (
-          "Create an account"
+          dict.auth.signUp.createAccountButton
         )}
       </Button>
     </form>

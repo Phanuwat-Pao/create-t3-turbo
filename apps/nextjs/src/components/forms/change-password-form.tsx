@@ -8,24 +8,16 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { useChangePasswordMutation } from "~/data/user/change-password-mutation";
 
-const changePasswordSchema = z
-  .object({
-    confirmPassword: z.string().min(1, "Please confirm your password"),
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(128, "Password must be at most 128 characters"),
-    revokeOtherSessions: z.boolean(),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+interface ChangePasswordFormValues {
+  confirmPassword: string;
+  currentPassword: string;
+  newPassword: string;
+  revokeOtherSessions: boolean;
+}
 type FormErrors = Partial<
   Record<keyof ChangePasswordFormValues, { message: string }>
 >;
@@ -33,11 +25,13 @@ type FormErrors = Partial<
 interface ChangePasswordFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  dict: Dictionary;
 }
 
 export function ChangePasswordForm({
   onSuccess,
   onError,
+  dict,
 }: ChangePasswordFormProps) {
   const changePasswordMutation = useChangePasswordMutation();
 
@@ -46,6 +40,25 @@ export function ChangePasswordForm({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const changePasswordSchema = z
+    .object({
+      confirmPassword: z
+        .string()
+        .min(1, dict.validation.confirmPasswordRequired),
+      currentPassword: z
+        .string()
+        .min(1, dict.validation.currentPasswordRequired),
+      newPassword: z
+        .string()
+        .min(8, dict.validation.passwordMinLength)
+        .max(128, dict.validation.passwordMaxLength),
+      revokeOtherSessions: z.boolean(),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+      message: dict.validation.passwordsDoNotMatch,
+      path: ["confirmPassword"],
+    });
 
   const validate = useCallback((): boolean => {
     const result = changePasswordSchema.safeParse({
@@ -65,7 +78,13 @@ export function ChangePasswordForm({
     }
     setErrors({});
     return true;
-  }, [confirmPassword, currentPassword, newPassword, revokeOtherSessions]);
+  }, [
+    confirmPassword,
+    currentPassword,
+    newPassword,
+    revokeOtherSessions,
+    changePasswordSchema,
+  ]);
 
   const resetForm = useCallback(() => {
     setCurrentPassword("");
@@ -143,11 +162,15 @@ export function ChangePasswordForm({
     <form onSubmit={handleSubmit}>
       <FieldGroup>
         <Field data-invalid={!!errors.currentPassword}>
-          <FieldLabel htmlFor="current-password">Current Password</FieldLabel>
+          <FieldLabel htmlFor="current-password">
+            {dict.dashboard.changePassword.currentPasswordLabel}
+          </FieldLabel>
           <PasswordInput
             id="current-password"
             autoComplete="current-password"
-            placeholder="Current password"
+            placeholder={
+              dict.dashboard.changePassword.currentPasswordPlaceholder
+            }
             disabled={changePasswordMutation.isPending}
             value={currentPassword}
             onChange={handleCurrentPasswordChange}
@@ -158,11 +181,13 @@ export function ChangePasswordForm({
         </Field>
 
         <Field data-invalid={!!errors.newPassword}>
-          <FieldLabel htmlFor="new-password">New Password</FieldLabel>
+          <FieldLabel htmlFor="new-password">
+            {dict.dashboard.changePassword.newPasswordLabel}
+          </FieldLabel>
           <PasswordInput
             id="new-password"
             autoComplete="new-password"
-            placeholder="New password"
+            placeholder={dict.dashboard.changePassword.newPasswordPlaceholder}
             disabled={changePasswordMutation.isPending}
             value={newPassword}
             onChange={handleNewPasswordChange}
@@ -171,11 +196,15 @@ export function ChangePasswordForm({
         </Field>
 
         <Field data-invalid={!!errors.confirmPassword}>
-          <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
+          <FieldLabel htmlFor="confirm-password">
+            {dict.dashboard.changePassword.confirmPasswordLabel}
+          </FieldLabel>
           <PasswordInput
             id="confirm-password"
             autoComplete="new-password"
-            placeholder="Confirm password"
+            placeholder={
+              dict.dashboard.changePassword.confirmPasswordPlaceholder
+            }
             disabled={changePasswordMutation.isPending}
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
@@ -193,7 +222,7 @@ export function ChangePasswordForm({
             disabled={changePasswordMutation.isPending}
           />
           <label htmlFor="revoke-sessions" className="text-sm">
-            Sign out from other devices
+            {dict.dashboard.changePassword.revokeOtherSessions}
           </label>
         </div>
 
@@ -201,7 +230,7 @@ export function ChangePasswordForm({
           {changePasswordMutation.isPending ? (
             <Loader2 size={15} className="animate-spin" />
           ) : (
-            "Change Password"
+            dict.dashboard.changePassword.changeButton
           )}
         </Button>
       </FieldGroup>

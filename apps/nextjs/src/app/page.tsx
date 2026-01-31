@@ -2,84 +2,87 @@ import { headers } from "next/headers";
 import Link from "next/link";
 
 import EntryButton from "~/components/entry-button";
+import { getDictionary } from "~/i18n/get-dictionary";
+import { i18n } from "~/i18n/i18n-config";
 import { auth } from "~/lib/auth";
 
-const features: { name: string; link: string }[] = [
+const features = [
   {
+    key: "emailPassword",
     link: "https://www.better-auth.com/docs/authentication/email-password",
-    name: "Email & Password",
   },
   {
+    key: "organization",
     link: "https://www.better-auth.com/docs/plugins/organization",
-    name: "Organization | Teams",
   },
   {
+    key: "passkeys",
     link: "https://www.better-auth.com/docs/plugins/passkey",
-    name: "Passkeys",
   },
   {
+    key: "multiFactor",
     link: "https://www.better-auth.com/docs/plugins/2fa",
-    name: "Multi Factor",
   },
   {
+    key: "passwordReset",
     link: "https://www.better-auth.com/docs/authentication/email-password#request-password-reset",
-    name: "Password Reset",
   },
   {
+    key: "emailVerification",
     link: "https://www.better-auth.com/docs/authentication/email-password#email-verification",
-    name: "Email Verification",
   },
   {
+    key: "rolesPermissions",
     link: "https://www.better-auth.com/docs/plugins/organization#roles",
-    name: "Roles & Permissions",
   },
   {
+    key: "rateLimiting",
     link: "https://www.better-auth.com/docs/reference/security#rate-limiting",
-    name: "Rate Limiting",
   },
   {
+    key: "sessionManagement",
     link: "https://www.better-auth.com/docs/concepts/session-management",
-    name: "Session Management",
   },
   {
+    key: "multipleSessions",
     link: "https://www.better-auth.com/docs/plugins/multi-session",
-    name: "Multiple Session",
   },
   {
+    key: "stripeIntegration",
     link: "https://www.better-auth.com/docs/plugins/stripe",
-    name: "Stripe Integration",
   },
   {
+    key: "lastLoginMethod",
     link: "https://www.better-auth.com/docs/plugins/last-login-method",
-    name: "Last Login Method",
   },
   {
+    key: "oauthProvider",
     link: "https://www.better-auth.com/docs/plugins/oauth-provider",
-    name: "OAuth Provider",
   },
-];
+] as const;
 
 export default async function HomePage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
+  const dict = await getDictionary(i18n.defaultLocale);
 
   return (
     <main className="container h-screen py-16">
       <div className="flex flex-col items-center justify-center gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            BETTER-AUTH.
+            {dict.landing.title}
           </h1>
           <p className="text-center text-sm wrap-break-word md:text-base">
-            Official demo to showcase{" "}
+            {dict.landing.description}{" "}
             <a
               href="https://better-auth.com"
               target="_blank"
               className="italic underline"
               rel="noreferrer"
             >
-              better-auth.
+              {dict.landing.linkText}
             </a>{" "}
             features and capabilities. <br />
           </p>
@@ -88,29 +91,26 @@ export default async function HomePage() {
           <div className="flex flex-col flex-wrap gap-3 pt-2">
             <div className="bg-secondary/70 border border-dashed p-2">
               <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
-                <span className="text-center">
-                  All features on this demo are implemented with Better Auth
-                  without any custom backend code
-                </span>
+                <span className="text-center">{dict.landing.infoBox}</span>
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
               {features.map((feature) => (
                 <Link
                   className="text-muted-foreground hover:text-foreground hover:border-foreground flex cursor-pointer items-center gap-1 border-b pb-1 text-xs transition-all duration-150 ease-in-out"
-                  key={feature.name}
+                  key={feature.key}
                   href={feature.link}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {feature.name}
+                  {dict.landing.features[feature.key]}
                 </Link>
               ))}
             </div>
           </div>
 
           <div className="flex items-center justify-center">
-            <EntryButton session={session} />
+            <EntryButton session={session} dict={dict} />
           </div>
         </div>
       </div>

@@ -8,17 +8,23 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { authClient } from "~/auth/client";
+
+interface SelectOrganizationBtnProps {
+  organization: Partial<Organization>;
+  dict: Dictionary;
+}
 
 export function SelectOrganizationBtn({
   organization,
-}: {
-  organization: Partial<Organization>;
-}) {
+  dict,
+}: SelectOrganizationBtnProps) {
   const handleClick = useCallback(async () => {
     try {
       if (!organization.id) {
-        toast.error("No organization");
+        toast.error(dict.oauth.selectOrganization.noOrganization);
         return;
       }
       const { data: active, error: activeError } =
@@ -27,7 +33,8 @@ export function SelectOrganizationBtn({
         });
       if (activeError || !active) {
         toast.error(
-          activeError?.message ?? "Failed to set active organization"
+          activeError?.message ??
+            dict.oauth.selectOrganization.failedToSetActive
         );
         return;
       }
@@ -35,14 +42,21 @@ export function SelectOrganizationBtn({
         postLogin: true,
       });
       if (error || !data?.redirect || !data.uri) {
-        toast.error(error?.message ?? "Failed to continue");
+        toast.error(
+          error?.message ?? dict.oauth.selectOrganization.failedToContinue
+        );
         return;
       }
       window.location.href = data.uri;
     } catch (error) {
       toast.error(String(error));
     }
-  }, [organization.id]);
+  }, [
+    dict.oauth.selectOrganization.failedToContinue,
+    dict.oauth.selectOrganization.failedToSetActive,
+    dict.oauth.selectOrganization.noOrganization,
+    organization.id,
+  ]);
 
   return (
     <Button
@@ -66,7 +80,11 @@ export function SelectOrganizationBtn({
   );
 }
 
-export function GoBackBtn() {
+interface GoBackBtnProps {
+  dict: Dictionary;
+}
+
+export function GoBackBtn({ dict }: GoBackBtnProps) {
   const router = useRouter();
   const handleGoBack = useCallback(() => router.back(), [router]);
   return (
@@ -75,7 +93,7 @@ export function GoBackBtn() {
       variant="outline"
       onClick={handleGoBack}
     >
-      Go Back
+      {dict.oauth.selectOrganization.goBack}
     </Button>
   );
 }

@@ -5,16 +5,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import { headers } from "next/headers";
 import Link from "next/link";
 
+import type { Locale } from "~/i18n/i18n-config";
+
+import { getDictionary } from "~/i18n/get-dictionary";
 import { auth } from "~/lib/auth";
 
-import { GoBackBtn, SelectOrganizationBtn } from "./org-buttons";
+import { GoBackBtn, SelectOrganizationBtn } from "./_components/org-buttons";
 
 export const metadata: Metadata = {
   description: "Specify which organization to authorize to this application",
   title: "Select Organization",
 };
 
-export default async function SelectOrganizationPage() {
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
+
+export default async function SelectOrganizationPage({ params }: PageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
   const organizations = await auth.api.listOrganizations({
     headers: await headers(),
   });
@@ -25,26 +34,29 @@ export default async function SelectOrganizationPage() {
           <Card className="w-full rounded-none border-zinc-800 bg-zinc-900">
             <CardHeader>
               <CardTitle className="text-lg md:text-xl">
-                Select Organization
+                {dict.oauth.selectOrganization.title}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               {organizations.length ? (
                 organizations.map((o, i) => (
-                  <SelectOrganizationBtn key={o.id ?? i} organization={o} />
+                  <SelectOrganizationBtn
+                    key={o.id ?? i}
+                    organization={o}
+                    dict={dict}
+                  />
                 ))
               ) : (
                 <div>
-                  <p>
-                    Application is requesting scopes for an organization but no
-                    organizations exist for this account.
-                  </p>
+                  <p>{dict.oauth.selectOrganization.noOrganizations}</p>
                   <br />
                   <div className="flex flex-col gap-1">
                     <Link href="/dashboard">
-                      <Button className="w-full">Create Organization</Button>
+                      <Button className="w-full">
+                        {dict.oauth.selectOrganization.createOrganization}
+                      </Button>
                     </Link>
-                    <GoBackBtn />
+                    <GoBackBtn dict={dict} />
                   </div>
                 </div>
               )}

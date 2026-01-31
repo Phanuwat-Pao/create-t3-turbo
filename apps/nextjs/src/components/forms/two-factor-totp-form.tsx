@@ -7,31 +7,37 @@ import { CheckCircle2, Loader2 } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { authClient } from "~/auth/client";
 
-const totpSchema = z.object({
-  code: z
-    .string()
-    .length(6, "TOTP code must be 6 digits.")
-    .regex(/^\d+$/, "TOTP code must be digits only."),
-});
-
-type TotpFormValues = z.infer<typeof totpSchema>;
+interface TotpFormValues {
+  code: string;
+}
 type FormErrors = Partial<Record<keyof TotpFormValues, { message: string }>>;
 
 interface TwoFactorTotpFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  dict: Dictionary;
 }
 
 export function TwoFactorTotpForm({
   onSuccess,
   onError,
+  dict,
 }: TwoFactorTotpFormProps) {
   const [loading, startTransition] = useTransition();
   const [isVerified, setIsVerified] = useState(false);
   const [code, setCode] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const totpSchema = z.object({
+    code: z
+      .string()
+      .length(6, dict.auth.twoFactor.codeMustBe6Digits)
+      .regex(/^\d+$/, dict.auth.twoFactor.codeMustBeDigitsOnly),
+  });
 
   const validate = useCallback((): boolean => {
     const result = totpSchema.safeParse({ code });
@@ -46,7 +52,7 @@ export function TwoFactorTotpForm({
     }
     setErrors({});
     return true;
-  }, [code]);
+  }, [code, totpSchema]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,12 +69,12 @@ export function TwoFactorTotpForm({
           setIsVerified(true);
           onSuccess?.();
         } else {
-          onError?.("Invalid TOTP code");
-          setErrors({ code: { message: "Invalid TOTP code" } });
+          onError?.(dict.auth.twoFactor.invalidCode);
+          setErrors({ code: { message: dict.auth.twoFactor.invalidCode } });
         }
       });
     },
-    [code, onError, onSuccess, validate]
+    [code, dict.auth.twoFactor.invalidCode, onError, onSuccess, validate]
   );
 
   const handleCodeChange = useCallback(
@@ -82,7 +88,9 @@ export function TwoFactorTotpForm({
     return (
       <div className="flex flex-col items-center justify-center space-y-2 py-4">
         <CheckCircle2 className="h-12 w-12 text-green-500" />
-        <p className="text-lg font-semibold">Verification Successful</p>
+        <p className="text-lg font-semibold">
+          {dict.auth.twoFactor.verificationSuccess}
+        </p>
       </div>
     );
   }
@@ -91,13 +99,15 @@ export function TwoFactorTotpForm({
     <form onSubmit={handleSubmit} className="grid gap-4">
       <FieldGroup>
         <Field data-invalid={!!errors.code}>
-          <FieldLabel htmlFor="totp-code">TOTP Code</FieldLabel>
+          <FieldLabel htmlFor="totp-code">
+            {dict.auth.twoFactor.codeLabel}
+          </FieldLabel>
           <Input
             id="totp-code"
             type="text"
             inputMode="numeric"
             maxLength={6}
-            placeholder="Enter 6-digit code"
+            placeholder={dict.auth.twoFactor.codePlaceholder}
             aria-invalid={!!errors.code}
             autoComplete="one-time-code"
             value={code}
@@ -107,7 +117,11 @@ export function TwoFactorTotpForm({
         </Field>
       </FieldGroup>
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? <Loader2 size={16} className="animate-spin" /> : "Verify"}
+        {loading ? (
+          <Loader2 size={16} className="animate-spin" />
+        ) : (
+          dict.auth.twoFactor.verifyButton
+        )}
       </Button>
     </form>
   );

@@ -8,20 +8,15 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { convertImageToBase64 } from "~/lib/utils";
 
-const updateUserSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be at most 50 characters")
-    .optional()
-    .or(z.literal("")),
-});
-
-type UpdateUserFormValues = z.infer<typeof updateUserSchema>;
+interface UpdateUserFormValues {
+  name: string;
+}
 type FormErrors = Partial<
   Record<keyof UpdateUserFormValues, { message: string }>
 >;
@@ -30,12 +25,14 @@ interface UpdateUserFormProps {
   currentName?: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  dict: Dictionary;
 }
 
 export function UpdateUserForm({
   currentName,
   onSuccess,
   onError,
+  dict,
 }: UpdateUserFormProps) {
   const updateUserMutation = useUpdateUserMutation();
   const { image, imagePreview, handleImageChange, clearImage } =
@@ -43,6 +40,15 @@ export function UpdateUserForm({
 
   const [name, setName] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const updateUserSchema = z.object({
+    name: z
+      .string()
+      .min(2, dict.validation.nameMinLength)
+      .max(50, dict.validation.nameMaxLength)
+      .optional()
+      .or(z.literal("")),
+  });
 
   const validate = useCallback((): boolean => {
     const result = updateUserSchema.safeParse({ name });
@@ -57,7 +63,7 @@ export function UpdateUserForm({
     }
     setErrors({});
     return true;
-  }, [name]);
+  }, [name, updateUserSchema]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -89,11 +95,22 @@ export function UpdateUserForm({
         );
       } catch (error) {
         onError?.(
-          error instanceof Error ? error.message : "Failed to process image"
+          error instanceof Error
+            ? error.message
+            : dict.validation.failedToProcessImage
         );
       }
     },
-    [validate, image, updateUserMutation, name, onError, clearImage, onSuccess]
+    [
+      validate,
+      image,
+      updateUserMutation,
+      name,
+      onError,
+      clearImage,
+      onSuccess,
+      dict,
+    ]
   );
 
   const handleNameChange = useCallback(
@@ -107,7 +124,9 @@ export function UpdateUserForm({
     <form onSubmit={handleSubmit}>
       <FieldGroup>
         <Field data-invalid={!!errors.name}>
-          <FieldLabel htmlFor="name">Full Name</FieldLabel>
+          <FieldLabel htmlFor="name">
+            {dict.dashboard.user.fullNameLabel}
+          </FieldLabel>
           <Input
             id="name"
             type="text"
@@ -120,13 +139,15 @@ export function UpdateUserForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="image">Profile Image</FieldLabel>
+          <FieldLabel htmlFor="image">
+            {dict.dashboard.user.profileImageLabel}
+          </FieldLabel>
           <div className="flex items-end gap-4">
             {imagePreview && (
               <div className="relative h-16 w-16 overflow-hidden rounded-sm">
                 <Image
                   src={imagePreview}
-                  alt="Profile preview"
+                  alt={dict.dashboard.user.profileImageAlt}
                   fill
                   className="object-cover"
                 />
@@ -159,7 +180,7 @@ export function UpdateUserForm({
           {updateUserMutation.isPending ? (
             <Loader2 size={15} className="animate-spin" />
           ) : (
-            "Update"
+            dict.dashboard.user.updateButton
           )}
         </Button>
       </FieldGroup>

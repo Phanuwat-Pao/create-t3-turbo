@@ -1,54 +1,16 @@
-"use client";
+import type { Locale } from "~/i18n/i18n-config";
 
-import { Tabs } from "@acme/ui/tabs2";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
-import { toast } from "sonner";
+import { getDictionary } from "~/i18n/get-dictionary";
 
-import { authClient } from "~/auth/client";
-import { getCallbackURL } from "~/lib/shared";
+import SignInPage from "./_components/sign-in-page";
 
-import SignIn from "./_components/sign-in";
-import { SignUp } from "./_components/sign-up";
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-export default function Page() {
-  const router = useRouter();
-  const params = useSearchParams();
+export default async function Page({ params }: PageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
 
-  useEffect(() => {
-    authClient.oneTap({
-      fetchOptions: {
-        onError: ({ error }: { error: { message?: string } }) => {
-          toast.error(error.message || "An error occurred");
-        },
-        onSuccess: () => {
-          toast.success("Successfully signed in");
-          router.push(getCallbackURL(params));
-        },
-      },
-    });
-  }, [router, params]);
-
-  return (
-    <div className="w-full">
-      <div className="flex w-full flex-col items-center justify-center md:py-10">
-        <div className="w-full max-w-md">
-          <Tabs
-            tabs={[
-              {
-                content: <SignIn />,
-                title: "Sign In",
-                value: "sign-in",
-              },
-              {
-                content: <SignUp />,
-                title: "Sign Up",
-                value: "sign-up",
-              },
-            ]}
-          />
-        </div>
-      </div>
-    </div>
-  );
+  return <SignInPage dict={dict} />;
 }

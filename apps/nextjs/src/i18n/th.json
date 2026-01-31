@@ -1,1 +1,315 @@
-{}
+{
+  "common": {
+    "error": "ข้อผิดพลาด",
+    "success": "สำเร็จ",
+    "loading": "กำลังโหลด...",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "save": "บันทึก",
+    "delete": "ลบ",
+    "close": "ปิด",
+    "back": "กลับ",
+    "name": "ชื่อ",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน"
+  },
+  "landing": {
+    "title": "BETTER-AUTH.",
+    "description": "สาธิตอย่างเป็นทางการเพื่อแสดง",
+    "linkText": "better-auth.",
+    "infoBox": "ฟีเจอร์ทั้งหมดในการสาธิตนี้ถูกสร้างด้วย Better Auth โดยไม่ต้องเขียนโค้ดแบ็กเอนด์เอง",
+    "features": {
+      "emailPassword": "อีเมลและรหัสผ่าน",
+      "organization": "องค์กร | ทีม",
+      "passkeys": "Passkeys",
+      "multiFactor": "การยืนยันหลายขั้นตอน",
+      "passwordReset": "รีเซ็ตรหัสผ่าน",
+      "emailVerification": "ยืนยันอีเมล",
+      "rolesPermissions": "บทบาทและสิทธิ์",
+      "rateLimiting": "การจำกัดอัตรา",
+      "sessionManagement": "การจัดการเซสชัน",
+      "multipleSessions": "หลายเซสชัน",
+      "stripeIntegration": "การเชื่อมต่อ Stripe",
+      "lastLoginMethod": "วิธีเข้าสู่ระบบล่าสุด",
+      "oauthProvider": "ผู้ให้บริการ OAuth"
+    }
+  },
+  "header": {
+    "title": "BETTER-AUTH."
+  },
+  "entryButton": {
+    "signIn": "เข้าสู่ระบบ",
+    "dashboard": "แดชบอร์ด"
+  },
+  "auth": {
+    "signIn": {
+      "title": "เข้าสู่ระบบ",
+      "description": "กรอกอีเมลของคุณด้านล่างเพื่อเข้าสู่ระบบบัญชีของคุณ",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "m@example.com",
+      "passwordLabel": "รหัสผ่าน",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "forgotPassword": "ลืมรหัสผ่าน?",
+      "rememberMe": "จำฉันไว้",
+      "loginButton": "เข้าสู่ระบบ",
+      "successMessage": "เข้าสู่ระบบสำเร็จ",
+      "withGoogle": "Google",
+      "withGitHub": "GitHub",
+      "withMicrosoft": "Microsoft",
+      "withVercel": "Vercel",
+      "withPasskey": "เข้าสู่ระบบด้วย Passkey",
+      "orContinueWith": "หรือดำเนินการต่อด้วย",
+      "builtWith": "สร้างด้วย",
+      "ariaGoogle": "เข้าสู่ระบบด้วย Google",
+      "ariaGitHub": "เข้าสู่ระบบด้วย GitHub",
+      "ariaMicrosoft": "เข้าสู่ระบบด้วย Microsoft",
+      "ariaVercel": "เข้าสู่ระบบด้วย Vercel"
+    },
+    "signUp": {
+      "title": "สมัครสมาชิก",
+      "description": "กรอกข้อมูลของคุณเพื่อสร้างบัญชี",
+      "firstNameLabel": "ชื่อจริง",
+      "firstNamePlaceholder": "ชื่อจริง",
+      "lastNameLabel": "นามสกุล",
+      "lastNamePlaceholder": "นามสกุล",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "m@example.com",
+      "passwordLabel": "รหัสผ่าน",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
+      "confirmPasswordPlaceholder": "ยืนยันรหัสผ่าน",
+      "profileImageLabel": "รูปโปรไฟล์ (ไม่บังคับ)",
+      "profileImageAlt": "ตัวอย่างโปรไฟล์",
+      "createAccountButton": "สร้างบัญชี",
+      "successMessage": "สมัครสมาชิกสำเร็จ",
+      "builtWith": "สร้างด้วย"
+    },
+    "forgotPassword": {
+      "title": "ลืมรหัสผ่าน",
+      "description": "กรอกอีเมลเพื่อรีเซ็ตรหัสผ่าน",
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "กรอกอีเมลของคุณ",
+      "sendResetLink": "ส่งลิงก์รีเซ็ต",
+      "checkEmail": "ตรวจสอบอีเมลของคุณ",
+      "emailSentDescription": "เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว",
+      "checkSpam": "หากคุณไม่เห็นอีเมล กรุณาตรวจสอบโฟลเดอร์สแปม",
+      "backToSignIn": "กลับไปหน้าเข้าสู่ระบบ"
+    },
+    "resetPassword": {
+      "title": "รีเซ็ตรหัสผ่าน",
+      "description": "กรอกรหัสผ่านใหม่ของคุณ",
+      "newPasswordLabel": "รหัสผ่านใหม่",
+      "newPasswordPlaceholder": "กรอกรหัสผ่านใหม่",
+      "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
+      "confirmPasswordPlaceholder": "ยืนยันรหัสผ่านใหม่",
+      "resetButton": "รีเซ็ตรหัสผ่าน",
+      "successMessage": "รีเซ็ตรหัสผ่านสำเร็จ"
+    },
+    "twoFactor": {
+      "title": "ยืนยัน TOTP",
+      "description": "กรอกรหัส TOTP 6 หลักเพื่อยืนยันตัวตน",
+      "switchToEmail": "เปลี่ยนไปยืนยันทางอีเมล",
+      "otpTitle": "การยืนยันตัวตนสองขั้นตอน",
+      "otpDescription": "ยืนยันตัวตนด้วยรหัสผ่านครั้งเดียว",
+      "codeLabel": "รหัส TOTP",
+      "codePlaceholder": "กรอกรหัส 6 หลัก",
+      "verifyButton": "ยืนยัน",
+      "verificationSuccess": "ยืนยันสำเร็จ",
+      "invalidCode": "รหัส TOTP ไม่ถูกต้อง",
+      "codeMustBe6Digits": "รหัส TOTP ต้องมี 6 หลัก",
+      "codeMustBeDigitsOnly": "รหัส TOTP ต้องเป็นตัวเลขเท่านั้น",
+      "otpCodeLabel": "รหัสผ่านครั้งเดียว",
+      "otpCodePlaceholder": "กรอกรหัส OTP 6 หลัก",
+      "sendOtpButton": "ส่ง OTP ไปยังอีเมล",
+      "validateOtpButton": "ยืนยัน OTP",
+      "otpSentTo": "ส่ง OTP ไปยัง {{email}}",
+      "otpValidatedSuccess": "ยืนยัน OTP สำเร็จ",
+      "invalidOtp": "OTP ไม่ถูกต้อง",
+      "otpMustBe6Digits": "รหัส OTP ต้องมี 6 หลัก",
+      "otpMustBeDigitsOnly": "รหัส OTP ต้องเป็นตัวเลขเท่านั้น",
+      "yourEmail": "อีเมลของคุณ"
+    }
+  },
+  "dashboard": {
+    "user": {
+      "title": "ผู้ใช้",
+      "avatarAlt": "อวาตาร์",
+      "editUser": "แก้ไขผู้ใช้",
+      "editUserDescription": "แก้ไขข้อมูลผู้ใช้",
+      "signOut": "ออกจากระบบ",
+      "stopImpersonation": "หยุดการแอบอ้าง",
+      "fullNameLabel": "ชื่อเต็ม",
+      "profileImageLabel": "รูปโปรไฟล์",
+      "profileImageAlt": "ตัวอย่างโปรไฟล์",
+      "updateButton": "อัปเดต"
+    },
+    "sessions": {
+      "title": "เซสชันที่ใช้งาน",
+      "signOut": "ออกจากระบบ",
+      "terminate": "ยุติ"
+    },
+    "emailVerification": {
+      "title": "ยืนยันที่อยู่อีเมลของคุณ",
+      "description": "กรุณายืนยันที่อยู่อีเมลของคุณ ตรวจสอบกล่องจดหมายสำหรับอีเมลยืนยัน หากคุณไม่ได้รับอีเมล ให้คลิกปุ่มด้านล่างเพื่อส่งใหม่",
+      "resendButton": "ส่งอีเมลยืนยันอีกครั้ง",
+      "sentSuccess": "ส่งอีเมลยืนยันสำเร็จ"
+    },
+    "passkeys": {
+      "title": "Passkeys",
+      "addNew": "เพิ่ม Passkey ใหม่",
+      "addNewDescription": "สร้าง Passkey ใหม่เพื่อเข้าถึงบัญชีของคุณอย่างปลอดภัยโดยไม่ต้องใช้รหัสผ่าน",
+      "nameLabel": "ชื่อ Passkey",
+      "createButton": "สร้าง Passkey",
+      "listTitle": "Passkeys",
+      "listDescription": "รายการ Passkeys",
+      "noPasskeys": "ไม่พบ Passkeys",
+      "newPasskey": "Passkey ใหม่",
+      "defaultName": "Passkey ของฉัน",
+      "addedSuccess": "เพิ่ม Passkey สำเร็จ คุณสามารถใช้เข้าสู่ระบบได้แล้ว",
+      "deletedSuccess": "ลบ Passkey สำเร็จ",
+      "nameRequired": "ต้องระบุชื่อ Passkey"
+    },
+    "twoFactor": {
+      "title": "การยืนยันสองขั้นตอน",
+      "enable": "เปิดใช้งาน 2FA",
+      "disable": "ปิดใช้งาน 2FA",
+      "enableDescription": "เปิดใช้งาน 2FA เพื่อรักษาความปลอดภัยบัญชีของคุณ",
+      "disableDescription": "ปิดการยืนยันตัวตนสองขั้นตอนจากบัญชีของคุณ",
+      "scanQrCode": "สแกน QR Code",
+      "scanQrDescription": "สแกน QR Code ด้วยแอป TOTP ของคุณ"
+    },
+    "changePassword": {
+      "title": "เปลี่ยนรหัสผ่าน",
+      "description": "เปลี่ยนรหัสผ่านของคุณ",
+      "currentPasswordLabel": "รหัสผ่านปัจจุบัน",
+      "currentPasswordPlaceholder": "รหัสผ่านปัจจุบัน",
+      "newPasswordLabel": "รหัสผ่านใหม่",
+      "newPasswordPlaceholder": "รหัสผ่านใหม่",
+      "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
+      "confirmPasswordPlaceholder": "ยืนยันรหัสผ่าน",
+      "revokeOtherSessions": "ออกจากระบบจากอุปกรณ์อื่น",
+      "changeButton": "เปลี่ยนรหัสผ่าน"
+    }
+  },
+  "organization": {
+    "title": "องค์กร",
+    "personal": "ส่วนตัว",
+    "members": "สมาชิก",
+    "invites": "คำเชิญ",
+    "owner": "เจ้าของ",
+    "admin": "ผู้ดูแล",
+    "member": "สมาชิก",
+    "noActiveInvitations": "ไม่มีคำเชิญที่ใช้งานอยู่",
+    "cantInvitePersonal": "คุณไม่สามารถเชิญสมาชิกไปยังพื้นที่ทำงานส่วนตัวได้",
+    "newOrganization": "องค์กรใหม่",
+    "newOrganizationDescription": "สร้างองค์กรใหม่เพื่อร่วมงานกับทีมของคุณ",
+    "inviteMember": "เชิญสมาชิก",
+    "inviteMemberDescription": "เชิญสมาชิกเข้าสู่องค์กรของคุณ",
+    "leave": "ออก",
+    "remove": "ลบ",
+    "revoke": "เพิกถอน",
+    "membersCount": "สมาชิก",
+    "create": {
+      "nameLabel": "ชื่อองค์กร",
+      "namePlaceholder": "องค์กรของฉัน",
+      "slugLabel": "Slug องค์กร",
+      "slugPlaceholder": "my-organization",
+      "logoLabel": "โลโก้",
+      "logoAlt": "ตัวอย่างโลโก้",
+      "createButton": "สร้าง"
+    },
+    "invite": {
+      "emailLabel": "อีเมล",
+      "emailPlaceholder": "member@example.com",
+      "roleLabel": "บทบาท",
+      "rolePlaceholder": "เลือกบทบาท",
+      "inviteButton": "เชิญ"
+    }
+  },
+  "device": {
+    "title": "การอนุญาตอุปกรณ์",
+    "description": "กรอกรหัสที่แสดงบนอุปกรณ์ของคุณ",
+    "codeLabel": "รหัสอุปกรณ์",
+    "codePlaceholder": "XXXX-XXXX",
+    "verifying": "กำลังตรวจสอบ...",
+    "continueButton": "ดำเนินการต่อ",
+    "invalidCode": "รหัสไม่ถูกต้อง กรุณาตรวจสอบและลองอีกครั้ง",
+    "successTitle": "อนุมัติอุปกรณ์แล้ว",
+    "successDescription": "อุปกรณ์ได้รับอนุญาตให้เข้าถึงบัญชีของคุณสำเร็จแล้ว",
+    "successNote": "คุณสามารถกลับไปที่อุปกรณ์ของคุณเพื่อดำเนินการต่อได้แล้ว",
+    "returnHome": "กลับหน้าแรก",
+    "deniedTitle": "ปฏิเสธอุปกรณ์",
+    "deniedDescription": "คำขออนุญาตอุปกรณ์ถูกปฏิเสธ",
+    "deniedNote": "อุปกรณ์จะไม่สามารถเข้าถึงบัญชีของคุณได้",
+    "approveTitle": "อนุมัติอุปกรณ์",
+    "approveDescription": "อุปกรณ์กำลังขอเข้าถึงบัญชีของคุณ",
+    "signedInAs": "เข้าสู่ระบบในชื่อ",
+    "approveButton": "อนุมัติ",
+    "denyButton": "ปฏิเสธ",
+    "failedToApprove": "ไม่สามารถอนุมัติอุปกรณ์ได้",
+    "failedToDeny": "ไม่สามารถปฏิเสธอุปกรณ์ได้"
+  },
+  "oauth": {
+    "consent": {
+      "title": "อนุญาตแอปพลิเคชัน",
+      "description": "ให้สิทธิ์เข้าถึงบัญชีของคุณ",
+      "appLogoAlt": "โลโก้แอป",
+      "requestingAccess": "กำลังขอเข้าถึงบัญชี Better Auth ของคุณ",
+      "continueAllow": "การดำเนินการต่อจะอนุญาตให้เข้าสู่ระบบด้วย {{clientName}} เพื่อ:",
+      "scopeUserData": "อ่านข้อมูลผู้ใช้ Better Auth ของคุณ",
+      "scopeEmail": "อ่านที่อยู่อีเมลของคุณ",
+      "scopeOrganization": "อ่านองค์กร {{name}} ของคุณ",
+      "authorizeButton": "อนุญาต",
+      "cancelButton": "ยกเลิก",
+      "authorizeFailed": "การอนุญาตล้มเหลว",
+      "cancelFailed": "การยกเลิกล้มเหลว"
+    },
+    "selectAccount": {
+      "title": "เลือกบัญชี",
+      "description": "เลือกบัญชีเพื่อดำเนินการต่อ",
+      "anotherAccount": "บัญชีอื่น",
+      "noSession": "ไม่มีเซสชัน",
+      "failedToSetActive": "ไม่สามารถตั้งค่าเซสชันที่ใช้งานได้",
+      "failedToContinue": "ไม่สามารถดำเนินการต่อได้"
+    },
+    "selectOrganization": {
+      "title": "เลือกองค์กร",
+      "description": "เลือกองค์กรเพื่อดำเนินการต่อ",
+      "noOrganizations": "แอปพลิเคชันกำลังขอขอบเขตสำหรับองค์กร แต่ไม่มีองค์กรสำหรับบัญชีนี้",
+      "createOrganization": "สร้างองค์กร",
+      "goBack": "กลับ",
+      "noOrganization": "ไม่มีองค์กร",
+      "failedToSetActive": "ไม่สามารถตั้งค่าองค์กรที่ใช้งานได้",
+      "failedToContinue": "ไม่สามารถดำเนินการต่อได้"
+    }
+  },
+  "accountSwitch": {
+    "selectUser": "เลือกผู้ใช้",
+    "currentAccount": "บัญชีปัจจุบัน",
+    "switchAccount": "สลับบัญชี",
+    "addAccount": "เพิ่มบัญชี"
+  },
+  "validation": {
+    "emailRequired": "กรุณากรอกที่อยู่อีเมลที่ถูกต้อง",
+    "passwordRequired": "ต้องกรอกรหัสผ่าน",
+    "passwordMinLength": "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",
+    "passwordMaxLength": "รหัสผ่านต้องไม่เกิน 128 ตัวอักษร",
+    "passwordsDoNotMatch": "รหัสผ่านไม่ตรงกัน",
+    "confirmPasswordRequired": "กรุณายืนยันรหัสผ่านของคุณ",
+    "firstNameRequired": "ต้องกรอกชื่อจริง",
+    "lastNameRequired": "ต้องกรอกนามสกุล",
+    "currentPasswordRequired": "ต้องกรอกรหัสผ่านปัจจุบัน",
+    "nameMinLength": "ชื่อต้องมีอย่างน้อย 2 ตัวอักษร",
+    "nameMaxLength": "ชื่อต้องไม่เกิน 50 ตัวอักษร",
+    "slugMinLength": "Slug ต้องมีอย่างน้อย 2 ตัวอักษร",
+    "slugMaxLength": "Slug ต้องไม่เกิน 50 ตัวอักษร",
+    "slugInvalidChars": "Slug สามารถมีได้เฉพาะตัวอักษรพิมพ์เล็ก ตัวเลข และยัติภังค์",
+    "roleRequired": "กรุณาเลือกบทบาท",
+    "failedToProcessImage": "ประมวลผลรูปภาพล้มเหลว"
+  },
+  "admin": {
+    "title": "แผงควบคุมผู้ดูแล",
+    "users": "ผู้ใช้",
+    "impersonate": "แอบอ้าง"
+  }
+}

@@ -1,39 +1,16 @@
-"use client";
+import type { Locale } from "~/i18n/i18n-config";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@acme/ui/card";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { getDictionary } from "~/i18n/get-dictionary";
 
-import { ResetPasswordForm } from "~/components/forms/reset-password-form";
+import { ResetPasswordClient } from "./_components/reset-password-client";
 
-export default function Page() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token") ?? "";
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-  const handleSuccess = useCallback(() => {
-    router.push("/sign-in");
-  }, [router]);
+export default async function Page({ params }: PageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
 
-  return (
-    <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Reset password</CardTitle>
-          <CardDescription>
-            Enter new password and confirm it to reset your password
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResetPasswordForm token={token} onSuccess={handleSuccess} />
-        </CardContent>
-      </Card>
-    </div>
-  );
+  return <ResetPasswordClient dict={dict} />;
 }

@@ -12,10 +12,16 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { SignUpForm } from "~/components/forms/sign-up-form";
 import { getCallbackURL } from "~/lib/shared";
 
-export function SignUp() {
+interface SignUpProps {
+  dict: Dictionary;
+}
+
+export function SignUp({ dict }: SignUpProps) {
   const router = useRouter();
   const params = useSearchParams();
   const callbackURL = getCallbackURL(params);
@@ -27,18 +33,24 @@ export function SignUp() {
   return (
     <Card className="w-full rounded-md rounded-t-none">
       <CardHeader>
-        <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
+        <CardTitle className="text-lg md:text-xl">
+          {dict.auth.signUp.title}
+        </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          Enter your information to create an account
+          {dict.auth.signUp.description}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <SignUpForm onSuccess={handleSuccess} callbackURL={callbackURL} />
+        <SignUpForm
+          onSuccess={handleSuccess}
+          callbackURL={callbackURL}
+          dict={dict}
+        />
       </CardContent>
       <CardFooter>
         <div className="flex w-full justify-center border-t pt-4">
           <p className="text-center text-xs text-neutral-500">
-            built with{" "}
+            {dict.auth.signUp.builtWith}{" "}
             <Link
               href="https://better-auth.com"
               className="underline"

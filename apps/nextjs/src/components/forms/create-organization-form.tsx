@@ -8,26 +8,16 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { useOrganizationCreateMutation } from "~/data/organization/organization-create-mutation";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { convertImageToBase64 } from "~/lib/utils";
 
-const createOrganizationSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must be at most 50 characters"),
-  slug: z
-    .string()
-    .min(2, "Slug must be at least 2 characters")
-    .max(50, "Slug must be at most 50 characters")
-    .regex(
-      /^[a-z0-9-]+$/,
-      "Slug can only contain lowercase letters, numbers, and hyphens"
-    ),
-});
-
-type CreateOrganizationFormValues = z.infer<typeof createOrganizationSchema>;
+interface CreateOrganizationFormValues {
+  name: string;
+  slug: string;
+}
 type FormErrors = Partial<
   Record<keyof CreateOrganizationFormValues, { message: string }>
 >;
@@ -35,11 +25,13 @@ type FormErrors = Partial<
 interface CreateOrganizationFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  dict: Dictionary;
 }
 
 export function CreateOrganizationForm({
   onSuccess,
   onError,
+  dict,
 }: CreateOrganizationFormProps) {
   const createMutation = useOrganizationCreateMutation();
   const { image, imagePreview, handleImageChange, clearImage } =
@@ -49,6 +41,18 @@ export function CreateOrganizationForm({
   const [slug, setSlug] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const slugManuallyEdited = useRef(false);
+
+  const createOrganizationSchema = z.object({
+    name: z
+      .string()
+      .min(2, dict.validation.nameMinLength)
+      .max(50, dict.validation.nameMaxLength),
+    slug: z
+      .string()
+      .min(2, dict.validation.slugMinLength)
+      .max(50, dict.validation.slugMaxLength)
+      .regex(/^[a-z0-9-]+$/, dict.validation.slugInvalidChars),
+  });
 
   // Auto-generate slug from name if slug hasn't been manually edited
   useEffect(() => {
@@ -75,7 +79,7 @@ export function CreateOrganizationForm({
     }
     setErrors({});
     return true;
-  }, [name, slug]);
+  }, [name, slug, createOrganizationSchema]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -106,11 +110,13 @@ export function CreateOrganizationForm({
         );
       } catch (error) {
         onError?.(
-          error instanceof Error ? error.message : "Failed to process image"
+          error instanceof Error
+            ? error.message
+            : dict.validation.failedToProcessImage
         );
       }
     },
-    [createMutation, image, name, onError, onSuccess, slug, validate]
+    [createMutation, image, name, onError, onSuccess, slug, validate, dict]
   );
 
   const handleNameChange = useCallback(
@@ -132,10 +138,12 @@ export function CreateOrganizationForm({
     <form onSubmit={handleSubmit}>
       <FieldGroup>
         <Field data-invalid={!!errors.name}>
-          <FieldLabel htmlFor="org-name">Organization Name</FieldLabel>
+          <FieldLabel htmlFor="org-name">
+            {dict.organization.create.nameLabel}
+          </FieldLabel>
           <Input
             id="org-name"
-            placeholder="My Organization"
+            placeholder={dict.organization.create.namePlaceholder}
             disabled={createMutation.isPending}
             value={name}
             onChange={handleNameChange}
@@ -144,10 +152,12 @@ export function CreateOrganizationForm({
         </Field>
 
         <Field data-invalid={!!errors.slug}>
-          <FieldLabel htmlFor="org-slug">Organization Slug</FieldLabel>
+          <FieldLabel htmlFor="org-slug">
+            {dict.organization.create.slugLabel}
+          </FieldLabel>
           <Input
             id="org-slug"
-            placeholder="my-organization"
+            placeholder={dict.organization.create.slugPlaceholder}
             disabled={createMutation.isPending}
             value={slug}
             onChange={handleSlugChange}
@@ -156,13 +166,15 @@ export function CreateOrganizationForm({
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="org-logo">Logo</FieldLabel>
+          <FieldLabel htmlFor="org-logo">
+            {dict.organization.create.logoLabel}
+          </FieldLabel>
           <div className="flex items-end gap-4">
             {imagePreview && (
               <div className="relative h-16 w-16 overflow-hidden rounded-sm">
                 <Image
                   src={imagePreview}
-                  alt="Logo preview"
+                  alt={dict.organization.create.logoAlt}
                   fill
                   className="object-cover"
                 />
@@ -192,7 +204,7 @@ export function CreateOrganizationForm({
           {createMutation.isPending ? (
             <Loader2 size={15} className="animate-spin" />
           ) : (
-            "Create"
+            dict.organization.create.createButton
           )}
         </Button>
       </FieldGroup>

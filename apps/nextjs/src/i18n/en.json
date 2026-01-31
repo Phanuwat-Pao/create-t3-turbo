@@ -109,8 +109,25 @@
       "title": "TOTP Verification",
       "description": "Enter your 6-digit TOTP code to authenticate",
       "switchToEmail": "Switch to Email Verification",
-      "otpTitle": "OTP Verification",
-      "otpDescription": "Enter the OTP code sent to your email"
+      "otpTitle": "Two-Factor Authentication",
+      "otpDescription": "Verify your identity with a one-time password",
+      "codeLabel": "TOTP Code",
+      "codePlaceholder": "Enter 6-digit code",
+      "verifyButton": "Verify",
+      "verificationSuccess": "Verification Successful",
+      "invalidCode": "Invalid TOTP code",
+      "codeMustBe6Digits": "TOTP code must be 6 digits.",
+      "codeMustBeDigitsOnly": "TOTP code must be digits only.",
+      "otpCodeLabel": "One-Time Password",
+      "otpCodePlaceholder": "Enter 6-digit OTP",
+      "sendOtpButton": "Send OTP to Email",
+      "validateOtpButton": "Validate OTP",
+      "otpSentTo": "OTP sent to {{email}}",
+      "otpValidatedSuccess": "OTP validated successfully",
+      "invalidOtp": "Invalid OTP",
+      "otpMustBe6Digits": "OTP code must be 6 digits.",
+      "otpMustBeDigitsOnly": "OTP code must be digits only.",
+      "yourEmail": "your email"
     }
   },
   "dashboard": {
@@ -120,7 +137,11 @@
       "editUser": "Edit User",
       "editUserDescription": "Edit user information",
       "signOut": "Sign Out",
-      "stopImpersonation": "Stop Impersonation"
+      "stopImpersonation": "Stop Impersonation",
+      "fullNameLabel": "Full Name",
+      "profileImageLabel": "Profile Image",
+      "profileImageAlt": "Profile preview",
+      "updateButton": "Update"
     },
     "sessions": {
       "title": "Active Sessions",
@@ -187,7 +208,23 @@
     "leave": "Leave",
     "remove": "Remove",
     "revoke": "Revoke",
-    "membersCount": "members"
+    "membersCount": "members",
+    "create": {
+      "nameLabel": "Organization Name",
+      "namePlaceholder": "My Organization",
+      "slugLabel": "Organization Slug",
+      "slugPlaceholder": "my-organization",
+      "logoLabel": "Logo",
+      "logoAlt": "Logo preview",
+      "createButton": "Create"
+    },
+    "invite": {
+      "emailLabel": "Email",
+      "emailPlaceholder": "member@example.com",
+      "roleLabel": "Role",
+      "rolePlaceholder": "Select a role",
+      "inviteButton": "Invite"
+    }
   },
   "device": {
     "title": "Device Authorization",
@@ -197,12 +234,20 @@
     "verifying": "Verifying...",
     "continueButton": "Continue",
     "invalidCode": "Invalid code. Please check and try again.",
-    "successTitle": "Device Authorized",
-    "successDescription": "Your device has been authorized successfully.",
-    "deniedTitle": "Authorization Denied",
-    "deniedDescription": "The device authorization was denied.",
+    "successTitle": "Device Approved",
+    "successDescription": "The device has been successfully authorized to access your account.",
+    "successNote": "You can now return to your device to continue.",
+    "returnHome": "Return to Home",
+    "deniedTitle": "Device Denied",
+    "deniedDescription": "The device authorization request has been denied.",
+    "deniedNote": "The device will not be able to access your account.",
     "approveTitle": "Approve Device",
-    "approveDescription": "Approve this device to continue."
+    "approveDescription": "A device is requesting access to your account",
+    "signedInAs": "Signed in as",
+    "approveButton": "Approve",
+    "denyButton": "Deny",
+    "failedToApprove": "Failed to approve device",
+    "failedToDeny": "Failed to deny device"
   },
   "oauth": {
     "consent": {
@@ -221,11 +266,21 @@
     },
     "selectAccount": {
       "title": "Select Account",
-      "description": "Choose an account to continue"
+      "description": "Choose an account to continue",
+      "anotherAccount": "Another Account",
+      "noSession": "No session",
+      "failedToSetActive": "Failed to set active session",
+      "failedToContinue": "Failed to continue"
     },
     "selectOrganization": {
       "title": "Select Organization",
-      "description": "Choose an organization to continue"
+      "description": "Choose an organization to continue",
+      "noOrganizations": "Application is requesting scopes for an organization but no organizations exist for this account.",
+      "createOrganization": "Create Organization",
+      "goBack": "Go Back",
+      "noOrganization": "No organization",
+      "failedToSetActive": "Failed to set active organization",
+      "failedToContinue": "Failed to continue"
     }
   },
   "accountSwitch": {
@@ -243,7 +298,14 @@
     "confirmPasswordRequired": "Please confirm your password.",
     "firstNameRequired": "First name is required.",
     "lastNameRequired": "Last name is required.",
-    "currentPasswordRequired": "Current password is required"
+    "currentPasswordRequired": "Current password is required",
+    "nameMinLength": "Name must be at least 2 characters",
+    "nameMaxLength": "Name must be at most 50 characters",
+    "slugMinLength": "Slug must be at least 2 characters",
+    "slugMaxLength": "Slug must be at most 50 characters",
+    "slugInvalidChars": "Slug can only contain lowercase letters, numbers, and hyphens",
+    "roleRequired": "Please select a role",
+    "failedToProcessImage": "Failed to process image"
   },
   "admin": {
     "title": "Admin Panel",

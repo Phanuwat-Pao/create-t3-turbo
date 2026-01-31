@@ -13,10 +13,13 @@ import { headers } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
+import type { Locale } from "~/i18n/i18n-config";
+
 import { Logo } from "~/components/logo";
+import { getDictionary } from "~/i18n/get-dictionary";
 import { auth } from "~/lib/auth";
 
-import { ConsentBtns } from "./consent-buttons";
+import { ConsentBtns } from "./_components/consent-buttons";
 
 export const metadata: Metadata = {
   description: "Grant access to your account",
@@ -24,6 +27,7 @@ export const metadata: Metadata = {
 };
 
 interface AuthorizePageProps {
+  params: Promise<{ lang: Locale }>;
   searchParams: Promise<{
     redirect_uri: string;
     scope: string;
@@ -33,8 +37,11 @@ interface AuthorizePageProps {
 }
 
 export default async function AuthorizePage({
+  params,
   searchParams,
 }: AuthorizePageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
   const { scope, client_id } = await searchParams;
   const _headers = await headers();
   const [session, clientDetails] = await Promise.all([
@@ -62,7 +69,7 @@ export default async function AuthorizePage({
   return (
     <div className="container mx-auto py-10">
       <h1 className="mb-6 text-center text-2xl font-bold">
-        Authorize Application
+        {dict.oauth.consent.title}
       </h1>
       <div className="flex min-h-screen flex-col bg-black text-white">
         <div className="mx-auto flex max-w-2xl flex-col items-center justify-center px-4">
@@ -71,7 +78,7 @@ export default async function AuthorizePage({
               {clientDetails.logo_uri ? (
                 <Image
                   src={clientDetails.logo_uri}
-                  alt="App Logo"
+                  alt={dict.oauth.consent.appLogoAlt}
                   className="object-cover"
                   width={64}
                   height={64}
@@ -94,8 +101,7 @@ export default async function AuthorizePage({
           </div>
 
           <h1 className="mb-8 text-center text-3xl font-semibold">
-            {clientDetails.client_name} is requesting access to your Better Auth
-            account
+            {clientDetails.client_name} {dict.oauth.consent.requestingAccess}
           </h1>
 
           <Card className="w-full rounded-none border-zinc-800 bg-zinc-900">
@@ -109,20 +115,22 @@ export default async function AuthorizePage({
               </div>
               <div className="flex flex-col gap-1">
                 <div className="mb-4 text-lg">
-                  Continuing will allow Sign in with {clientDetails.client_name}{" "}
-                  to:
+                  {dict.oauth.consent.continueAllow.replace(
+                    "{{clientName}}",
+                    clientDetails.client_name ?? ""
+                  )}
                 </div>
                 {scope.includes("profile") && (
                   <div className="flex items-center gap-3 text-zinc-300">
                     <User className="h-5 w-5" />
-                    <span>Read your Better Auth user data.</span>
+                    <span>{dict.oauth.consent.scopeUserData}</span>
                   </div>
                 )}
 
                 {scope.includes("email") && (
                   <div className="flex items-center gap-3 text-zinc-300">
                     <Mail className="h-5 w-5" />
-                    <span>Read your email address.</span>
+                    <span>{dict.oauth.consent.scopeEmail}</span>
                   </div>
                 )}
 
@@ -130,13 +138,16 @@ export default async function AuthorizePage({
                   <div className="flex items-center gap-3 text-zinc-300">
                     <Building className="h-5 w-5" />
                     <span>
-                      Read your organization {organization?.name ?? ""}.
+                      {dict.oauth.consent.scopeOrganization.replace(
+                        "{{name}}",
+                        organization?.name ?? ""
+                      )}
                     </span>
                   </div>
                 )}
               </div>
             </CardContent>
-            <ConsentBtns />
+            <ConsentBtns dict={dict} />
           </Card>
         </div>
       </div>

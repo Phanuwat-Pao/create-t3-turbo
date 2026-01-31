@@ -1,34 +1,16 @@
-"use client";
+import type { Locale } from "~/i18n/i18n-config";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@acme/ui/card";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { getDictionary } from "~/i18n/get-dictionary";
 
-import { TwoFactorEmailOtpForm } from "~/components/forms/two-factor-email-otp-form";
+import { TwoFactorOtpClient } from "./_components/two-factor-otp-client";
 
-export default function Page() {
-  const router = useRouter();
-  const handleSuccess = useCallback(() => router.push("/dashboard"), [router]);
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-  return (
-    <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Two-Factor Authentication</CardTitle>
-          <CardDescription>
-            Verify your identity with a one-time password
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <TwoFactorEmailOtpForm onSuccess={handleSuccess} />
-        </CardContent>
-      </Card>
-    </main>
-  );
+export default async function Page({ params }: PageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+
+  return <TwoFactorOtpClient dict={dict} />;
 }

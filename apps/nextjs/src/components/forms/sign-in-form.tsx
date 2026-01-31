@@ -11,36 +11,41 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { authClient } from "~/auth/client";
 
 import { LastUsedIndicator } from "../last-used-indicator";
 
-const signInSchema = z.object({
-  email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-  rememberMe: z.boolean(),
-});
-
-type SignInFormValues = z.infer<typeof signInSchema>;
-type FormErrors = Partial<Record<keyof SignInFormValues, { message: string }>>;
+type SignInFormErrors = Partial<
+  Record<"email" | "password" | "rememberMe", { message: string }>
+>;
 
 interface SignInFormProps {
   onSuccess?: () => void;
   callbackURL?: string;
   showPasswordToggle?: boolean;
+  dict: Dictionary;
 }
 
 export function SignInForm({
   onSuccess,
   callbackURL = "/dashboard",
   showPasswordToggle = false,
+  dict,
 }: SignInFormProps) {
   const [loading, startTransition] = useTransition();
   const [isMounted, setIsMounted] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<SignInFormErrors>({});
+
+  const signInSchema = z.object({
+    email: z.string().email(dict.validation.emailRequired),
+    password: z.string().min(1, dict.validation.passwordRequired),
+    rememberMe: z.boolean(),
+  });
 
   useEffect(() => {
     setIsMounted(true);
@@ -49,9 +54,9 @@ export function SignInForm({
   const validate = useCallback((): boolean => {
     const result = signInSchema.safeParse({ email, password, rememberMe });
     if (!result.success) {
-      const fieldErrors: FormErrors = {};
+      const fieldErrors: SignInFormErrors = {};
       for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof SignInFormValues;
+        const field = issue.path[0] as keyof SignInFormErrors;
         fieldErrors[field] = { message: issue.message };
       }
       setErrors(fieldErrors);
@@ -59,7 +64,7 @@ export function SignInForm({
     }
     setErrors({});
     return true;
-  }, [email, password, rememberMe]);
+  }, [email, password, rememberMe, signInSchema]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -81,14 +86,14 @@ export function SignInForm({
               toast.error(context.error.message);
             },
             onSuccess() {
-              toast.success("Successfully signed in");
+              toast.success(dict.auth.signIn.successMessage);
               onSuccess?.();
             },
           }
         );
       });
     },
-    [validate, callbackURL, email, password, rememberMe, onSuccess]
+    [validate, callbackURL, email, password, rememberMe, onSuccess, dict]
   );
 
   const handleEmailChange = useCallback(
@@ -110,11 +115,13 @@ export function SignInForm({
     <form onSubmit={handleSubmit} className="grid gap-2">
       <FieldGroup>
         <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="sign-in-email">Email</FieldLabel>
+          <FieldLabel htmlFor="sign-in-email">
+            {dict.auth.signIn.emailLabel}
+          </FieldLabel>
           <Input
             id="sign-in-email"
             type="email"
-            placeholder="m@example.com"
+            placeholder={dict.auth.signIn.emailPlaceholder}
             aria-invalid={!!errors.email}
             autoComplete="email"
             value={email}
@@ -124,18 +131,20 @@ export function SignInForm({
         </Field>
         <Field data-invalid={!!errors.password}>
           <div className="flex items-center">
-            <FieldLabel htmlFor="sign-in-password">Password</FieldLabel>
+            <FieldLabel htmlFor="sign-in-password">
+              {dict.auth.signIn.passwordLabel}
+            </FieldLabel>
             <Link
               href="/forget-password"
               className="text-foreground ml-auto inline-block text-sm underline"
             >
-              Forgot your password?
+              {dict.auth.signIn.forgotPassword}
             </Link>
           </div>
           {showPasswordToggle ? (
             <PasswordInput
               id="sign-in-password"
-              placeholder="Password"
+              placeholder={dict.auth.signIn.passwordPlaceholder}
               aria-invalid={!!errors.password}
               autoComplete="current-password"
               value={password}
@@ -145,7 +154,7 @@ export function SignInForm({
             <Input
               id="sign-in-password"
               type="password"
-              placeholder="password"
+              placeholder={dict.auth.signIn.passwordPlaceholder}
               aria-invalid={!!errors.password}
               autoComplete="current-password"
               value={password}
@@ -161,12 +170,16 @@ export function SignInForm({
             onCheckedChange={handleRememberMeChange}
           />
           <FieldLabel htmlFor="sign-in-remember" className="font-normal">
-            Remember me
+            {dict.auth.signIn.rememberMe}
           </FieldLabel>
         </Field>
       </FieldGroup>
       <Button type="submit" className="relative w-full" disabled={loading}>
-        {loading ? <Loader2 size={16} className="animate-spin" /> : "Login"}
+        {loading ? (
+          <Loader2 size={16} className="animate-spin" />
+        ) : (
+          dict.auth.signIn.loginButton
+        )}
         {isMounted && authClient.isLastUsedLoginMethod("email") && (
           <LastUsedIndicator />
         )}

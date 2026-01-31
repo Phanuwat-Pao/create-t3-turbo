@@ -1,13 +1,21 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import type { Locale } from "~/i18n/i18n-config";
+
 import AccountSwitcher from "~/components/account-switch";
+import { getDictionary } from "~/i18n/get-dictionary";
 import { auth } from "~/lib/auth";
 
 import OrganizationCard from "./_components/organization-card";
 import UserCard from "./_components/user-card";
 
-export default async function Page() {
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
+
+export default async function Page({ params }: PageProps) {
+  const { lang } = await params;
   const requestHeaders = await headers();
 
   const session = await auth.api.getSession({
@@ -17,13 +25,14 @@ export default async function Page() {
     redirect("/sign-in");
   }
 
-  const [activeSessions, deviceSessions] = await Promise.all([
+  const [activeSessions, deviceSessions, dict] = await Promise.all([
     auth.api.listSessions({
       headers: requestHeaders,
     }),
     auth.api.listDeviceSessions({
       headers: requestHeaders,
     }),
+    getDictionary(lang),
   ]);
 
   return (
@@ -32,9 +41,14 @@ export default async function Page() {
         <AccountSwitcher
           deviceSessions={deviceSessions}
           initialSession={session}
+          dict={dict}
         />
-        <UserCard session={session} activeSessions={activeSessions} />
-        <OrganizationCard session={session} />
+        <UserCard
+          session={session}
+          activeSessions={activeSessions}
+          dict={dict}
+        />
+        <OrganizationCard session={session} dict={dict} />
       </div>
     </div>
   );

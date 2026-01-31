@@ -7,15 +7,21 @@ import { useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
 import type { Session } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
 
-export function SelectAccountBtn({ session }: { session: Partial<Session> }) {
+interface SelectAccountBtnProps {
+  session: Partial<Session>;
+  dict: Dictionary;
+}
+
+export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
   const handleClick = useCallback(async () => {
     try {
       if (!session.session?.token) {
-        toast.error("No session");
+        toast.error(dict.oauth.selectAccount.noSession);
         return;
       }
       const { data: active, error: activeError } =
@@ -23,21 +29,30 @@ export function SelectAccountBtn({ session }: { session: Partial<Session> }) {
           sessionToken: session.session.token,
         });
       if (activeError || !active?.session) {
-        toast.error(activeError?.message ?? "Failed to set active session");
+        toast.error(
+          activeError?.message ?? dict.oauth.selectAccount.failedToSetActive
+        );
         return;
       }
       const { data, error } = await authClient.oauth2.continue({
         selected: true,
       });
       if (error || !active?.session || !data.redirect || !data?.uri) {
-        toast.error(error?.message ?? "Failed to continue");
+        toast.error(
+          error?.message ?? dict.oauth.selectAccount.failedToContinue
+        );
         return;
       }
       window.location.href = data.uri;
     } catch (error) {
       toast.error(String(error));
     }
-  }, [session.session?.token]);
+  }, [
+    dict.oauth.selectAccount.failedToContinue,
+    dict.oauth.selectAccount.failedToSetActive,
+    dict.oauth.selectAccount.noSession,
+    session.session?.token,
+  ]);
 
   return (
     <Button
@@ -62,12 +77,16 @@ export function SelectAccountBtn({ session }: { session: Partial<Session> }) {
   );
 }
 
-export function AnotherAccountBtn() {
+interface AnotherAccountBtnProps {
+  dict: Dictionary;
+}
+
+export function AnotherAccountBtn({ dict }: AnotherAccountBtnProps) {
   const params = useSearchParams();
   return (
     <Link href={`/sign-in${params ? `?${params.toString()}` : ""}`}>
       <Button className="h-12 w-full gap-2" variant="outline">
-        Another Account
+        {dict.oauth.selectAccount.anotherAccount}
       </Button>
     </Link>
   );

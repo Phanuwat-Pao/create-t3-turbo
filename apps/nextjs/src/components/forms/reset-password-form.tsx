@@ -8,19 +8,14 @@ import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
+
 import { authClient } from "~/auth/client";
 
-const resetPasswordSchema = z
-  .object({
-    confirmPassword: z.string().min(1, "Please confirm your password."),
-    password: z.string().min(8, "Password must be at least 8 characters."),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match.",
-    path: ["confirmPassword"],
-  });
-
-type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
+interface ResetPasswordFormValues {
+  confirmPassword: string;
+  password: string;
+}
 type FormErrors = Partial<
   Record<keyof ResetPasswordFormValues, { message: string }>
 >;
@@ -28,16 +23,30 @@ type FormErrors = Partial<
 interface ResetPasswordFormProps {
   token: string;
   onSuccess?: () => void;
+  dict: Dictionary;
 }
 
 export function ResetPasswordForm({
   token,
   onSuccess,
+  dict,
 }: ResetPasswordFormProps) {
   const [loading, startTransition] = useTransition();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const resetPasswordSchema = z
+    .object({
+      confirmPassword: z
+        .string()
+        .min(1, dict.validation.confirmPasswordRequired),
+      password: z.string().min(8, dict.validation.passwordMinLength),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: dict.validation.passwordsDoNotMatch,
+      path: ["confirmPassword"],
+    });
 
   const validate = useCallback((): boolean => {
     const result = resetPasswordSchema.safeParse({ confirmPassword, password });
@@ -52,7 +61,7 @@ export function ResetPasswordForm({
     }
     setErrors({});
     return true;
-  }, [confirmPassword, password]);
+  }, [confirmPassword, password, resetPasswordSchema]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -70,11 +79,17 @@ export function ResetPasswordForm({
           toast.error(res.error.message);
           return;
         }
-        toast.success("Password reset successfully");
+        toast.success(dict.auth.resetPassword.successMessage);
         onSuccess?.();
       });
     },
-    [validate, password, token, onSuccess]
+    [
+      dict.auth.resetPassword.successMessage,
+      onSuccess,
+      password,
+      token,
+      validate,
+    ]
   );
 
   const handlePasswordChange = useCallback(
@@ -92,10 +107,12 @@ export function ResetPasswordForm({
     <form onSubmit={handleSubmit} className="grid gap-4">
       <FieldGroup>
         <Field data-invalid={!!errors.password}>
-          <FieldLabel htmlFor="reset-password">New password</FieldLabel>
+          <FieldLabel htmlFor="reset-password">
+            {dict.auth.resetPassword.newPasswordLabel}
+          </FieldLabel>
           <PasswordInput
             id="reset-password"
-            placeholder="Enter new password"
+            placeholder={dict.auth.resetPassword.newPasswordPlaceholder}
             aria-invalid={!!errors.password}
             autoComplete="new-password"
             value={password}
@@ -105,11 +122,11 @@ export function ResetPasswordForm({
         </Field>
         <Field data-invalid={!!errors.confirmPassword}>
           <FieldLabel htmlFor="reset-confirm-password">
-            Confirm password
+            {dict.auth.resetPassword.confirmPasswordLabel}
           </FieldLabel>
           <PasswordInput
             id="reset-confirm-password"
-            placeholder="Confirm new password"
+            placeholder={dict.auth.resetPassword.confirmPasswordPlaceholder}
             aria-invalid={!!errors.confirmPassword}
             autoComplete="new-password"
             value={confirmPassword}
@@ -124,7 +141,7 @@ export function ResetPasswordForm({
         {loading ? (
           <Loader2 size={16} className="animate-spin" />
         ) : (
-          "Reset password"
+          dict.auth.resetPassword.resetButton
         )}
       </Button>
     </form>

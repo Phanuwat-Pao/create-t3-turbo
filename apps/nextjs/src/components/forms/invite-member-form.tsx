@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import * as z from "zod";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
 import type { OrganizationRole } from "~/lib/auth";
 
 import { useInviteMemberMutation } from "~/data/organization/invitation-member-mutation";
@@ -23,14 +24,10 @@ const ORGANIZATION_ROLES = {
   MEMBER: "member",
 } as const satisfies Record<string, OrganizationRole>;
 
-const inviteMemberSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  role: z.enum(["admin", "member"], {
-    message: "Please select a role",
-  }),
-});
-
-type InviteMemberFormValues = z.infer<typeof inviteMemberSchema>;
+interface InviteMemberFormValues {
+  email: string;
+  role: "admin" | "member";
+}
 type FormErrors = Partial<
   Record<keyof InviteMemberFormValues, { message: string }>
 >;
@@ -38,17 +35,26 @@ type FormErrors = Partial<
 interface InviteMemberFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  dict: Dictionary;
 }
 
 export function InviteMemberForm({
   onSuccess,
   onError,
+  dict,
 }: InviteMemberFormProps) {
   const inviteMutation = useInviteMemberMutation();
 
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"admin" | "member">("member");
   const [errors, setErrors] = useState<FormErrors>({});
+
+  const inviteMemberSchema = z.object({
+    email: z.string().email(dict.validation.emailRequired),
+    role: z.enum(["admin", "member"], {
+      message: dict.validation.roleRequired,
+    }),
+  });
 
   const validate = useCallback((): boolean => {
     const result = inviteMemberSchema.safeParse({ email, role });
@@ -63,7 +69,7 @@ export function InviteMemberForm({
     }
     setErrors({});
     return true;
-  }, [email, role]);
+  }, [email, role, inviteMemberSchema]);
 
   const resetForm = useCallback(() => {
     setEmail("");
@@ -112,11 +118,13 @@ export function InviteMemberForm({
     <form onSubmit={handleSubmit}>
       <FieldGroup>
         <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="invite-email">Email</FieldLabel>
+          <FieldLabel htmlFor="invite-email">
+            {dict.organization.invite.emailLabel}
+          </FieldLabel>
           <Input
             id="invite-email"
             type="email"
-            placeholder="member@example.com"
+            placeholder={dict.organization.invite.emailPlaceholder}
             disabled={inviteMutation.isPending}
             value={email}
             onChange={handleEmailChange}
@@ -125,18 +133,26 @@ export function InviteMemberForm({
         </Field>
 
         <Field data-invalid={!!errors.role}>
-          <FieldLabel htmlFor="invite-role">Role</FieldLabel>
+          <FieldLabel htmlFor="invite-role">
+            {dict.organization.invite.roleLabel}
+          </FieldLabel>
           <Select
             value={role}
             onValueChange={handleRoleChange}
             disabled={inviteMutation.isPending}
           >
             <SelectTrigger id="invite-role">
-              <SelectValue placeholder="Select a role" />
+              <SelectValue
+                placeholder={dict.organization.invite.rolePlaceholder}
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ORGANIZATION_ROLES.ADMIN}>Admin</SelectItem>
-              <SelectItem value={ORGANIZATION_ROLES.MEMBER}>Member</SelectItem>
+              <SelectItem value={ORGANIZATION_ROLES.ADMIN}>
+                {dict.organization.admin}
+              </SelectItem>
+              <SelectItem value={ORGANIZATION_ROLES.MEMBER}>
+                {dict.organization.member}
+              </SelectItem>
             </SelectContent>
           </Select>
           {errors.role && <FieldError errors={[errors.role]} />}
@@ -146,7 +162,7 @@ export function InviteMemberForm({
           {inviteMutation.isPending ? (
             <Loader2 size={15} className="animate-spin" />
           ) : (
-            "Invite"
+            dict.organization.invite.inviteButton
           )}
         </Button>
       </FieldGroup>

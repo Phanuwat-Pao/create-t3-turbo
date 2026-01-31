@@ -1,35 +1,16 @@
-"use client";
+import type { Locale } from "~/i18n/i18n-config";
 
-import { Button } from "@acme/ui/button";
-import { Card } from "@acme/ui/card";
-import { X } from "lucide-react";
-import Link from "next/link";
+import { getDictionary } from "~/i18n/get-dictionary";
 
-export default function Page() {
-  return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md p-6">
-        <div className="space-y-4 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-            <X className="h-6 w-6 text-red-600" />
-          </div>
+import { DeviceDeniedClient } from "./_components/device-denied-client";
 
-          <div>
-            <h1 className="text-2xl font-bold">Device Denied</h1>
-            <p className="text-muted-foreground mt-2">
-              The device authorization request has been denied.
-            </p>
-          </div>
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
 
-          <p className="text-muted-foreground text-sm">
-            The device will not be able to access your account.
-          </p>
+export default async function Page({ params }: PageProps) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
 
-          <Button asChild className="w-full">
-            <Link href="/">Return to Home</Link>
-          </Button>
-        </div>
-      </Card>
-    </div>
-  );
+  return <DeviceDeniedClient dict={dict} />;
 }

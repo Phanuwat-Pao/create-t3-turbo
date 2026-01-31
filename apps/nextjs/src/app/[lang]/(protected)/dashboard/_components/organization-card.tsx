@@ -25,6 +25,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, MailPlus } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
 import type { OrganizationRole, Session } from "~/lib/auth";
 
 import { CreateOrganizationForm } from "~/components/forms/create-organization-form";
@@ -78,6 +79,7 @@ interface MemberItemProps {
   currentMember: { id: string; role: OrganizationRole } | undefined;
   isRemoving: boolean;
   onRemove: (memberId: string) => void;
+  dict: Dictionary;
 }
 
 const MemberItem = memo(function MemberItem({
@@ -85,6 +87,7 @@ const MemberItem = memo(function MemberItem({
   currentMember,
   isRemoving,
   onRemove,
+  dict,
 }: MemberItemProps) {
   const handleRemove = useCallback(() => {
     onRemove(member.id);
@@ -115,8 +118,12 @@ const MemberItem = memo(function MemberItem({
             onClick={handleRemove}
           >
             {isRemoving && <Loader2 className="animate-spin" size={16} />}
-            {!isRemoving && currentMember?.id === member.id && "Leave"}
-            {!isRemoving && currentMember?.id !== member.id && "Remove"}
+            {!isRemoving &&
+              currentMember?.id === member.id &&
+              dict.organization.leave}
+            {!isRemoving &&
+              currentMember?.id !== member.id &&
+              dict.organization.remove}
           </Button>
         )}
     </div>
@@ -127,12 +134,14 @@ interface InvitationItemProps {
   invitation: { id: string; email: string; role: OrganizationRole };
   isCanceling: boolean;
   onCancel: (invitationId: string) => void;
+  dict: Dictionary;
 }
 
 const InvitationItem = memo(function InvitationItem({
   invitation,
   isCanceling,
   onCancel,
+  dict,
 }: InvitationItemProps) {
   const handleCancel = useCallback(() => {
     onCancel(invitation.id);
@@ -165,7 +174,7 @@ const InvitationItem = memo(function InvitationItem({
           {isCanceling ? (
             <Loader2 className="animate-spin" size={16} />
           ) : (
-            "Revoke"
+            dict.organization.revoke
           )}
         </Button>
         <div>
@@ -178,7 +187,11 @@ const InvitationItem = memo(function InvitationItem({
   );
 });
 
-const OrganizationCard = (props: { session: Session | null }) => {
+const OrganizationCard = (props: {
+  session: Session | null;
+  dict: Dictionary;
+}) => {
+  const { dict } = props;
   const { data: sessionData } = useSessionQuery();
   const { data: organizations } = useOrganizationListQuery();
   const { data: activeOrganization, isFetching: isOrganizationFetching } =
@@ -218,20 +231,20 @@ const OrganizationCard = (props: { session: Session | null }) => {
   );
 
   if (isOrganizationFetching) {
-    return <OrganizationCardSkeleton />;
+    return <OrganizationCardSkeleton dict={dict} />;
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Organization</CardTitle>
+        <CardTitle>{dict.organization.title}</CardTitle>
         <div className="flex justify-between">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex cursor-pointer items-center gap-1">
                 <p className="text-sm">
                   <span className="font-bold" />{" "}
-                  {activeOrganization?.name || "Personal"}
+                  {activeOrganization?.name || dict.organization.personal}
                 </p>
 
                 <ChevronDownIcon />
@@ -239,7 +252,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem className="py-1" onClick={handleSelectPersonal}>
-                <p className="sm text-sm">Personal</p>
+                <p className="sm text-sm">{dict.organization.personal}</p>
               </DropdownMenuItem>
               {organizations?.map((org: { id: string; name: string }) => (
                 <OrganizationDropdownItem
@@ -253,7 +266,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
             </DropdownMenuContent>
           </DropdownMenu>
           <div>
-            <CreateOrganizationDialog />
+            <CreateOrganizationDialog dict={dict} />
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -267,9 +280,10 @@ const OrganizationCard = (props: { session: Session | null }) => {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p>{activeOrganization?.name || "Personal"}</p>
+            <p>{activeOrganization?.name || dict.organization.personal}</p>
             <p className="text-muted-foreground text-xs">
-              {activeOrganization?.members?.length || 1} members
+              {activeOrganization?.members?.length || 1}{" "}
+              {dict.organization.membersCount}
             </p>
           </div>
         </div>
@@ -278,7 +292,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              Members
+              {dict.organization.members}
             </p>
             <div className="flex flex-col gap-2">
               {activeOrganization?.members?.map(
@@ -293,6 +307,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
                         member.id
                     }
                     onRemove={handleRemoveMember}
+                    dict={dict}
                   />
                 )
               )}
@@ -307,7 +322,9 @@ const OrganizationCard = (props: { session: Session | null }) => {
                     </Avatar>
                     <div>
                       <p className="text-sm">{session?.user.name}</p>
-                      <p className="text-muted-foreground text-xs">Owner</p>
+                      <p className="text-muted-foreground text-xs">
+                        {dict.organization.owner}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -316,7 +333,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
           </div>
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              Invites
+              {dict.organization.invites}
             </p>
             <div className="flex flex-col gap-2">
               <AnimatePresence>
@@ -335,6 +352,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
                           invitation.id
                       }
                       onCancel={handleCancelInvitation}
+                      dict={dict}
                     />
                   ))}
               </AnimatePresence>
@@ -348,12 +366,12 @@ const OrganizationCard = (props: { session: Session | null }) => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  No Active Invitations
+                  {dict.organization.noActiveInvitations}
                 </motion.p>
               )}
               {!activeOrganization?.id && (
                 <Label className="text-muted-foreground text-xs">
-                  You can&apos;t invite members to your personal workspace.
+                  {dict.organization.cantInvitePersonal}
                 </Label>
               )}
             </div>
@@ -361,7 +379,9 @@ const OrganizationCard = (props: { session: Session | null }) => {
         </div>
         <div className="mt-4 flex w-full justify-end">
           <div>
-            <div>{activeOrganization?.id && <InviteMemberDialog />}</div>
+            <div>
+              {activeOrganization?.id && <InviteMemberDialog dict={dict} />}
+            </div>
           </div>
         </div>
       </CardContent>
@@ -370,7 +390,7 @@ const OrganizationCard = (props: { session: Session | null }) => {
 };
 export default OrganizationCard;
 
-function CreateOrganizationDialog() {
+function CreateOrganizationDialog({ dict }: { dict: Dictionary }) {
   const [open, setOpen] = useState(false);
 
   const handleSuccess = useCallback(() => setOpen(false), []);
@@ -380,23 +400,23 @@ function CreateOrganizationDialog() {
       <DialogTrigger asChild>
         <Button size="sm" className="w-full gap-2" variant="default">
           <PlusIcon />
-          <p>New Organization</p>
+          <p>{dict.organization.newOrganization}</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>New Organization</DialogTitle>
+          <DialogTitle>{dict.organization.newOrganization}</DialogTitle>
           <DialogDescription>
-            Create a new organization to collaborate with your team.
+            {dict.organization.newOrganizationDescription}
           </DialogDescription>
         </DialogHeader>
-        <CreateOrganizationForm onSuccess={handleSuccess} />
+        <CreateOrganizationForm onSuccess={handleSuccess} dict={dict} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function InviteMemberDialog() {
+function InviteMemberDialog({ dict }: { dict: Dictionary }) {
   const [open, setOpen] = useState(false);
 
   const handleSuccess = useCallback(() => setOpen(false), []);
@@ -406,27 +426,27 @@ function InviteMemberDialog() {
       <DialogTrigger asChild>
         <Button size="sm" className="w-full gap-2" variant="outline">
           <MailPlus size={16} />
-          <p>Invite Member</p>
+          <p>{dict.organization.inviteMember}</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Invite Member</DialogTitle>
+          <DialogTitle>{dict.organization.inviteMember}</DialogTitle>
           <DialogDescription>
-            Invite a member to your organization.
+            {dict.organization.inviteMemberDescription}
           </DialogDescription>
         </DialogHeader>
-        <InviteMemberForm onSuccess={handleSuccess} />
+        <InviteMemberForm onSuccess={handleSuccess} dict={dict} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function OrganizationCardSkeleton() {
+function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Organization</CardTitle>
+        <CardTitle>{dict.organization.title}</CardTitle>
         <div className="mt-2 flex justify-between">
           <Skeleton className="h-5 w-24" />
           <Skeleton className="h-8 w-32" />
@@ -443,7 +463,7 @@ function OrganizationCardSkeleton() {
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              Members
+              {dict.organization.members}
             </p>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
@@ -457,7 +477,7 @@ function OrganizationCardSkeleton() {
           </div>
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              Invites
+              {dict.organization.invites}
             </p>
             <Skeleton className="h-4 w-32" />
           </div>

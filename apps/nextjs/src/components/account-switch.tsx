@@ -14,6 +14,7 @@ import { ChevronDown, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 
+import type { Dictionary } from "~/i18n/get-dictionary";
 import type { DeviceSession } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
@@ -59,9 +60,11 @@ const AccountItem = memo(function AccountItem({
 export default function AccountSwitcher({
   deviceSessions,
   initialSession,
+  dict,
 }: {
   deviceSessions: DeviceSession[];
   initialSession: SessionData;
+  dict: Dictionary;
 }) {
   const queryClient = getQueryClient();
   const { data: currentUser } = useSessionQuery(initialSession);
@@ -97,7 +100,7 @@ export default function AccountSwitcher({
         <Button
           variant="outline"
           aria-expanded={open}
-          aria-label="Select a user"
+          aria-label={dict.accountSwitch.selectUser}
           className="w-[250px] justify-between"
         >
           <Avatar className="mr-2 h-6 w-6">
@@ -114,7 +117,7 @@ export default function AccountSwitcher({
       <PopoverContent className="w-[250px] p-0">
         <Command>
           <CommandList>
-            <CommandGroup heading="Current Account">
+            <CommandGroup heading={dict.accountSwitch.currentAccount}>
               <CommandItem
                 onSelect={noop}
                 className="w-full justify-between text-sm"
@@ -135,7 +138,7 @@ export default function AccountSwitcher({
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Switch Account">
+            <CommandGroup heading={dict.accountSwitch.switchAccount}>
               {deviceSessions
                 .filter((s) => s.user.id !== currentUser?.user.id)
                 .map((u) => (
@@ -156,7 +159,7 @@ export default function AccountSwitcher({
                 className="cursor-pointer text-sm"
               >
                 <PlusCircle className="mr-2 h-5 w-5" />
-                Add Account
+                {dict.accountSwitch.addAccount}
               </CommandItem>
             </CommandGroup>
           </CommandList>
