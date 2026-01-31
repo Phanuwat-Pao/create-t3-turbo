@@ -23,4 +23,5 @@ export const CreatePostSchema = createInsertSchema(Post, {
   updatedAt: true,
 });
 
+// oxlint-disable-next-line no-barrel-file -- auto-generated auth schema
 export * from "./auth-schema";
