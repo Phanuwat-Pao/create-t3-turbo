@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/AntDesign";
 import { router } from "expo-router";
 import { useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -11,6 +12,8 @@ import { authClient } from "~/utils/auth";
 
 export default function Dashboard() {
   const { data: session, isPending } = authClient.useSession();
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (!session && !isPending) {
       router.push("/");
@@ -31,7 +34,7 @@ export default function Dashboard() {
     <Card className="w-10/12">
       <CardHeader>
         <View className="flex-row items-center gap-2">
-          <Avatar alt="user-image">
+          <Avatar alt={t("dashboard.userImageAlt")}>
             <AvatarImage
               source={{
                 uri: session?.user?.image || "",
@@ -54,7 +57,7 @@ export default function Dashboard() {
           className="flex-row items-center gap-2"
         >
           <Ionicons name="edit" size={16} color="white" />
-          <Text>Edit User</Text>
+          <Text>{t("dashboard.editUser")}</Text>
         </Button>
         <Button
           variant="secondary"
@@ -63,7 +66,7 @@ export default function Dashboard() {
           onPress={handleSignOut}
         >
           <Ionicons name="logout" size={14} color="black" />
-          <Text>Sign Out</Text>
+          <Text>{t("dashboard.signOut")}</Text>
         </Button>
       </CardFooter>
     </Card>

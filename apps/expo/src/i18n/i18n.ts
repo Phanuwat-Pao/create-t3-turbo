@@ -3,8 +3,8 @@ import { Storage } from "expo-sqlite/kv-store";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-import en from "~/locales/en.json";
-import th from "~/locales/th.json";
+import en from "~/i18n/en.json";
+import th from "~/i18n/th.json";
 
 declare module "i18next" {
   // Extend CustomTypeOptions

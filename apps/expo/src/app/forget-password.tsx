@@ -1,6 +1,7 @@
 import Icons from "@expo/vector-icons/AntDesign";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 
 import { Button } from "~/components/ui/button";
@@ -17,6 +18,7 @@ import { authClient } from "~/utils/auth";
 
 export default function ForgetPassword() {
   const [email, setEmail] = useState("");
+  const { t } = useTranslation();
 
   const handleSendEmail = useCallback(() => {
     (
@@ -36,15 +38,15 @@ export default function ForgetPassword() {
   return (
     <Card className="w-10/12">
       <CardHeader>
-        <CardTitle>Forget Password</CardTitle>
+        <CardTitle>{t("auth.forgotPassword.title")}</CardTitle>
         <CardDescription>
-          Enter your email to reset your password
+          {t("auth.forgotPassword.description")}
         </CardDescription>
       </CardHeader>
       <View className="mb-2 px-6">
         <Input
           autoCapitalize="none"
-          placeholder="Email"
+          placeholder={t("auth.forgotPassword.emailPlaceholder")}
           value={email}
           onChangeText={setEmail}
         />
@@ -56,7 +58,7 @@ export default function ForgetPassword() {
             className="w-full"
             variant="default"
           >
-            <Text>Send Email</Text>
+            <Text>{t("auth.forgotPassword.sendEmail")}</Text>
           </Button>
           <Button
             onPress={handleBack}
@@ -64,7 +66,7 @@ export default function ForgetPassword() {
             variant="outline"
           >
             <Icons name="arrow-left" size={18} />
-            <Text>Back to Sign In</Text>
+            <Text>{t("auth.forgotPassword.backToSignIn")}</Text>
           </Button>
         </View>
       </CardFooter>

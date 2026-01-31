@@ -1,0 +1,51 @@
+{
+  "common": {
+    "error": "ข้อผิดพลาด",
+    "loading": "กำลังโหลด...",
+    "cancel": "ยกเลิก",
+    "confirm": "ยืนยัน",
+    "save": "บันทึก",
+    "continue": "ดำเนินการต่อ"
+  },
+  "navigation": {
+    "home": "หน้าหลัก",
+    "rooms": "ห้อง",
+    "contacts": "รายชื่อ",
+    "settings": "การตั้งค่า"
+  },
+  "auth": {
+    "signIn": {
+      "title": "เข้าสู่ระบบ",
+      "subtitle": "เข้าสู่ระบบบัญชีของคุณ",
+      "withGoogle": "เข้าสู่ระบบด้วย Google",
+      "withGitHub": "เข้าสู่ระบบด้วย GitHub",
+      "orContinueWith": "หรือดำเนินการต่อด้วย",
+      "emailPlaceholder": "ที่อยู่อีเมล",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "forgotPassword": "ลืมรหัสผ่าน?",
+      "noAccount": "ยังไม่มีบัญชี?",
+      "createAccount": "สร้างบัญชี"
+    },
+    "signUp": {
+      "title": "สร้างบัญชีใหม่",
+      "namePlaceholder": "ชื่อ",
+      "emailPlaceholder": "อีเมล",
+      "passwordPlaceholder": "รหัสผ่าน",
+      "signUpButton": "สมัครสมาชิก",
+      "hasAccount": "มีบัญชีอยู่แล้ว?",
+      "signIn": "เข้าสู่ระบบ"
+    },
+    "forgotPassword": {
+      "title": "ลืมรหัสผ่าน",
+      "description": "กรอกอีเมลเพื่อรีเซ็ตรหัสผ่าน",
+      "emailPlaceholder": "อีเมล",
+      "sendEmail": "ส่งอีเมล",
+      "backToSignIn": "กลับไปหน้าเข้าสู่ระบบ"
+    }
+  },
+  "dashboard": {
+    "userImageAlt": "รูปผู้ใช้",
+    "editUser": "แก้ไขผู้ใช้",
+    "signOut": "ออกจากระบบ"
+  }
+}

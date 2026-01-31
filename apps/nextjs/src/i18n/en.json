@@ -1,1 +1,253 @@
-{}
+{
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "close": "Close",
+    "back": "Back",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password"
+  },
+  "landing": {
+    "title": "BETTER-AUTH.",
+    "description": "Official demo to showcase",
+    "linkText": "better-auth.",
+    "infoBox": "All features on this demo are implemented with Better Auth without any custom backend code",
+    "features": {
+      "emailPassword": "Email & Password",
+      "organization": "Organization | Teams",
+      "passkeys": "Passkeys",
+      "multiFactor": "Multi Factor",
+      "passwordReset": "Password Reset",
+      "emailVerification": "Email Verification",
+      "rolesPermissions": "Roles & Permissions",
+      "rateLimiting": "Rate Limiting",
+      "sessionManagement": "Session Management",
+      "multipleSessions": "Multiple Session",
+      "stripeIntegration": "Stripe Integration",
+      "lastLoginMethod": "Last Login Method",
+      "oauthProvider": "OAuth Provider"
+    }
+  },
+  "header": {
+    "title": "BETTER-AUTH."
+  },
+  "entryButton": {
+    "signIn": "Sign In",
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign In",
+      "description": "Enter your email below to login to your account",
+      "emailLabel": "Email",
+      "emailPlaceholder": "m@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "password",
+      "forgotPassword": "Forgot your password?",
+      "rememberMe": "Remember me",
+      "loginButton": "Login",
+      "successMessage": "Successfully signed in",
+      "withGoogle": "Google",
+      "withGitHub": "GitHub",
+      "withMicrosoft": "Microsoft",
+      "withVercel": "Vercel",
+      "withPasskey": "Sign in with Passkey",
+      "orContinueWith": "Or continue with",
+      "builtWith": "built with",
+      "ariaGoogle": "Sign in with Google",
+      "ariaGitHub": "Sign in with GitHub",
+      "ariaMicrosoft": "Sign in with Microsoft",
+      "ariaVercel": "Sign in with Vercel"
+    },
+    "signUp": {
+      "title": "Sign Up",
+      "description": "Enter your information to create an account",
+      "firstNameLabel": "First name",
+      "firstNamePlaceholder": "Max",
+      "lastNameLabel": "Last name",
+      "lastNamePlaceholder": "Robinson",
+      "emailLabel": "Email",
+      "emailPlaceholder": "m@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm Password",
+      "profileImageLabel": "Profile Image (optional)",
+      "profileImageAlt": "Profile preview",
+      "createAccountButton": "Create an account",
+      "successMessage": "Successfully signed up",
+      "builtWith": "built with"
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Enter your email to reset your password",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "sendResetLink": "Send reset link",
+      "checkEmail": "Check your email",
+      "emailSentDescription": "We've sent a password reset link to your email.",
+      "checkSpam": "If you don't see the email, check your spam folder.",
+      "backToSignIn": "Back to sign in"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "description": "Enter your new password",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "resetButton": "Reset Password",
+      "successMessage": "Password reset successfully"
+    },
+    "twoFactor": {
+      "title": "TOTP Verification",
+      "description": "Enter your 6-digit TOTP code to authenticate",
+      "switchToEmail": "Switch to Email Verification",
+      "otpTitle": "OTP Verification",
+      "otpDescription": "Enter the OTP code sent to your email"
+    }
+  },
+  "dashboard": {
+    "user": {
+      "title": "User",
+      "avatarAlt": "Avatar",
+      "editUser": "Edit User",
+      "editUserDescription": "Edit user information",
+      "signOut": "Sign Out",
+      "stopImpersonation": "Stop Impersonation"
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "signOut": "Sign Out",
+      "terminate": "Terminate"
+    },
+    "emailVerification": {
+      "title": "Verify Your Email Address",
+      "description": "Please verify your email address. Check your inbox for the verification email. If you haven't received the email, click the button below to resend.",
+      "resendButton": "Resend Verification Email",
+      "sentSuccess": "Verification email sent successfully"
+    },
+    "passkeys": {
+      "title": "Passkeys",
+      "addNew": "Add New Passkey",
+      "addNewDescription": "Create a new passkey to securely access your account without a password.",
+      "nameLabel": "Passkey Name",
+      "createButton": "Create Passkey",
+      "listTitle": "Passkeys",
+      "listDescription": "List of passkeys",
+      "noPasskeys": "No passkeys found",
+      "newPasskey": "New Passkey",
+      "defaultName": "My Passkey",
+      "addedSuccess": "Passkey added successfully. You can now use it to login.",
+      "deletedSuccess": "Passkey deleted successfully",
+      "nameRequired": "Passkey name is required"
+    },
+    "twoFactor": {
+      "title": "Two Factor",
+      "enable": "Enable 2FA",
+      "disable": "Disable 2FA",
+      "enableDescription": "Enable 2FA to secure your account",
+      "disableDescription": "Disable the second factor authentication from your account",
+      "scanQrCode": "Scan QR Code",
+      "scanQrDescription": "Scan the QR code with your TOTP app"
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "description": "Change your password",
+      "currentPasswordLabel": "Current Password",
+      "currentPasswordPlaceholder": "Current password",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "New password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm password",
+      "revokeOtherSessions": "Sign out from other devices",
+      "changeButton": "Change Password"
+    }
+  },
+  "organization": {
+    "title": "Organization",
+    "personal": "Personal",
+    "members": "Members",
+    "invites": "Invites",
+    "owner": "Owner",
+    "admin": "Admin",
+    "member": "Member",
+    "noActiveInvitations": "No Active Invitations",
+    "cantInvitePersonal": "You can't invite members to your personal workspace.",
+    "newOrganization": "New Organization",
+    "newOrganizationDescription": "Create a new organization to collaborate with your team.",
+    "inviteMember": "Invite Member",
+    "inviteMemberDescription": "Invite a member to your organization.",
+    "leave": "Leave",
+    "remove": "Remove",
+    "revoke": "Revoke",
+    "membersCount": "members"
+  },
+  "device": {
+    "title": "Device Authorization",
+    "description": "Enter the code displayed on your device",
+    "codeLabel": "Device Code",
+    "codePlaceholder": "XXXX-XXXX",
+    "verifying": "Verifying...",
+    "continueButton": "Continue",
+    "invalidCode": "Invalid code. Please check and try again.",
+    "successTitle": "Device Authorized",
+    "successDescription": "Your device has been authorized successfully.",
+    "deniedTitle": "Authorization Denied",
+    "deniedDescription": "The device authorization was denied.",
+    "approveTitle": "Approve Device",
+    "approveDescription": "Approve this device to continue."
+  },
+  "oauth": {
+    "consent": {
+      "title": "Authorize Application",
+      "description": "Grant access to your account",
+      "appLogoAlt": "App Logo",
+      "requestingAccess": "is requesting access to your Better Auth account",
+      "continueAllow": "Continuing will allow Sign in with {{clientName}} to:",
+      "scopeUserData": "Read your Better Auth user data.",
+      "scopeEmail": "Read your email address.",
+      "scopeOrganization": "Read your organization {{name}}.",
+      "authorizeButton": "Authorize",
+      "cancelButton": "Cancel",
+      "authorizeFailed": "Failed to authorize",
+      "cancelFailed": "Failed to cancel"
+    },
+    "selectAccount": {
+      "title": "Select Account",
+      "description": "Choose an account to continue"
+    },
+    "selectOrganization": {
+      "title": "Select Organization",
+      "description": "Choose an organization to continue"
+    }
+  },
+  "accountSwitch": {
+    "selectUser": "Select a user",
+    "currentAccount": "Current Account",
+    "switchAccount": "Switch Account",
+    "addAccount": "Add Account"
+  },
+  "validation": {
+    "emailRequired": "Please enter a valid email address.",
+    "passwordRequired": "Password is required.",
+    "passwordMinLength": "Password must be at least 8 characters.",
+    "passwordMaxLength": "Password must be at most 128 characters.",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "confirmPasswordRequired": "Please confirm your password.",
+    "firstNameRequired": "First name is required.",
+    "lastNameRequired": "Last name is required.",
+    "currentPasswordRequired": "Current password is required"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "users": "Users",
+    "impersonate": "Impersonate"
+  }
+}

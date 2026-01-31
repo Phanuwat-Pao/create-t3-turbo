@@ -73,7 +73,7 @@ export default function LineTabsLayout() {
               // <Ionicons name="home" color={color} size={size} />
               <HomeIcon color={color} size={size} />
             ),
-            title: t("home"),
+            title: t("navigation.home"),
           }}
         />
         <Tabs.Screen
@@ -83,7 +83,7 @@ export default function LineTabsLayout() {
               // <Ionicons name="message" color={color} size={size} />
               <TargetIcon color={color} size={size} />
             ),
-            title: t("rooms"),
+            title: t("navigation.rooms"),
           }}
         />
         <Tabs.Screen
@@ -93,7 +93,7 @@ export default function LineTabsLayout() {
               // <Ionicons name="dashboard" color={color} size={size} />
               <AppsIcon color={color} size={size} />
             ),
-            title: t("contacts"),
+            title: t("navigation.contacts"),
           }}
         />
         <Tabs.Screen
@@ -102,7 +102,7 @@ export default function LineTabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons color={color} name="menu" size={size} />
             ),
-            title: t("settings"),
+            title: t("navigation.settings"),
           }}
         />
       </Tabs>

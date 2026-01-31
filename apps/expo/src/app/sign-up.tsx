@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, Image, KeyboardAvoidingView, View } from "react-native";
 
 import { Button } from "~/components/ui/button";
@@ -15,6 +16,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const { t } = useTranslation();
 
   const handleSignUp = useCallback(async () => {
     await authClient.signUp.email(
@@ -25,14 +27,14 @@ export default function SignUp() {
       },
       {
         onError: (ctx) => {
-          Alert.alert("Error", ctx.error.message);
+          Alert.alert(t("common.error"), ctx.error.message);
         },
         onSuccess: () => {
           router.push("/dashboard");
         },
       }
     );
-  }, [email, name, password, router]);
+  }, [email, name, password, router, t]);
 
   const handleSignIn = useCallback(() => {
     router.push("/");
@@ -48,12 +50,12 @@ export default function SignUp() {
             width: 40,
           }}
         />
-        <CardTitle>Create new Account</CardTitle>
+        <CardTitle>{t("auth.signUp.title")}</CardTitle>
       </CardHeader>
       <View className="px-6">
         <KeyboardAvoidingView>
           <Input
-            placeholder="Name"
+            placeholder={t("auth.signUp.namePlaceholder")}
             className="rounded-b-none border-b-0"
             value={name}
             onChangeText={setName}
@@ -61,7 +63,7 @@ export default function SignUp() {
         </KeyboardAvoidingView>
         <KeyboardAvoidingView>
           <Input
-            placeholder="Email"
+            placeholder={t("auth.signUp.emailPlaceholder")}
             className="rounded-b-none border-b-0"
             value={email}
             onChangeText={setEmail}
@@ -71,7 +73,7 @@ export default function SignUp() {
 
         <KeyboardAvoidingView>
           <Input
-            placeholder="Password"
+            placeholder={t("auth.signUp.passwordPlaceholder")}
             secureTextEntry
             className="rounded-t-none"
             value={password}
@@ -82,12 +84,12 @@ export default function SignUp() {
       <CardFooter>
         <View className="mt-2 w-full">
           <Button onPress={handleSignUp}>
-            <Text>Sign Up</Text>
+            <Text>{t("auth.signUp.signUpButton")}</Text>
           </Button>
           <Text className="mt-2 text-center">
-            Already have an account?{" "}
+            {t("auth.signUp.hasAccount")}{" "}
             <Text className="underline" onPress={handleSignIn}>
-              Sign In
+              {t("auth.signUp.signIn")}
             </Text>
           </Text>
         </View>

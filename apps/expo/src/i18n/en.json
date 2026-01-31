@@ -1,0 +1,51 @@
+{
+  "common": {
+    "error": "Error",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "continue": "Continue"
+  },
+  "navigation": {
+    "home": "Home",
+    "rooms": "Rooms",
+    "contacts": "Contacts",
+    "settings": "Settings"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign In",
+      "subtitle": "Sign In to your account",
+      "withGoogle": "Sign In with Google",
+      "withGitHub": "Sign In with GitHub",
+      "orContinueWith": "or continue with",
+      "emailPlaceholder": "Email Address",
+      "passwordPlaceholder": "Password",
+      "forgotPassword": "Forget Password?",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create Account"
+    },
+    "signUp": {
+      "title": "Create new Account",
+      "namePlaceholder": "Name",
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "signUpButton": "Sign Up",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign In"
+    },
+    "forgotPassword": {
+      "title": "Forget Password",
+      "description": "Enter your email to reset your password",
+      "emailPlaceholder": "Email",
+      "sendEmail": "Send Email",
+      "backToSignIn": "Back to Sign In"
+    }
+  },
+  "dashboard": {
+    "userImageAlt": "user-image",
+    "editUser": "Edit User",
+    "signOut": "Sign Out"
+  }
+}
