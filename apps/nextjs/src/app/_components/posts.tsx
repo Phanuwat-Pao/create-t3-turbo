@@ -177,7 +177,7 @@ export function PostCard(props: {
   );
 
   const handleDelete = useCallback(() => {
-    deletePost.mutate(props.post.id);
+    deletePost.mutate({ id: props.post.id });
   }, [deletePost, props.post.id]);
 
   return (

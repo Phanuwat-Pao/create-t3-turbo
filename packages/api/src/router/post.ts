@@ -42,8 +42,8 @@ export default {
       method: "DELETE",
       path: "/delete/{id}",
     })
-    .input(z.string())
+    .input(z.object({ id: z.string() }))
     .handler(({ context, input }) =>
-      context.db.delete(Post).where(eq(Post.id, input))
+      context.db.delete(Post).where(eq(Post.id, input.id))
     ),
 };
