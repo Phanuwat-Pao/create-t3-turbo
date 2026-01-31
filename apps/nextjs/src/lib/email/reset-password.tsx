@@ -15,12 +15,12 @@ import {
 
 interface BetterAuthResetPasswordEmailProps {
   username?: string;
-  resetLink?: string;
+  url?: string;
 }
 
 export const ResetPasswordEmail = ({
   username,
-  resetLink,
+  url,
 }: BetterAuthResetPasswordEmailProps) => {
   const previewText = `Reset your Better Auth password`;
   return (
@@ -44,15 +44,15 @@ export const ResetPasswordEmail = ({
             <Section className="mt-[32px] mb-[32px] text-center">
               <Button
                 className="rounded bg-[#000000] px-5 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={resetLink}
+                href={url}
               >
                 Reset Password
               </Button>
             </Section>
             <Text className="text-[14px] leading-[24px] text-black">
               Or copy and paste this URL into your browser:{" "}
-              <Link href={resetLink} className="text-blue-600 no-underline">
-                {resetLink}
+              <Link href={url} className="text-blue-600 no-underline">
+                {url}
               </Link>
             </Text>
             <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
@@ -70,6 +70,5 @@ export const ResetPasswordEmail = ({
 export function reactResetPasswordEmail(
   props: BetterAuthResetPasswordEmailProps
 ) {
-  console.log(props);
   return <ResetPasswordEmail {...props} />;
 }
