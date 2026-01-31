@@ -11,10 +11,10 @@
   },
   "scripts": {
     "ncu": "ncu -u",
-    "build": "tsc",
+    "build": "tsgo",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsc --watch",
-    "typecheck": "tsc --noEmit"
+    "dev": "tsgo --watch",
+    "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
     "@acme/auth": "workspace:*",
