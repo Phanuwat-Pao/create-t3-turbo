@@ -19,7 +19,6 @@
     // Disable import/namespace - false positives with @rn-primitives packages
     "import/namespace": "off",
     "unicorn/no-useless-undefined": "off",
-    "unicorn/filename-case": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "eslint/complexity": "off"
   }
