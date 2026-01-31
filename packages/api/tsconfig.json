@@ -3,6 +3,10 @@
   "include": ["src"],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "declaration": false,
+    "declarationMap": false,
+    "emitDeclarationOnly": false,
+    "noEmit": true
   }
 }
