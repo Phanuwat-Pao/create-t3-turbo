@@ -1,8 +1,9 @@
+import type { Session } from "@acme/auth";
+
 import { Button } from "@acme/ui/button";
 import Link from "next/link";
 
 import type { Dictionary } from "~/i18n/get-dictionary";
-import type { Session } from "~/lib/auth";
 
 interface Props {
   session: Session | null;

@@ -7,8 +7,8 @@ import Link from "next/link";
 
 import type { Locale } from "~/i18n/i18n-config";
 
+import { auth } from "~/auth/server";
 import { getDictionary } from "~/i18n/get-dictionary";
-import { auth } from "~/lib/auth";
 
 import { GoBackBtn, SelectOrganizationBtn } from "./_components/org-buttons";
 

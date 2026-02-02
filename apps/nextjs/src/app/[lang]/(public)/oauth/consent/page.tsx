@@ -15,9 +15,9 @@ import { redirect } from "next/navigation";
 
 import type { Locale } from "~/i18n/i18n-config";
 
+import { auth } from "~/auth/server";
 import { Logo } from "~/components/logo";
 import { getDictionary } from "~/i18n/get-dictionary";
-import { auth } from "~/lib/auth";
 
 import { ConsentBtns } from "./_components/consent-buttons";
 

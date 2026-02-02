@@ -1,5 +1,7 @@
 "use client";
 
+import type { OrganizationRole, Session } from "@acme/auth";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
@@ -26,7 +28,6 @@ import { Loader2, MailPlus } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 
 import type { Dictionary } from "~/i18n/get-dictionary";
-import type { OrganizationRole, Session } from "~/lib/auth";
 
 import { CreateOrganizationForm } from "~/components/forms/create-organization-form";
 import { InviteMemberForm } from "~/components/forms/invite-member-form";

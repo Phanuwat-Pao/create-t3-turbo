@@ -1,5 +1,7 @@
 "use client";
 
+import type { DeviceSession } from "@acme/auth";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import {
@@ -15,7 +17,6 @@ import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 
 import type { Dictionary } from "~/i18n/get-dictionary";
-import type { DeviceSession } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
 import { getQueryClient } from "~/data/query-client";

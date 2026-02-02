@@ -1,5 +1,7 @@
 "use client";
 
+import type { OrganizationRole } from "@acme/auth";
+
 import { Button } from "@acme/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
@@ -15,7 +17,6 @@ import { useCallback, useState } from "react";
 import * as z from "zod";
 
 import type { Dictionary } from "~/i18n/get-dictionary";
-import type { OrganizationRole } from "~/lib/auth";
 
 import { useInviteMemberMutation } from "~/data/organization/invitation-member-mutation";
 

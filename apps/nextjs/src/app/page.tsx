@@ -1,10 +1,10 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 
+import { auth } from "~/auth/server";
 import EntryButton from "~/components/entry-button";
 import { getDictionary } from "~/i18n/get-dictionary";
 import { i18n } from "~/i18n/i18n-config";
-import { auth } from "~/lib/auth";
 
 const features = [
   {

@@ -1,5 +1,7 @@
 "use client";
 
+import type { Session } from "@acme/auth";
+
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
@@ -49,7 +51,6 @@ import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
 import type { Dictionary } from "~/i18n/get-dictionary";
-import type { Session } from "~/lib/auth";
 
 import { authClient } from "~/auth/client";
 import { ChangePasswordForm } from "~/components/forms/change-password-form";

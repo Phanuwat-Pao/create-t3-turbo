@@ -2,7 +2,7 @@ pre-commit:
   parallel: true
   jobs:
     - name: lint-format
-      run: pnpm check
+      run: pnpm check:fix
       glob:
         - "*.js"
         - "*.jsx"

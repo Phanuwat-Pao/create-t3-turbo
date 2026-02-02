@@ -1,53 +1,43 @@
-import type { NextRequest } from "next/server";
-
 import { appRouter, createContext } from "@acme/api";
 import { onError } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
+import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
+import { CORSPlugin } from "@orpc/server/plugins";
 
 import { auth } from "~/auth/server";
-
+import origins from "~/config/origin";
 function logError(error: unknown) {
   console.error(">>> oRPC Error:", error);
 }
 
 const handler = new RPCHandler(appRouter, {
   interceptors: [onError(logError)],
+  plugins: [
+    new CORSPlugin({
+      credentials: true,
+      exposeHeaders: ["Content-Disposition"],
+      origin: origins,
+    }),
+    new CompressionPlugin(),
+  ],
 });
 
-/**
- * Configure basic CORS headers
- * You should extend this to match your needs
- */
-const setCorsHeaders = (res: Response) => {
-  res.headers.set("Access-Control-Allow-Origin", "*");
-  res.headers.set("Access-Control-Request-Method", "*");
-  res.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-  res.headers.set("Access-Control-Allow-Headers", "*");
-};
-
-export const OPTIONS = () => {
-  const response = new Response(null, {
-    status: 204,
+async function handleRequest(request: Request) {
+  const context = await createContext({
+    auth,
+    headers: request.headers,
   });
-  setCorsHeaders(response);
-  return response;
-};
-
-async function handleRequest(req: NextRequest) {
-  const { response, matched } = await handler.handle(req, {
-    context: await createContext({
-      auth,
-      headers: req.headers,
-    }),
-    prefix: "/api/rpc",
+  // Provide initial context if needed
+  const { response } = await handler.handle(request, {
+    context,
+    prefix: `/api/rest`,
   });
 
-  if (matched) {
-    setCorsHeaders(response);
-    return response;
-  }
-
-  return new Response("Not Found", { status: 404 });
+  return response ?? new Response("Not found", { status: 404 });
 }
 
-export { handleRequest as GET, handleRequest as POST };
+export const HEAD = handleRequest;
+export const GET = handleRequest;
+export const POST = handleRequest;
+export const PUT = handleRequest;
+export const PATCH = handleRequest;
+export const DELETE = handleRequest;
