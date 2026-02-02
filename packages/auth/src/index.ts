@@ -286,3 +286,15 @@ export type { Organization };
 export type Auth = ReturnType<typeof initAuth>;
 export type AuthApi = Auth["api"];
 export type Session = Auth["$Infer"]["Session"];
+export type ActiveOrganization = Auth["$Infer"]["ActiveOrganization"];
+export type OrganizationRole = ActiveOrganization["members"][number]["role"];
+export type Invitation = Auth["$Infer"]["Invitation"];
+export type DeviceSession = Awaited<
+  ReturnType<Auth["api"]["listDeviceSessions"]>
+>[number];
+
+// Extended session data with organization fields (from organization plugin)
+export interface OrganizationSession {
+  activeOrganizationId: string | null;
+  activeTeamId: string | null;
+}
