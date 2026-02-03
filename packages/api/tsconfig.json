@@ -3,13 +3,11 @@
   "include": ["src"],
   "exclude": ["node_modules"],
   "compilerOptions": {
+    "rootDir": ".",
     "strictNullChecks": true,
     "declaration": false,
     "declarationMap": false,
     "emitDeclarationOnly": false,
-    "noEmit": true,
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "noEmit": true
   }
 }
