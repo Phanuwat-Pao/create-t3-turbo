@@ -8,7 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
-import { authClient } from "~/lib/auth-client";
+import { authClient } from "~/utils/auth";
 
 export default function SignUp() {
   const router = useRouter();
