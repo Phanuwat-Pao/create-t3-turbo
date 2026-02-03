@@ -4,8 +4,6 @@ import type { Session } from "@acme/auth";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
@@ -75,20 +73,5 @@ export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
         </div>
       </div>
     </Button>
-  );
-}
-
-interface AnotherAccountBtnProps {
-  dict: Dictionary;
-}
-
-export function AnotherAccountBtn({ dict }: AnotherAccountBtnProps) {
-  const params = useSearchParams();
-  return (
-    <Link href={`/sign-in${params ? `?${params.toString()}` : ""}`}>
-      <Button className="h-12 w-full gap-2" variant="outline">
-        {dict.oauth.selectAccount.anotherAccount}
-      </Button>
-    </Link>
   );
 }

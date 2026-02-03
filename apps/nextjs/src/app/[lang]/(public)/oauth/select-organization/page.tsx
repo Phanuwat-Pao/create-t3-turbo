@@ -10,7 +10,8 @@ import type { Locale } from "~/i18n/i18n-config";
 import { auth } from "~/auth/server";
 import { getDictionary } from "~/i18n/get-dictionary";
 
-import { GoBackBtn, SelectOrganizationBtn } from "./_components/org-buttons";
+import { GoBackBtn } from "./_components/go-back-button";
+import { SelectOrganizationBtn } from "./_components/org-buttons";
 
 export const metadata: Metadata = {
   description: "Specify which organization to authorize to this application",

@@ -4,7 +4,6 @@ import type { Organization } from "better-auth/plugins";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
-import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
@@ -76,24 +75,6 @@ export function SelectOrganizationBtn({
           <p>{organization?.name}</p>
         </div>
       </div>
-    </Button>
-  );
-}
-
-interface GoBackBtnProps {
-  dict: Dictionary;
-}
-
-export function GoBackBtn({ dict }: GoBackBtnProps) {
-  const router = useRouter();
-  const handleGoBack = useCallback(() => router.back(), [router]);
-  return (
-    <Button
-      className="h-12 w-full gap-2"
-      variant="outline"
-      onClick={handleGoBack}
-    >
-      {dict.oauth.selectOrganization.goBack}
     </Button>
   );
 }

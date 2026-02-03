@@ -10,7 +10,6 @@ import { type Database, db } from "@acme/db/client";
  * The pieces you will need to use are documented accordingly near the end
  */
 import { ORPCError, os } from "@orpc/server";
-import { setTimeout } from "node:timers/promises";
 
 /**
  * 1. CONTEXT
@@ -63,25 +62,13 @@ const base = o;
  */
 
 /**
- * Middleware for timing procedure execution and adding an artificial delay in development.
- *
- * You can remove this if you don't like it, but it can help catch unwanted waterfalls by simulating
- * network latency that would occur in production but not in local development.
+ * Middleware for timing procedure execution.
  */
 const withTiming = base.use(async ({ context, next, path }) => {
   const start = Date.now();
-
-  if (process.env.NODE_ENV === "development") {
-    // artificial delay in dev 100-500ms
-    const waitMs = Math.floor(Math.random() * 400) + 100;
-    await setTimeout(waitMs);
-  }
-
   const result = await next({ context });
-
   const end = Date.now();
   console.log(`[ORPC] ${path.join(".")} took ${end - start}ms to execute`);
-
   return result;
 });
 

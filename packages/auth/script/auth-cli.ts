@@ -7,16 +7,16 @@
  * This configuration is consumed by the CLI command:
  * `pnpx @better-auth/cli generate --config script/auth-cli.ts --output ../db/src/auth-schema.ts`
  *
- * For actual authentication usage, import from "../src/index.ts" instead.
+ * For actual authentication usage, import from "@acme/auth" instead.
  */
 
-import { initAuth } from "../src/index";
+import { initAuth } from "@acme/auth";
 
 /**
  * CLI-only authentication configuration for schema generation.
  *
  * Note: This configuration is NOT intended for runtime use.
- * Use the main auth configuration from "../src/index.ts" for your application.
+ * Use the main auth configuration from "@acme/auth" for your application.
  */
 export const auth = initAuth({
   baseUrl: "http://localhost:3000",

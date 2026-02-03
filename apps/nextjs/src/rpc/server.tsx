@@ -4,7 +4,11 @@ import type { RouterClient } from "@orpc/server";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import {
+  dehydrate,
+  type FetchQueryOptions,
+  HydrationBoundary,
+} from "@tanstack/react-query";
 import { headers } from "next/headers";
 import { cache } from "react";
 
@@ -45,10 +49,7 @@ export function HydrateClient(props: { children: React.ReactNode }) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function prefetch<T extends { queryKey: any; queryFn: any }>(
-  queryOptions: T
-) {
+export async function prefetch(queryOptions: FetchQueryOptions) {
   const queryClient = getQueryClient();
   try {
     await queryClient.prefetchQuery(queryOptions);

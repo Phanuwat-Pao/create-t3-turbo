@@ -9,15 +9,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
-import { Skeleton } from "@acme/ui/skeleton";
-import { AlertCircle, CheckIcon, XIcon } from "lucide-react";
-import Link from "next/link";
+import { CheckIcon, XIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
 import { useInviteAcceptMutation } from "~/data/organization/invitation-accept-mutation";
 import { useInvitationQuery } from "~/data/organization/invitation-query";
 import { useInviteRejectMutation } from "~/data/organization/invitation-reject-mutation";
+
+import { InvitationError } from "./_components/invitation-error";
+import { InvitationSkeleton } from "./_components/invitation-skeleton";
 
 export default function Page() {
   const params = useParams<{
@@ -147,61 +148,5 @@ export default function Page() {
         </Card>
       )}
     </div>
-  );
-}
-
-function InvitationSkeleton() {
-  return (
-    <Card className="mx-auto w-full max-w-md">
-      <CardHeader>
-        <div className="flex items-center space-x-2">
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <Skeleton className="h-6 w-24" />
-        </div>
-        <Skeleton className="mt-2 h-4 w-full" />
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-end">
-        <Skeleton className="h-8 w-full" />
-      </CardFooter>
-    </Card>
-  );
-}
-
-function InvitationError() {
-  return (
-    <Card className="mx-auto w-full max-w-md">
-      <CardHeader>
-        <div className="flex items-center space-x-2">
-          <AlertCircle className="text-destructive h-6 w-6" />
-          <CardTitle className="text-destructive text-xl">
-            Invitation Error
-          </CardTitle>
-        </div>
-        <CardDescription>
-          There was an issue with your invitation.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground mb-4 text-sm">
-          The invitation you&apos;re trying to access is either invalid or you
-          don&apos;t have the correct permissions. Please check your email for a
-          valid invitation or contact the person who sent it.
-        </p>
-      </CardContent>
-      <CardFooter>
-        <Link href="/" className="w-full">
-          <Button variant="outline" className="w-full">
-            Go back to home
-          </Button>
-        </Link>
-      </CardFooter>
-    </Card>
   );
 }

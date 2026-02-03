@@ -8,10 +8,8 @@ import type { Locale } from "~/i18n/i18n-config";
 import { auth } from "~/auth/server";
 import { getDictionary } from "~/i18n/get-dictionary";
 
-import {
-  AnotherAccountBtn,
-  SelectAccountBtn,
-} from "./_components/account-button";
+import { SelectAccountBtn } from "./_components/account-button";
+import { AnotherAccountBtn } from "./_components/another-account-button";
 
 export const metadata: Metadata = {
   description: "Select account to authorize this application",

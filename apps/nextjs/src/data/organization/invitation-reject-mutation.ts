@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
+import { getQueryClient } from "~/data/query-client";
 
-import { getQueryClient } from "../query-client";
 import { organizationKeys } from "./keys";
 
 export interface InviteRejectParams {

@@ -1,3 +1,4 @@
+import logoImage from "@assets/images/logo.png";
 import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -8,8 +9,6 @@ import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/lib/auth-client";
-
-import logoImage from "../../assets/images/logo.png";
 
 export default function SignUp() {
   const router = useRouter();

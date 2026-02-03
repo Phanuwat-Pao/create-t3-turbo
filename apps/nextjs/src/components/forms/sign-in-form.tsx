@@ -14,8 +14,7 @@ import * as z from "zod";
 import type { Dictionary } from "~/i18n/get-dictionary";
 
 import { authClient } from "~/auth/client";
-
-import { LastUsedIndicator } from "../last-used-indicator";
+import { LastUsedIndicator } from "~/components/last-used-indicator";
 
 type SignInFormErrors = Partial<
   Record<"email" | "password" | "rememberMe", { message: string }>

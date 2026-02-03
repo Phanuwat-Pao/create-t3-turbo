@@ -20,6 +20,8 @@
     "import/namespace": "off",
     "unicorn/no-useless-undefined": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "eslint/complexity": "off"
+    "eslint/complexity": "off",
+    // Disable no-multi-comp - allows multiple components per file (shadcn pattern)
+    "react/no-multi-comp": "off"
   }
 }
