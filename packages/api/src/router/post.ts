@@ -1,8 +1,7 @@
+import { protectedProcedure, publicProcedure } from "@acme/api/procedures";
 import { desc, eq } from "@acme/db";
 import { CreatePostSchema, Post } from "@acme/db/schema";
 import { z } from "zod/v4";
-
-import { protectedProcedure, publicProcedure } from "../orpc";
 
 export default {
   all: publicProcedure

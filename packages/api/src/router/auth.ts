@@ -1,4 +1,4 @@
-import { protectedProcedure, publicProcedure } from "../orpc";
+import { protectedProcedure, publicProcedure } from "@acme/api/procedures";
 
 export default {
   getSecretMessage: protectedProcedure
