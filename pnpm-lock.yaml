@@ -47,16 +47,16 @@ catalogs:
       version: 4.3.6
   react19:
     '@types/react':
-      specifier: ^19.2.0
+      specifier: ^19.1.0
       version: 19.2.10
     '@types/react-dom':
-      specifier: ^19.2.0
+      specifier: ^19.1.0
       version: 19.2.3
     react:
-      specifier: ^19.2.4
+      specifier: ^19.1.17
       version: 19.2.4
     react-dom:
-      specifier: ^19.2.4
+      specifier: ^19.1.17
       version: 19.2.4
 
 overrides:
