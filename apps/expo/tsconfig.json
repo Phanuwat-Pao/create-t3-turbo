@@ -5,9 +5,7 @@
     "checkJs": false,
     "moduleSuffixes": [".ios", ".android", ".native", ""],
     "paths": {
-      "~/*": ["./src/*"],
-      "@/*": ["./src/*"],
-      "@assets/*": ["./assets/*"]
+      "~/*": ["./src/*"]
     },
     "strictNullChecks": true
   },
