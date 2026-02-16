@@ -68,6 +68,57 @@ This is a T3 Stack monorepo using Turborepo with pnpm workspaces. Package names 
 - In Next.js: `orpc` from `~/rpc/server` for RSC, `orpc` from `~/rpc/react` for client components
 - API endpoint at `/api/rpc/[[...rest]]/route.ts` using `RPCHandler`
 
+### oRPC with React Query
+
+Pass `enabled` and other query options directly inside `queryOptions()`, not spread outside:
+
+```tsx
+// ✅ Correct - pass enabled inside queryOptions
+const { data, isLoading } = useQuery(
+  orpc.patrol.getSession.queryOptions({
+    enabled: Boolean(sessionId),
+    input: { sessionId: sessionId ?? "" },
+  })
+);
+
+// ❌ Wrong - don't spread and add enabled outside
+const { data, isLoading } = useQuery({
+  ...orpc.patrol.getSession.queryOptions({
+    input: { sessionId: sessionId ?? "" },
+  }),
+  enabled: Boolean(sessionId),
+});
+```
+
+Similarly for `useMutation`, pass callbacks inside `mutationOptions()`:
+
+```tsx
+// ✅ Correct - pass callbacks inside mutationOptions
+const setActiveMutation = useMutation(
+  orpc.team.setActive.mutationOptions({
+    onError: (error) => {
+      Alert.alert(t("common.error"), error.message);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+      router.replace("/(tabs)");
+    },
+  })
+);
+
+// ❌ Wrong - don't spread and add callbacks outside
+const setActiveMutation = useMutation({
+  ...orpc.team.setActive.mutationOptions(),
+  onError: (error) => {
+    Alert.alert(t("common.error"), error.message);
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries();
+    router.replace("/(tabs)");
+  },
+});
+```
+
 ### Database Schema
 
 - Define tables in `packages/db/src/schema.ts` using Drizzle's `pgTable`
@@ -104,6 +155,12 @@ This project uses **Ultracite**, a zero-config preset that enforces strict code 
 Oxlint + Oxfmt (the underlying engines) provide robust linting and formatting. Most issues are automatically fixable.
 
 ---
+
+## Lint Rules
+
+- **Never add `eslint-disable`, `oxlint-ignore`, or similar comments to suppress lint warnings/errors**
+- **Never add or modify lint configuration to disable rules**
+- Always fix the underlying code to satisfy the lint rule
 
 ## Core Principles
 

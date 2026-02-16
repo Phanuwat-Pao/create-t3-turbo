@@ -37,12 +37,8 @@ export default async function SelectAccountPage({ params }: PageProps) {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              {sessions.map((s, i) => (
-                <SelectAccountBtn
-                  key={s.session.id ?? i}
-                  session={s}
-                  dict={dict}
-                />
+              {sessions.map((s) => (
+                <SelectAccountBtn key={s.session.id} session={s} dict={dict} />
               ))}
             </CardContent>
             <AnotherAccountBtn dict={dict} />

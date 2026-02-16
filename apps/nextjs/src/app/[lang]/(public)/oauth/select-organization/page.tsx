@@ -40,9 +40,9 @@ export default async function SelectOrganizationPage({ params }: PageProps) {
             </CardHeader>
             <CardContent className="p-6">
               {organizations.length ? (
-                organizations.map((o, i) => (
+                organizations.map((o) => (
                   <SelectOrganizationBtn
-                    key={o.id ?? i}
+                    key={o.id}
                     organization={o}
                     dict={dict}
                   />

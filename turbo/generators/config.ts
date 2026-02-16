@@ -1,5 +1,8 @@
 import type { PlopTypes } from "@turbo/gen";
 
+// eslint-disable-next-line import/no-nodejs-modules
+import { execSync } from "node:child_process";
+
 interface PackageJson {
   name: string;
   scripts: Record<string, string>;
@@ -65,18 +68,16 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
       (answers) => {
         /**
          * Install deps and format everything
-         * Note: Run these commands manually after scaffolding:
-         * - pnpm i
-         * - pnpm prettier --write packages/<name>/** --list-different
          */
         if ("name" in answers && typeof answers.name === "string") {
-          console.log("\nPackage scaffolded successfully!");
-          console.log("\nPlease run the following commands:");
-          console.log("  pnpm i");
-          console.log(
-            `  pnpm prettier --write packages/${answers.name}/** --list-different`
+          // execSync("pnpm dlx sherif@latest --fix", {
+          //   stdio: "inherit",
+          // });
+          execSync("pnpm i", { stdio: "inherit" });
+          execSync(
+            `pnpm prettier --write packages/${answers.name}/** --list-different`
           );
-          return "Package scaffolded - run pnpm i to complete setup";
+          return "Package scaffolded";
         }
         return "Package not scaffolded";
       },

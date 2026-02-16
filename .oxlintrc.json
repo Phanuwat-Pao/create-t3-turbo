@@ -19,9 +19,16 @@
     // Disable import/namespace - false positives with @rn-primitives packages
     "import/namespace": "off",
     "unicorn/no-useless-undefined": "off",
+    // "unicorn/filename-case": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "eslint/complexity": "off",
     // Disable no-multi-comp - allows multiple components per file (shadcn pattern)
-    "react/no-multi-comp": "off"
+    "react/no-multi-comp": "off",
+    // oxfmt formats hex literals to lowercase, conflicts with this rule requiring uppercase
+    "unicorn/number-literal-case": "off",
+    // Allow relative parent imports (expo build doesn't resolve ~ alias)
+    "import/no-relative-parent-imports": "off",
+    // Required for deferred promise pattern (Hermes doesn't support Promise.withResolvers)
+    "eslint-plugin-promise/avoid-new": "off"
   }
 }
