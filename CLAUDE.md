@@ -33,7 +33,7 @@ This is a T3 Stack monorepo using Turborepo with pnpm workspaces. Package names 
 
 ### Apps (`apps/`)
 
-- **nextjs**: Next.js 15 web app with App Router, React 19, Tailwind CSS v4
+- **nextjs**: Next.js 16 web app with App Router, React 19, Tailwind CSS v4
 - **expo**: React Native app with Expo SDK 54, Expo Router, NativeWind v5
 - **tanstack-start**: TanStack Start v1 (rc) web app alternative
 
@@ -130,6 +130,16 @@ const setActiveMutation = useMutation({
 - Copy `.env.example` to `.env` at root
 - Required: `POSTGRES_URL`, `AUTH_SECRET`, `AUTH_DISCORD_ID`, `AUTH_DISCORD_SECRET`
 - Apps use `dotenv -e ../../.env --` (via `with-env` script) to load root `.env`
+
+### Next.js Proxy (replaces Middleware)
+
+Next.js 16 replaces `middleware.ts` with `proxy.ts`. The proxy runs on the Node.js runtime (not edge).
+
+- Proxy file at `apps/nextjs/src/proxy.ts` - handles locale detection, session validation, and route protection
+- Export a named `proxy` function (not `middleware`), with a `config` object for `matcher`
+- Config flags use `proxy` naming: `skipProxyUrlNormalize` (not `skipMiddlewareUrlNormalize`)
+- Uses `NextRequest`/`NextResponse` from `next/server` (same API as before)
+- To migrate: rename `middleware.ts` → `proxy.ts`, rename export `middleware` → `proxy`, or run `npx @next/codemod@latest middleware-to-proxy .`
 
 ### Adding oRPC Procedures
 
@@ -237,11 +247,12 @@ Write code that is **accessible, performant, type-safe, and maintainable**. Focu
 
 ### Framework-Specific Guidance
 
-**Next.js:**
+**Next.js 16:**
 
 - Use Next.js `<Image>` component for images
 - Use `next/head` or App Router metadata API for head elements
 - Use Server Components for async data fetching instead of async Client Components
+- Use `proxy.ts` (not `middleware.ts`) — export a named `proxy` function, runs on Node.js runtime
 
 **React 19+:**
 
