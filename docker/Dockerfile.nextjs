@@ -35,7 +35,7 @@ COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 RUN pnpm install
 
-from installer AS builder
+FROM installer AS builder
 
 # Build the project
 COPY --from=pruner /app/out/full/ .
@@ -70,5 +70,5 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/nextjs/.next/static ./apps/n
 COPY --from=builder --chown=nextjs:nodejs /app/apps/nextjs/public ./apps/nextjs/public
 COPY --from=builder --chown=nextjs:nodejs /app/.env ./apps/nextjs/.env
 
-ENV NODE_ENV production
-CMD node apps/nextjs/server.js
+ENV NODE_ENV=production
+CMD ["node", "apps/nextjs/server.js"]
