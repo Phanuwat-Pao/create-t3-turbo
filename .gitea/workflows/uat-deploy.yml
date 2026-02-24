@@ -7,9 +7,9 @@ on:
 
 env:
   REGISTRY_URL: registry.telecorpthailand.com
-  REGISTRY_PROJECT: guardtour
+  REGISTRY_PROJECT: turbo
   IMAGE_NAME: turbo-nextjs-uat
-  SERVICE_NAME: guardtour
+  SERVICE_NAME: turbo
 
 jobs:
   build-and-deploy:
