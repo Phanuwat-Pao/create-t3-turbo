@@ -1,0 +1,391 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - "release/*"
+      - "develop"
+      - "feature/*"
+  pull_request:
+
+jobs:
+  # ─── Job 0: Wait for MiniIDP validation ───
+  validate:
+    name: "⓪ Validate idp.yaml"
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Wait for MiniIDP check
+        env:
+          GITEA_TOKEN: ${{ github.token }}
+        run: |
+          GITEA_URL="${{ github.server_url }}"
+          REPO="${{ github.repository }}"
+          SHA="${{ github.sha }}"
+          MAX_ATTEMPTS=30
+
+          echo "⏳ Waiting for MiniIDP commit status..."
+          echo "   Repo: ${REPO}"
+          echo "   SHA:  ${SHA}"
+          echo ""
+
+          for i in $(seq 1 ${MAX_ATTEMPTS}); do
+            STATUSES=$(curl -s -H "Authorization: token ${GITEA_TOKEN}" \
+              "${GITEA_URL}/api/v1/repos/${REPO}/commits/${SHA}/statuses")
+
+            # Find MiniIDP status (context starts with "MiniIDP")
+            IDP_STATE=$(echo "${STATUSES}" | jq -r '[.[] | select(.context | startswith("MiniIDP"))][0].status // empty')
+            IDP_DESC=$(echo "${STATUSES}" | jq -r '[.[] | select(.context | startswith("MiniIDP"))][0].description // empty')
+
+            if [ "${IDP_STATE}" = "success" ]; then
+              echo "✅ MiniIDP validation passed"
+              exit 0
+            elif [ "${IDP_STATE}" = "failure" ] || [ "${IDP_STATE}" = "error" ]; then
+              echo "::error::MiniIDP validation failed"
+              echo ""
+              echo "❌ MiniIDP errors:"
+              echo "   ${IDP_DESC}"
+              exit 1
+            fi
+
+            echo "   [${i}/${MAX_ATTEMPTS}] MiniIDP not ready yet (state: ${IDP_STATE:-pending})..."
+            sleep 2
+          done
+
+          echo "::warning::MiniIDP check timed out after $((MAX_ATTEMPTS * 2))s — proceeding anyway"
+
+  # ─── Job 1: Quality Gates ───
+  quality:
+    name: "① Quality Gates"
+    runs-on: ubuntu-latest
+    needs: validate
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.26.0 --activate
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Generate OpenAPI spec
+        run: pnpm openapi:generate
+
+      - name: Unit tests
+        run: pnpm test:unit
+
+      - name: Build
+        run: pnpm build
+
+      - name: Security audit (high+)
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
+
+  # ─── Job 2: Build & Push Docker images (push only) ───
+  build-push:
+    name: "② Build · ${{ matrix.service }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: quality
+    if: github.event_name == 'push'
+    strategy:
+      matrix:
+        service:
+          - api
+          - web
+          # - worker  ← เพิ่ม service ใหม่ตรงนี้
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: changes
+        run: |
+          echo "::group::Changed files"
+          if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
+            echo "⚠️ Cannot find HEAD~1 (first commit or force push)"
+            echo "build=true" >> $GITHUB_OUTPUT
+            echo "ℹ️ First commit or force push → building all" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          echo "${CHANGED}"
+          echo "::endgroup::"
+
+          # shared code หรือไฟล์ root เปลี่ยน → build ทุก service
+          if echo "${CHANGED}" | grep -qE '^(packages/|\.gitea/|[^/]+$)'; then
+            echo "✅ Shared code or root files changed → building all services"
+            echo "build=true" >> $GITHUB_OUTPUT
+            echo "ℹ️ Shared code changed → building all" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+
+          # เช็คว่า service นี้มีไฟล์เปลี่ยนไหม
+          if echo "${CHANGED}" | grep -q "^apps/${{ matrix.service }}/"; then
+            echo "✅ Changes detected in apps/${{ matrix.service }}/"
+            echo "build=true" >> $GITHUB_OUTPUT
+          else
+            echo "⏭️ No changes in apps/${{ matrix.service }}/ → skipping"
+            echo "build=false" >> $GITHUB_OUTPUT
+            echo "⏭️ No changes in **${{ matrix.service }}** → skipped" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Validate secrets
+        if: steps.changes.outputs.build == 'true'
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          IDP_URL: ${{ secrets.IDP_URL }}
+          IDP_TOKEN: ${{ secrets.IDP_TOKEN }}
+        run: |
+          echo "::group::Checking required secrets"
+          MISSING=""
+          FOUND=""
+
+          for SECRET_NAME in REGISTRY_URL REGISTRY_USERNAME REGISTRY_PASSWORD; do
+            VAL=$(eval echo "\${$SECRET_NAME}")
+            if [ -z "${VAL}" ]; then
+              MISSING="${MISSING} ${SECRET_NAME}"
+              echo "❌ ${SECRET_NAME}: NOT SET"
+            else
+              FOUND="${FOUND} ${SECRET_NAME}"
+              echo "✅ ${SECRET_NAME}: set (${#VAL} chars)"
+            fi
+          done
+          echo "::endgroup::"
+
+          echo "::group::Checking optional secrets"
+          for SECRET_NAME in IDP_URL IDP_TOKEN; do
+            VAL=$(eval echo "\${$SECRET_NAME}")
+            if [ -z "${VAL}" ]; then
+              echo "⚠️ ${SECRET_NAME}: NOT SET (notify step will be skipped)"
+            else
+              echo "✅ ${SECRET_NAME}: set (${#VAL} chars)"
+            fi
+          done
+          echo "::endgroup::"
+
+          if [ -n "${MISSING}" ]; then
+            echo "::error::Missing required secrets:${MISSING}"
+            exit 1
+          fi
+          echo "✅ All required secrets present"
+
+      - name: Login to registry
+        if: steps.changes.outputs.build == 'true'
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          echo "🔐 Logging in to ${REGISTRY_URL} as ${REGISTRY_USERNAME}..."
+          echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_URL}" \
+            -u "${REGISTRY_USERNAME}" --password-stdin
+          echo "✅ Login successful"
+
+      - name: Set image meta
+        if: steps.changes.outputs.build == 'true'
+        id: meta
+        run: |
+          SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
+          BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          TAG="${BRANCH}-sha-${SHA_SHORT}"
+          IMAGE="${{ secrets.REGISTRY_URL }}/${{ github.event.repository.name }}/${{ matrix.service }}"
+
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+
+          echo "📋 Image Meta:"
+          echo "  Service:  ${{ matrix.service }}"
+          echo "  Branch:   ${BRANCH}"
+          echo "  SHA:      ${SHA_SHORT}"
+          echo "  Tag:      ${TAG}"
+          echo "  Image:    ${IMAGE}"
+          echo "  Full:     ${IMAGE}:${TAG}"
+
+      - name: Build image
+        if: steps.changes.outputs.build == 'true'
+        run: |
+          FULL_TAG="${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
+          echo "🔨 Building ${FULL_TAG}"
+          echo "   Dockerfile: apps/${{ matrix.service }}/Dockerfile"
+          echo "   Context:    ."
+          echo ""
+          docker build \
+            -t "${FULL_TAG}" \
+            -f apps/${{ matrix.service }}/Dockerfile \
+            .
+          echo ""
+          echo "✅ Build complete"
+          docker images "${FULL_TAG}" --format "   Size: {{.Size}}"
+
+      - name: Tag latest
+        if: steps.changes.outputs.build == 'true'
+        run: |
+          echo "🏷️ Tagging ${{ steps.meta.outputs.image }}:latest"
+          docker tag \
+            "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" \
+            "${{ steps.meta.outputs.image }}:latest"
+
+      - name: Push image
+        if: steps.changes.outputs.build == 'true'
+        run: |
+          echo "📤 Pushing ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
+          docker push "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
+          echo "✅ Push complete"
+
+      - name: Push latest
+        if: steps.changes.outputs.build == 'true'
+        run: |
+          echo "📤 Pushing ${{ steps.meta.outputs.image }}:latest"
+          docker push "${{ steps.meta.outputs.image }}:latest"
+          echo "✅ Push complete"
+
+      - name: Summary
+        if: steps.changes.outputs.build == 'true'
+        run: |
+          echo "## 🐳 ${{ matrix.service }} image pushed" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ steps.meta.outputs.image }}:latest\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify MiniIDP
+        if: steps.changes.outputs.build == 'true'
+        env:
+          IDP_URL: ${{ secrets.IDP_URL }}
+          IDP_TOKEN: ${{ secrets.IDP_TOKEN }}
+        run: |
+          if [ -z "${IDP_URL}" ] || [ -z "${IDP_TOKEN}" ]; then
+            echo "⚠️ IDP_URL or IDP_TOKEN not set → skipping notify"
+            echo "   IDP_URL:   $([ -n "${IDP_URL}" ] && echo 'set' || echo '❌ NOT SET')"
+            echo "   IDP_TOKEN: $([ -n "${IDP_TOKEN}" ] && echo 'set' || echo '❌ NOT SET')"
+            exit 0
+          fi
+
+          ENDPOINT="${IDP_URL}/api/v1/image-update"
+          PAYLOAD=$(cat <<EOF
+          {
+            "repo": "${{ github.event.repository.name }}",
+            "service": "${{ matrix.service }}",
+            "tag": "${{ steps.meta.outputs.tag }}",
+            "image": "${{ steps.meta.outputs.image }}"
+          }
+          EOF
+          )
+
+          echo "📡 Notifying MiniIDP"
+          echo "   URL:     ${ENDPOINT}"
+          echo "   Payload: ${PAYLOAD}"
+          echo ""
+
+          HTTP_CODE=$(curl -s -o /tmp/idp_response.txt -w "%{http_code}" \
+            -X POST "${ENDPOINT}" \
+            -H "X-IDP-Token: ${IDP_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "${PAYLOAD}" \
+            --connect-timeout 10 \
+            --max-time 30)
+
+          RESPONSE=$(cat /tmp/idp_response.txt 2>/dev/null || echo "(empty)")
+
+          echo "   Status:   ${HTTP_CODE}"
+          echo "   Response: ${RESPONSE}"
+
+          if [ "${HTTP_CODE}" -ge 200 ] && [ "${HTTP_CODE}" -lt 300 ]; then
+            echo "✅ MiniIDP notified successfully"
+          else
+            echo "::error::MiniIDP notify failed (HTTP ${HTTP_CODE}): ${RESPONSE}"
+            exit 1
+          fi
+
+      - name: "🗑️ Harbor Retention (keep last 3)"
+        if: steps.changes.outputs.build == 'true'
+        continue-on-error: true
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          PROJECT="${{ github.event.repository.name }}"
+          REPO="${{ matrix.service }}"
+          API="https://${REGISTRY_URL}/api/v2.0"
+
+          echo "🗑️ Harbor Retention"
+          echo "   Registry: ${REGISTRY_URL}"
+          echo "   Project:  ${PROJECT}"
+          echo "   Repo:     ${REPO}"
+          echo ""
+
+          # List all tags sorted by push time (newest first), skip 'latest'
+          echo "::group::Fetching tags from Harbor"
+          RESPONSE=$(curl -s -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
+            "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts?sort=-push_time&page_size=100")
+
+          if echo "${RESPONSE}" | jq empty 2>/dev/null; then
+            TAGS=$(echo "${RESPONSE}" | jq -r '.[].tags[]?.name // empty' | grep -v '^latest$')
+          else
+            echo "::warning::Cannot parse Harbor response: ${RESPONSE}"
+            echo "⚠️ Skipping retention"
+            exit 0
+          fi
+          echo "::endgroup::"
+
+          if [ -z "${TAGS}" ]; then
+            echo "ℹ️ No tags found (or only 'latest') → nothing to clean"
+            exit 0
+          fi
+
+          TOTAL=$(echo "${TAGS}" | wc -l)
+          echo "📋 Found ${TOTAL} tags (excluding latest):"
+
+          COUNT=0
+          DELETED=0
+          for TAG in ${TAGS}; do
+            COUNT=$((COUNT + 1))
+            if [ ${COUNT} -le 3 ]; then
+              echo "   ✅ KEEP  [${COUNT}] ${TAG}"
+            else
+              echo "   🗑️ DEL   [${COUNT}] ${TAG}"
+              DEL_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                -X DELETE -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
+                "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts/${TAG}")
+              if [ "${DEL_CODE}" -ge 200 ] && [ "${DEL_CODE}" -lt 300 ]; then
+                DELETED=$((DELETED + 1))
+              else
+                echo "   ⚠️ Failed to delete ${TAG} (HTTP ${DEL_CODE})"
+              fi
+            fi
+          done
+
+          echo ""
+          echo "✅ Retention complete: kept 3, deleted ${DELETED}"

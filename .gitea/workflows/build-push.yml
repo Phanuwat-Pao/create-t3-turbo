@@ -1,0 +1,101 @@
+name: Build & Push (Manual)
+
+on:
+  workflow_dispatch:
+
+# ──────────────────────────────────────────────
+# Manual trigger: กดรันจากหน้า Gitea Actions
+# ใช้สำหรับ build & push โดยไม่ต้องรัน Quality Gates
+# ──────────────────────────────────────────────
+
+jobs:
+  registry-login:
+    name: "① Registry Login"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate secrets
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          MISSING=""
+          [ -z "${REGISTRY_URL}" ]      && MISSING="${MISSING} REGISTRY_URL"
+          [ -z "${REGISTRY_USERNAME}" ]  && MISSING="${MISSING} REGISTRY_USERNAME"
+          [ -z "${REGISTRY_PASSWORD}" ]  && MISSING="${MISSING} REGISTRY_PASSWORD"
+
+          if [ -n "${MISSING}" ]; then
+            echo "::error::Missing secrets:${MISSING}"
+            exit 1
+          fi
+
+      - name: Docker login
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_URL}" \
+            -u "${REGISTRY_USERNAME}" --password-stdin
+
+  build-push:
+    name: "② Build · ${{ matrix.service }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: registry-login
+    strategy:
+      matrix:
+        service:
+          - api
+          - web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image meta
+        id: meta
+        run: |
+          SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
+          BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
+          TAG="${BRANCH}-sha-${SHA_SHORT}"
+          IMAGE="${{ secrets.REGISTRY_URL }}/${{ github.event.repository.name }}/${{ matrix.service }}"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+
+      - name: Login to registry
+        env:
+          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_URL}" \
+            -u "${REGISTRY_USERNAME}" --password-stdin
+
+      - name: Build image
+        run: |
+          docker build \
+            -t "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" \
+            -f apps/${{ matrix.service }}/Dockerfile \
+            .
+
+      - name: Tag latest (main only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker tag \
+            "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" \
+            "${{ steps.meta.outputs.image }}:latest"
+
+      - name: Push image
+        run: |
+          docker push "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
+
+      - name: Push latest (main only)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker push "${{ steps.meta.outputs.image }}:latest"
+
+      - name: Summary
+        run: |
+          echo "## 🐳 ${{ matrix.service }} image pushed" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY

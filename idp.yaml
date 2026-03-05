@@ -1,0 +1,91 @@
+# ─── MiniIDP Configuration ───
+# ไฟล์นี้ใช้กำหนดค่าการ deploy สำหรับแต่ละ service
+# MiniIDP จะอ่านไฟล์นี้จาก repo และสร้าง Helm values + ArgoCD manifests ให้อัตโนมัติ
+
+# ─── Environments ───
+# กำหนด branch → environment mapping
+# branch ที่ไม่ได้ map ไว้จะถูก skip (ไม่ deploy)
+# namespace/domain จะถูก enrich อัตโนมัติตอน bootstrap ถ้าไม่ได้กำหนด
+environments:
+  dev:
+    branch: develop
+    enabled: true
+    # namespace: project-dev        ← auto-generated ถ้าไม่ใส่
+    # domain: project-dev.thaisee.com  ← auto-generated ถ้าไม่ใส่
+  production:
+    branch: main
+    enabled: false # เปิดเมื่อพร้อม deploy production
+
+# ─── Services ───
+services:
+  api:
+    workload:
+      containerPort: 4000
+      replicas: 1 # สูงสุด 4
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m # สูงสุด 2 cores (2000m)
+          memory: 512Mi # สูงสุด 4Gi
+      env:
+        - name: NODE_ENV
+          value: production
+    service:
+      port: 4000
+    ingress:
+      enabled: true
+      className: nginx
+      hosts:
+        - paths:
+            - path: /api
+              pathType: Prefix
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: http
+      initialDelaySeconds: 15
+      periodSeconds: 20
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: http
+      initialDelaySeconds: 5
+      periodSeconds: 10
+
+  web:
+    workload:
+      containerPort: 3000
+      replicas: 1
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+      env:
+        - name: NODE_ENV
+          value: production
+    service:
+      port: 3000
+    ingress:
+      enabled: true
+      className: nginx
+      hosts:
+        - paths:
+            - path: /
+              pathType: Prefix
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /
+        port: http
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /
+        port: http
