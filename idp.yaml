@@ -34,12 +34,12 @@ environments:
         livenessProbe:
           enabled: true
           httpGet:
-            path: /
+            path: /api/rest/health/liveness
             port: http
         readinessProbe:
           enabled: true
           httpGet:
-            path: /
+            path: /api/rest/health/readiness
             port: http
 
   production:
@@ -72,10 +72,10 @@ environments:
         livenessProbe:
           enabled: true
           httpGet:
-            path: /
+            path: /api/rest/health/liveness
             port: http
         readinessProbe:
           enabled: true
           httpGet:
-            path: /
+            path: /api/rest/health/readiness
             port: http

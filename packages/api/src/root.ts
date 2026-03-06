@@ -6,6 +6,10 @@ export const appRouter = {
     .tag("auth")
     .prefix("/auth")
     .lazy(() => import("./router/auth")),
+  health: o
+    .tag("health")
+    .prefix("/health")
+    .lazy(() => import("./router/health")),
   post: o
     .tag("post")
     .prefix("/post")
