@@ -1,8 +1,6 @@
 import type { LucideIcon } from "lucide-react-native";
-import { styled } from "nativewind";
+import { withUniwind } from "uniwind";
 
 export function iconWithClassName(icon: LucideIcon) {
-  return styled(icon, {
-    className: "style",
-  });
+  return withUniwind(icon);
 }

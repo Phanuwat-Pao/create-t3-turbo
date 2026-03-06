@@ -6,7 +6,7 @@ import { cn } from "~/lib/utils";
 const Input = React.forwardRef<
   React.ElementRef<typeof TextInput>,
   TextInputProps
->(({ className, placeholderClassName, ...props }, ref) => (
+>(({ className, ...props }, ref) => (
   <TextInput
     ref={ref}
     className={cn(
@@ -14,7 +14,7 @@ const Input = React.forwardRef<
       props.editable === false && "web:cursor-not-allowed opacity-50",
       className
     )}
-    placeholderClassName={cn("text-muted-foreground", placeholderClassName)}
+    placeholderTextColorClassName="accent-muted-foreground"
     {...props}
   />
 ));
