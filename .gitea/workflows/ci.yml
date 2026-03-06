@@ -93,7 +93,7 @@ jobs:
         run: pnpm check:fix
 
       - name: Type check
-        run: pnpm type-check
+        run: pnpm typecheck
 
       - name: Build
         run: pnpm build
