@@ -118,9 +118,7 @@ jobs:
     strategy:
       matrix:
         service:
-          - api
           - web
-          # - worker  ← เพิ่ม service ใหม่ตรงนี้
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -142,20 +140,20 @@ jobs:
           echo "${CHANGED}"
           echo "::endgroup::"
 
-          # shared code หรือไฟล์ root เปลี่ยน → build ทุก service
-          if echo "${CHANGED}" | grep -qE '^(packages/|\.gitea/|[^/]+$)'; then
+          # shared code, workflow, Dockerfile หรือไฟล์ root เปลี่ยน → build service
+          if echo "${CHANGED}" | grep -qE '^(packages/|\.gitea/|docker/Dockerfile.nextjs$|[^/]+$)'; then
             echo "✅ Shared code or root files changed → building all services"
             echo "build=true" >> $GITHUB_OUTPUT
             echo "ℹ️ Shared code changed → building all" >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
 
-          # เช็คว่า service นี้มีไฟล์เปลี่ยนไหม
-          if echo "${CHANGED}" | grep -q "^apps/${{ matrix.service }}/"; then
-            echo "✅ Changes detected in apps/${{ matrix.service }}/"
+          # เช็คว่า Next.js app มีไฟล์เปลี่ยนไหม
+          if echo "${CHANGED}" | grep -q "^apps/nextjs/"; then
+            echo "✅ Changes detected in apps/nextjs/"
             echo "build=true" >> $GITHUB_OUTPUT
           else
-            echo "⏭️ No changes in apps/${{ matrix.service }}/ → skipping"
+            echo "⏭️ No changes in apps/nextjs/ → skipping"
             echo "build=false" >> $GITHUB_OUTPUT
             echo "⏭️ No changes in **${{ matrix.service }}** → skipped" >> $GITHUB_STEP_SUMMARY
           fi
@@ -239,12 +237,12 @@ jobs:
         run: |
           FULL_TAG="${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
           echo "🔨 Building ${FULL_TAG}"
-          echo "   Dockerfile: apps/${{ matrix.service }}/Dockerfile"
+          echo "   Dockerfile: docker/Dockerfile.nextjs"
           echo "   Context:    ."
           echo ""
           docker build \
             -t "${FULL_TAG}" \
-            -f apps/${{ matrix.service }}/Dockerfile \
+            -f docker/Dockerfile.nextjs \
             .
           echo ""
           echo "✅ Build complete"

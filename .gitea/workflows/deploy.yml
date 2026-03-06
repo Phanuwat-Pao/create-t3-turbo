@@ -8,7 +8,6 @@ on:
         required: true
         type: choice
         options:
-          - api
           - web
       tag:
         description: "Image tag (เช่น main-sha-abc1234) — ดูได้จาก registry หรือ ใน workflows ของ version ที่ต้องการ deploy"
@@ -19,7 +18,7 @@ on:
 # วิธีใช้:
 #   1. ไปหน้า Actions → เลือก "🚀 Deploy / Rollback"
 #   2. กด "Run workflow"
-#   3. เลือก service (api / web)
+#   3. เลือก service (web)
 #   4. ใส่ tag ที่ต้องการ deploy (เช่น main-sha-abc1234)
 #
 # Rollback:
