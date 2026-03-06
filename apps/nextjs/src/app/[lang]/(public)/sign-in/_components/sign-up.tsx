@@ -12,9 +12,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { SignUpForm } from "~/components/forms/sign-up-form";
+import type { Dictionary } from "~/i18n/get-dictionary";
 import { getCallbackURL } from "~/lib/shared";
 
 interface SignUpProps {

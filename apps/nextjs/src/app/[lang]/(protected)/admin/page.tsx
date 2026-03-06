@@ -159,35 +159,6 @@ const UserRow = memo(function UserRow({
   );
 });
 
-export default function Page() {
-  const { data: session, isPending: isSessionLoading } =
-    authClient.useSession();
-  const router = useRouter();
-
-  // Cast user to include role from admin plugin
-  const userRole = (session?.user as { role?: string } | undefined)?.role;
-
-  useEffect(() => {
-    if (!isSessionLoading && userRole !== "admin") {
-      router.push("/dashboard");
-    }
-  }, [userRole, isSessionLoading, router]);
-
-  if (isSessionLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
-  if (userRole !== "admin") {
-    return null;
-  }
-
-  return <AdminDashboard />;
-}
-
 function AdminDashboard() {
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -579,4 +550,33 @@ function AdminDashboard() {
       </Card>
     </div>
   );
+}
+
+export default function Page() {
+  const { data: session, isPending: isSessionLoading } =
+    authClient.useSession();
+  const router = useRouter();
+
+  // Cast user to include role from admin plugin
+  const userRole = (session?.user as { role?: string } | undefined)?.role;
+
+  useEffect(() => {
+    if (!isSessionLoading && userRole !== "admin") {
+      router.push("/dashboard");
+    }
+  }, [userRole, isSessionLoading, router]);
+
+  if (isSessionLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (userRole !== "admin") {
+    return null;
+  }
+
+  return <AdminDashboard />;
 }

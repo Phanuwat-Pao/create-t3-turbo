@@ -1,7 +1,6 @@
 "use client";
 
 import type { RouterOutputs } from "@acme/api";
-
 import { CreatePostSchema } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
@@ -21,7 +20,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 import { orpc } from "~/rpc/react";
 
@@ -73,6 +72,8 @@ function TextField(props: {
 
 export function CreatePostForm() {
   const queryClient = useQueryClient();
+  const formRef = useRef<{ reset: () => void } | null>(null);
+
   const createPost = useMutation(
     orpc.post.create.mutationOptions({
       onError: (err) => {
@@ -85,7 +86,7 @@ export function CreatePostForm() {
         );
       },
       onSuccess: async () => {
-        form.reset();
+        formRef.current?.reset();
         await queryClient.invalidateQueries({ queryKey: orpc.post.key() });
       },
     })
@@ -101,6 +102,7 @@ export function CreatePostForm() {
       onSubmit: CreatePostSchema,
     },
   });
+  formRef.current = form;
 
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
@@ -129,28 +131,28 @@ export function CreatePostForm() {
   );
 }
 
-export function PostList() {
-  const { data: posts } = useSuspenseQuery(orpc.post.all.queryOptions());
-
-  if (posts.length === 0) {
-    return (
-      <div className="relative flex w-full flex-col gap-4">
-        <PostCardSkeleton pulse={false} />
-        <PostCardSkeleton pulse={false} />
-        <PostCardSkeleton pulse={false} />
-
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10">
-          <p className="text-2xl font-bold text-white">No posts yet</p>
-        </div>
-      </div>
-    );
-  }
-
+export function PostCardSkeleton(props: { pulse?: boolean }) {
+  const { pulse = true } = props;
   return (
-    <div className="flex w-full flex-col gap-4">
-      {posts.map((p) => (
-        <PostCard key={p.id} post={p} />
-      ))}
+    <div className="bg-muted flex flex-row rounded-lg p-4">
+      <div className="grow">
+        <h2
+          className={cn(
+            "bg-primary w-1/4 rounded-sm text-2xl font-bold",
+            pulse && "animate-pulse"
+          )}
+        >
+          &nbsp;
+        </h2>
+        <p
+          className={cn(
+            "mt-2 w-1/3 rounded-sm bg-current text-sm",
+            pulse && "animate-pulse"
+          )}
+        >
+          &nbsp;
+        </p>
+      </div>
     </div>
   );
 }
@@ -199,28 +201,28 @@ export function PostCard(props: {
   );
 }
 
-export function PostCardSkeleton(props: { pulse?: boolean }) {
-  const { pulse = true } = props;
-  return (
-    <div className="bg-muted flex flex-row rounded-lg p-4">
-      <div className="grow">
-        <h2
-          className={cn(
-            "bg-primary w-1/4 rounded-sm text-2xl font-bold",
-            pulse && "animate-pulse"
-          )}
-        >
-          &nbsp;
-        </h2>
-        <p
-          className={cn(
-            "mt-2 w-1/3 rounded-sm bg-current text-sm",
-            pulse && "animate-pulse"
-          )}
-        >
-          &nbsp;
-        </p>
+export function PostList() {
+  const { data: posts } = useSuspenseQuery(orpc.post.all.queryOptions());
+
+  if (posts.length === 0) {
+    return (
+      <div className="relative flex w-full flex-col gap-4">
+        <PostCardSkeleton pulse={false} />
+        <PostCardSkeleton pulse={false} />
+        <PostCardSkeleton pulse={false} />
+
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10">
+          <p className="text-2xl font-bold text-white">No posts yet</p>
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {posts.map((p) => (
+        <PostCard key={p.id} post={p} />
+      ))}
     </div>
   );
 }

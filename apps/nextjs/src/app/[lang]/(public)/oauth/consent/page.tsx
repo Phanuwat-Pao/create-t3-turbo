@@ -1,5 +1,3 @@
-import type { Metadata } from "next";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Card, CardContent } from "@acme/ui/card";
 import {
@@ -9,15 +7,15 @@ import {
   Mail,
   User,
 } from "lucide-react";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-import type { Locale } from "~/i18n/i18n-config";
-
 import { auth } from "~/auth/server";
 import { Logo } from "~/components/logo";
 import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
 
 import { ConsentBtns } from "./_components/consent-buttons";
 

@@ -1,7 +1,6 @@
 "use client";
 
 import type { OrganizationRole, Session } from "@acme/auth";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
@@ -27,8 +26,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, MailPlus } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { CreateOrganizationForm } from "~/components/forms/create-organization-form";
 import { InviteMemberForm } from "~/components/forms/invite-member-form";
 import { useInvitationCancelMutation } from "~/data/organization/invitation-cancel-mutation";
@@ -37,6 +34,7 @@ import { useOrganizationActiveMutation } from "~/data/organization/organization-
 import { useOrganizationDetailQuery } from "~/data/organization/organization-detail-query";
 import { useOrganizationListQuery } from "~/data/organization/organization-list-query";
 import { useSessionQuery } from "~/data/user/session-query";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 const ORGANIZATION_ROLES = {
   ADMIN: "admin",
@@ -187,6 +185,103 @@ const InvitationItem = memo(function InvitationItem({
     </motion.div>
   );
 });
+
+function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{dict.organization.title}</CardTitle>
+        <div className="mt-2 flex justify-between">
+          <Skeleton className="h-5 w-24" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-10 w-10 rounded-none" />
+          <div className="space-y-1">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-16" />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-8 md:flex-row">
+          <div className="flex grow flex-col gap-2">
+            <p className="border-b-foreground/10 border-b-2 font-medium">
+              {dict.organization.members}
+            </p>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-9 w-9 rounded-full" />
+                <div className="space-y-1">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex grow flex-col gap-2">
+            <p className="border-b-foreground/10 border-b-2 font-medium">
+              {dict.organization.invites}
+            </p>
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CreateOrganizationDialog({ dict }: { dict: Dictionary }) {
+  const [open, setOpen] = useState(false);
+
+  const handleSuccess = useCallback(() => setOpen(false), []);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="w-full gap-2" variant="default">
+          <PlusIcon />
+          <p>{dict.organization.newOrganization}</p>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-11/12 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{dict.organization.newOrganization}</DialogTitle>
+          <DialogDescription>
+            {dict.organization.newOrganizationDescription}
+          </DialogDescription>
+        </DialogHeader>
+        <CreateOrganizationForm onSuccess={handleSuccess} dict={dict} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function InviteMemberDialog({ dict }: { dict: Dictionary }) {
+  const [open, setOpen] = useState(false);
+
+  const handleSuccess = useCallback(() => setOpen(false), []);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="w-full gap-2" variant="outline">
+          <MailPlus size={16} />
+          <p>{dict.organization.inviteMember}</p>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-11/12 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{dict.organization.inviteMember}</DialogTitle>
+          <DialogDescription>
+            {dict.organization.inviteMemberDescription}
+          </DialogDescription>
+        </DialogHeader>
+        <InviteMemberForm onSuccess={handleSuccess} dict={dict} />
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 const OrganizationCard = (props: {
   session: Session | null;
@@ -390,100 +485,3 @@ const OrganizationCard = (props: {
   );
 };
 export default OrganizationCard;
-
-function CreateOrganizationDialog({ dict }: { dict: Dictionary }) {
-  const [open, setOpen] = useState(false);
-
-  const handleSuccess = useCallback(() => setOpen(false), []);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="w-full gap-2" variant="default">
-          <PlusIcon />
-          <p>{dict.organization.newOrganization}</p>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{dict.organization.newOrganization}</DialogTitle>
-          <DialogDescription>
-            {dict.organization.newOrganizationDescription}
-          </DialogDescription>
-        </DialogHeader>
-        <CreateOrganizationForm onSuccess={handleSuccess} dict={dict} />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function InviteMemberDialog({ dict }: { dict: Dictionary }) {
-  const [open, setOpen] = useState(false);
-
-  const handleSuccess = useCallback(() => setOpen(false), []);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="w-full gap-2" variant="outline">
-          <MailPlus size={16} />
-          <p>{dict.organization.inviteMember}</p>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{dict.organization.inviteMember}</DialogTitle>
-          <DialogDescription>
-            {dict.organization.inviteMemberDescription}
-          </DialogDescription>
-        </DialogHeader>
-        <InviteMemberForm onSuccess={handleSuccess} dict={dict} />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{dict.organization.title}</CardTitle>
-        <div className="mt-2 flex justify-between">
-          <Skeleton className="h-5 w-24" />
-          <Skeleton className="h-8 w-32" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-10 w-10 rounded-none" />
-          <div className="space-y-1">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-3 w-16" />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-8 md:flex-row">
-          <div className="flex grow flex-col gap-2">
-            <p className="border-b-foreground/10 border-b-2 font-medium">
-              {dict.organization.members}
-            </p>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Skeleton className="h-9 w-9 rounded-full" />
-                <div className="space-y-1">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-3 w-16" />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex grow flex-col gap-2">
-            <p className="border-b-foreground/10 border-b-2 font-medium">
-              {dict.organization.invites}
-            </p>
-            <Skeleton className="h-4 w-32" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

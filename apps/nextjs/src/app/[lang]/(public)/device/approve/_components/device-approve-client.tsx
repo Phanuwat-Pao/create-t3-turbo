@@ -7,10 +7,9 @@ import { Check, Loader2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface DeviceApproveClientProps {
   dict: Dictionary;
@@ -23,14 +22,14 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
   const { data: session } = useSessionQuery();
   const [isApprovePending, startApproveTransition] = useTransition();
   const [isDenyPending, startDenyTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleApprove = useCallback(() => {
     if (!userCode) {
       return;
     }
 
-    setError(null);
+    setErrorMessage(null);
 
     startApproveTransition(async () => {
       try {
@@ -40,7 +39,7 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
         router.push("/device/success");
       } catch (error: unknown) {
         const errorObj = error as { error?: { message?: string } };
-        setError(errorObj.error?.message ?? dict.device.failedToApprove);
+        setErrorMessage(errorObj.error?.message ?? dict.device.failedToApprove);
       }
     });
   }, [dict.device.failedToApprove, router, userCode]);
@@ -50,7 +49,7 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
       return;
     }
 
-    setError(null);
+    setErrorMessage(null);
 
     startDenyTransition(async () => {
       try {
@@ -60,7 +59,7 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
         router.push("/device/denied");
       } catch (error: unknown) {
         const errorObj = error as { error?: { message?: string } };
-        setError(errorObj.error?.message ?? dict.device.failedToDeny);
+        setErrorMessage(errorObj.error?.message ?? dict.device.failedToDeny);
       }
     });
   }, [dict.device.failedToDeny, router, userCode]);
@@ -91,9 +90,9 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
               <p>{session.user.email}</p>
             </div>
 
-            {error && (
+            {errorMessage && (
               <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{errorMessage}</AlertDescription>
               </Alert>
             )}
 

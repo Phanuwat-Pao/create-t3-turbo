@@ -1,8 +1,7 @@
 import type { AppRouter } from "@acme/api";
-import type { RouterClient } from "@orpc/server";
-
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
+import type { RouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import {
   dehydrate,

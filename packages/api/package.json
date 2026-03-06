@@ -24,14 +24,14 @@
     "@acme/auth": "workspace:*",
     "@acme/db": "workspace:*",
     "@acme/validators": "workspace:*",
-    "@aws-sdk/client-s3": "^3.975.0",
-    "@aws-sdk/s3-request-presigner": "^3.980.0",
+    "@aws-sdk/client-s3": "^3.1003.0",
+    "@aws-sdk/s3-request-presigner": "^3.1003.0",
     "@orpc/server": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "@types/pg": "^8.16.0",
+    "@types/pg": "^8.18.0",
     "@typescript/native-preview": "catalog:"
   }
 }

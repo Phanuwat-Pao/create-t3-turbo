@@ -8,7 +8,6 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
         backgroundColor: "#1F104A",
         foregroundImage: "./assets/icon-light.png",
       },
-      edgeToEdgeEnabled: true,
       package: "your.bundle.identifier",
     },
     assetBundlePatterns: ["**/*"],
@@ -33,7 +32,6 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
       supportsTablet: true,
     },
     name: "expo",
-    newArchEnabled: true,
     orientation: "portrait",
 
     plugins: [

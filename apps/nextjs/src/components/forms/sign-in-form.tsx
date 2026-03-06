@@ -11,10 +11,9 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 type SignInFormErrors = Partial<
   Record<"email" | "password" | "rememberMe", { message: string }>

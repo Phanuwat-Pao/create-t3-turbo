@@ -1,6 +1,5 @@
-import type { PressableStateCallbackType } from "react-native";
-
 import { type ClassValue, clsx } from "clsx";
+import type { PressableStateCallbackType } from "react-native";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {

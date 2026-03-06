@@ -1,6 +1,5 @@
-import type { Locale } from "~/i18n/i18n-config";
-
 import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
 
 import ForgetPasswordPage from "./_components/forget-password-page";
 

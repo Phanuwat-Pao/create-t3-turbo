@@ -9,9 +9,8 @@ import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface DeviceAuthClientProps {
   dict: Dictionary;
@@ -23,12 +22,12 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
   const user_code = params.get("user_code");
   const [userCode, setUserCode] = useState<string>(user_code || "");
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      setError(null);
+      setErrorMessage(null);
 
       startTransition(async () => {
         try {
@@ -46,7 +45,7 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
         } catch (error: unknown) {
           const message =
             error instanceof Error ? error.message : dict.device.invalidCode;
-          setError(message);
+          setErrorMessage(message);
         }
       });
     },
@@ -87,9 +86,9 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
               />
             </div>
 
-            {error && (
+            {errorMessage && (
               <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{errorMessage}</AlertDescription>
               </Alert>
             )}
 

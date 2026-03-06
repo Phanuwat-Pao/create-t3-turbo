@@ -15,11 +15,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
 import { SignInForm } from "~/components/forms/sign-in-form";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
+import type { Dictionary } from "~/i18n/get-dictionary";
 import { getCallbackURL } from "~/lib/shared";
 import { cn } from "~/lib/utils";
 

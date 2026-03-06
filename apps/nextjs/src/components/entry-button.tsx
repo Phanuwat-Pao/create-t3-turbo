@@ -1,5 +1,4 @@
 import type { Session } from "@acme/auth";
-
 import { Button } from "@acme/ui/button";
 import Link from "next/link";
 
@@ -9,18 +8,6 @@ interface Props {
   session: Session | null;
   dict: Dictionary;
 }
-
-const EntryButton = ({ session, dict }: Props) => {
-  const hasSession = !!session?.session;
-
-  return hasSession ? (
-    <DashboardButton dict={dict} />
-  ) : (
-    <SignInButton dict={dict} />
-  );
-};
-
-export default EntryButton;
 
 const SignInButton = ({ dict }: { dict: Dictionary }) => (
   <Button className="gap-2" variant="default" asChild>
@@ -56,3 +43,15 @@ const DashboardButton = ({ dict }: { dict: Dictionary }) => (
     </Link>
   </Button>
 );
+
+const EntryButton = ({ session, dict }: Props) => {
+  const hasSession = !!session?.session;
+
+  return hasSession ? (
+    <DashboardButton dict={dict} />
+  ) : (
+    <SignInButton dict={dict} />
+  );
+};
+
+export default EntryButton;

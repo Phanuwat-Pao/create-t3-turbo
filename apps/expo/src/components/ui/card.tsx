@@ -1,5 +1,4 @@
 import type { TextRef, ViewRef } from "@rn-primitives/types";
-
 import * as React from "react";
 import { type TextProps, type ViewProps, Text, View } from "react-native";
 

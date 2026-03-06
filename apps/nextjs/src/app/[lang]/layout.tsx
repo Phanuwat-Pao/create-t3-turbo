@@ -1,12 +1,13 @@
-import type { Metadata, Viewport } from "next";
-
 import { cn } from "@acme/ui";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { BackgroundRippleEffect } from "~/components/background-ripple-effect";
 import Header from "~/components/header";
 import Providers from "~/components/providers";
 import { createMetadata } from "~/lib/metadata";
+
+// @ts-expect-error -- CSS side-effect import handled by Next.js bundler
 import "~/app/styles.css";
 
 export const metadata: Metadata = createMetadata({

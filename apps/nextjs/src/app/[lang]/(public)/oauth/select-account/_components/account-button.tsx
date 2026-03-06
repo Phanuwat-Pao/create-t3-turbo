@@ -1,15 +1,13 @@
 "use client";
 
 import type { Session } from "@acme/auth";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface SelectAccountBtnProps {
   session: Partial<Session>;
@@ -36,13 +34,13 @@ export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
       const { data, error } = await authClient.oauth2.continue({
         selected: true,
       });
-      if (error || !active?.session || !data.redirect || !data?.uri) {
+      if (error || !active?.session || !data.redirect || !data?.url) {
         toast.error(
           error?.message ?? dict.oauth.selectAccount.failedToContinue
         );
         return;
       }
-      window.location.href = data.uri;
+      window.location.href = data.url;
     } catch (error) {
       toast.error(String(error));
     }

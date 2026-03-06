@@ -1,6 +1,5 @@
-import type { Locale } from "~/i18n/i18n-config";
-
 import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
 
 import { DeviceAuthClient } from "./_components/device-auth-client";
 

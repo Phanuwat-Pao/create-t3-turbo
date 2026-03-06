@@ -1,7 +1,6 @@
 "use client";
 
 import type { Session } from "@acme/auth";
-
 import { Alert, AlertDescription, AlertTitle } from "@acme/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
@@ -50,8 +49,6 @@ import { memo, useCallback, useState } from "react";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
 import { ChangePasswordForm } from "~/components/forms/change-password-form";
 import { TwoFactorDisableForm } from "~/components/forms/two-factor-disable-form";
@@ -61,6 +58,7 @@ import { UpdateUserForm } from "~/components/forms/update-user-form";
 import { useRevokeSessionMutation } from "~/data/user/revoke-session-mutation";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 // Extended user type with twoFactor plugin fields
 type ExtendedUser = Session["user"] & { twoFactorEnabled?: boolean };
@@ -117,6 +115,317 @@ const SessionItem = memo(function SessionItem({
   );
 });
 
+function EditUserDialog({ dict }: { dict: Dictionary }) {
+  const { data } = useSessionQuery();
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleSuccess = useCallback(() => setOpen(false), []);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="gap-2" variant="default">
+          <Edit size={13} />
+          {dict.dashboard.user.editUser}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-11/12 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{dict.dashboard.user.editUser}</DialogTitle>
+          <DialogDescription>
+            {dict.dashboard.user.editUserDescription}
+          </DialogDescription>
+        </DialogHeader>
+        <UpdateUserForm
+          currentName={data?.user.name}
+          onSuccess={handleSuccess}
+          dict={dict}
+        />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ChangePassword({ dict }: { dict: Dictionary }) {
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleSuccess = useCallback(() => setOpen(false), []);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="z-10 gap-2" variant="outline" size="sm">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="1em"
+            height="1em"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill="currentColor"
+              d="M2.5 18.5v-1h19v1zm.535-5.973l-.762-.442l.965-1.693h-1.93v-.884h1.93l-.965-1.642l.762-.443L4 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L4 10.835zm8 0l-.762-.442l.966-1.693H9.308v-.884h1.93l-.965-1.642l.762-.443L12 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L12 10.835zm8 0l-.762-.442l.966-1.693h-1.931v-.884h1.93l-.965-1.642l.762-.443L20 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L20 10.835z"
+            />
+          </svg>
+          <span className="text-muted-foreground text-sm">
+            {dict.dashboard.changePassword.title}
+          </span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-11/12 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{dict.dashboard.changePassword.title}</DialogTitle>
+          <DialogDescription>
+            {dict.dashboard.changePassword.description}
+          </DialogDescription>
+        </DialogHeader>
+        <ChangePasswordForm onSuccess={handleSuccess} dict={dict} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function AddPasskey({ dict }: { dict: Dictionary }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [passkeyName, setPasskeyName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleAddPasskey = useCallback(async () => {
+    if (!passkeyName) {
+      toast.error(dict.dashboard.passkeys.nameRequired);
+      return;
+    }
+    setIsLoading(true);
+    const res = await authClient.passkey.addPasskey({
+      name: passkeyName,
+    });
+    if (res?.error) {
+      toast.error(res?.error.message);
+    } else {
+      setIsOpen(false);
+      toast.success(dict.dashboard.passkeys.addedSuccess);
+    }
+    setIsLoading(false);
+  }, [passkeyName, dict]);
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPasskeyName(e.target.value);
+    },
+    []
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="gap-2 text-xs md:text-sm">
+          <Plus size={15} />
+          {dict.dashboard.passkeys.addNew}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-11/12 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{dict.dashboard.passkeys.addNew}</DialogTitle>
+          <DialogDescription>
+            {dict.dashboard.passkeys.addNewDescription}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-2">
+          <Label htmlFor="passkey-name">
+            {dict.dashboard.passkeys.nameLabel}
+          </Label>
+          <Input
+            id="passkey-name"
+            value={passkeyName}
+            onChange={handleNameChange}
+          />
+        </div>
+        <DialogFooter>
+          <Button
+            disabled={isLoading}
+            type="submit"
+            onClick={handleAddPasskey}
+            className="w-full"
+          >
+            {isLoading ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <>
+                <Fingerprint className="mr-2 h-4 w-4" />
+                {dict.dashboard.passkeys.createButton}
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface PasskeyRowProps {
+  passkey: { id: string; name?: string | null };
+  isDeleting: boolean;
+  onDelete: (id: string) => void;
+  dict: Dictionary;
+}
+
+const PasskeyRow = memo(function PasskeyRow({
+  passkey,
+  isDeleting,
+  onDelete,
+  dict,
+}: PasskeyRowProps) {
+  const handleDelete = useCallback(() => {
+    onDelete(passkey.id);
+  }, [passkey.id, onDelete]);
+
+  return (
+    <TableRow className="flex items-center justify-between">
+      <TableCell>
+        {passkey.name || dict.dashboard.passkeys.defaultName}
+      </TableCell>
+      <TableCell className="text-right">
+        <button type="button" onClick={handleDelete}>
+          {isDeleting ? (
+            <Loader2 size={15} className="animate-spin" />
+          ) : (
+            <Trash size={15} className="cursor-pointer text-red-600" />
+          )}
+        </button>
+      </TableCell>
+    </TableRow>
+  );
+});
+
+function ListPasskeys({ dict }: { dict: Dictionary }) {
+  const { data } = authClient.useListPasskeys();
+  const [isOpen, setIsOpen] = useState(false);
+  const [passkeyName, setPasskeyName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [deletingPasskeyId, setDeletingPasskeyId] = useState<string | null>(
+    null
+  );
+
+  const handleAddPasskey = useCallback(async () => {
+    if (!passkeyName) {
+      toast.error(dict.dashboard.passkeys.nameRequired);
+      return;
+    }
+    setIsLoading(true);
+    const res = await authClient.passkey.addPasskey({
+      name: passkeyName,
+    });
+    setIsLoading(false);
+    if (res?.error) {
+      toast.error(res?.error.message);
+    } else {
+      toast.success(dict.dashboard.passkeys.addedSuccess);
+    }
+  }, [passkeyName, dict]);
+
+  const handleDeletePasskey = useCallback(
+    async (passkeyId: string) => {
+      setDeletingPasskeyId(passkeyId);
+      await authClient.passkey.deletePasskey({
+        fetchOptions: {
+          onError: (error: { error: { message: string } }) => {
+            toast.error(error.error.message);
+            setDeletingPasskeyId(null);
+          },
+          onSuccess: () => {
+            toast(dict.dashboard.passkeys.deletedSuccess);
+            setDeletingPasskeyId(null);
+          },
+        },
+        id: passkeyId,
+      });
+    },
+    [dict]
+  );
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPasskeyName(e.target.value);
+    },
+    []
+  );
+
+  const handleClose = useCallback(() => setIsOpen(false), []);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="text-xs md:text-sm">
+          <Fingerprint className="mr-2 h-4 w-4" />
+          <span>
+            {dict.dashboard.passkeys.title}{" "}
+            {data?.length ? `[${data?.length}]` : ""}
+          </span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-11/12 sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{dict.dashboard.passkeys.listTitle}</DialogTitle>
+          <DialogDescription>
+            {dict.dashboard.passkeys.listDescription}
+          </DialogDescription>
+        </DialogHeader>
+        {data?.length ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{dict.common.name}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.map((passkey: PasskeyRowProps["passkey"]) => (
+                <PasskeyRow
+                  key={passkey.id}
+                  passkey={passkey}
+                  isDeleting={deletingPasskeyId === passkey.id}
+                  onDelete={handleDeletePasskey}
+                  dict={dict}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <p className="text-muted-foreground text-sm">
+            {dict.dashboard.passkeys.noPasskeys}
+          </p>
+        )}
+        {!data?.length && (
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="passkey-name" className="text-sm">
+                {dict.dashboard.passkeys.newPasskey}
+              </Label>
+              <Input
+                id="passkey-name"
+                value={passkeyName}
+                onChange={handleNameChange}
+                placeholder={dict.dashboard.passkeys.defaultName}
+              />
+            </div>
+            <Button type="submit" onClick={handleAddPasskey} className="w-full">
+              {isLoading ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <>
+                  <Fingerprint className="mr-2 h-4 w-4" />
+                  {dict.dashboard.passkeys.createButton}
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+        <DialogFooter>
+          <Button onClick={handleClose}>{dict.common.close}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 const UserCard = (props: {
   session: Session | null;
   activeSessions: Session["session"][];
@@ -135,7 +444,7 @@ const UserCard = (props: {
   const [activeSessions, setActiveSessions] = useState(props.activeSessions);
   const removeActiveSession = useCallback(
     (id: string) =>
-      setActiveSessions((prev) => prev.filter((session) => session.id !== id)),
+      setActiveSessions((prev) => prev.filter((s) => s.id !== id)),
     []
   );
 
@@ -398,314 +707,3 @@ const UserCard = (props: {
   );
 };
 export default UserCard;
-
-function ChangePassword({ dict }: { dict: Dictionary }) {
-  const [open, setOpen] = useState<boolean>(false);
-
-  const handleSuccess = useCallback(() => setOpen(false), []);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="z-10 gap-2" variant="outline" size="sm">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
-            viewBox="0 0 24 24"
-          >
-            <path
-              fill="currentColor"
-              d="M2.5 18.5v-1h19v1zm.535-5.973l-.762-.442l.965-1.693h-1.93v-.884h1.93l-.965-1.642l.762-.443L4 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L4 10.835zm8 0l-.762-.442l.966-1.693H9.308v-.884h1.93l-.965-1.642l.762-.443L12 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L12 10.835zm8 0l-.762-.442l.966-1.693h-1.931v-.884h1.93l-.965-1.642l.762-.443L20 9.066l.966-1.643l.761.443l-.965 1.642h1.93v.884h-1.93l.965 1.693l-.762.442L20 10.835z"
-            />
-          </svg>
-          <span className="text-muted-foreground text-sm">
-            {dict.dashboard.changePassword.title}
-          </span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{dict.dashboard.changePassword.title}</DialogTitle>
-          <DialogDescription>
-            {dict.dashboard.changePassword.description}
-          </DialogDescription>
-        </DialogHeader>
-        <ChangePasswordForm onSuccess={handleSuccess} dict={dict} />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function EditUserDialog({ dict }: { dict: Dictionary }) {
-  const { data } = useSessionQuery();
-  const [open, setOpen] = useState<boolean>(false);
-
-  const handleSuccess = useCallback(() => setOpen(false), []);
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="gap-2" variant="default">
-          <Edit size={13} />
-          {dict.dashboard.user.editUser}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{dict.dashboard.user.editUser}</DialogTitle>
-          <DialogDescription>
-            {dict.dashboard.user.editUserDescription}
-          </DialogDescription>
-        </DialogHeader>
-        <UpdateUserForm
-          currentName={data?.user.name}
-          onSuccess={handleSuccess}
-          dict={dict}
-        />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-function AddPasskey({ dict }: { dict: Dictionary }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [passkeyName, setPasskeyName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleAddPasskey = useCallback(async () => {
-    if (!passkeyName) {
-      toast.error(dict.dashboard.passkeys.nameRequired);
-      return;
-    }
-    setIsLoading(true);
-    const res = await authClient.passkey.addPasskey({
-      name: passkeyName,
-    });
-    if (res?.error) {
-      toast.error(res?.error.message);
-    } else {
-      setIsOpen(false);
-      toast.success(dict.dashboard.passkeys.addedSuccess);
-    }
-    setIsLoading(false);
-  }, [passkeyName, dict]);
-
-  const handleNameChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPasskeyName(e.target.value);
-    },
-    []
-  );
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2 text-xs md:text-sm">
-          <Plus size={15} />
-          {dict.dashboard.passkeys.addNew}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{dict.dashboard.passkeys.addNew}</DialogTitle>
-          <DialogDescription>
-            {dict.dashboard.passkeys.addNewDescription}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-2">
-          <Label htmlFor="passkey-name">
-            {dict.dashboard.passkeys.nameLabel}
-          </Label>
-          <Input
-            id="passkey-name"
-            value={passkeyName}
-            onChange={handleNameChange}
-          />
-        </div>
-        <DialogFooter>
-          <Button
-            disabled={isLoading}
-            type="submit"
-            onClick={handleAddPasskey}
-            className="w-full"
-          >
-            {isLoading ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <>
-                <Fingerprint className="mr-2 h-4 w-4" />
-                {dict.dashboard.passkeys.createButton}
-              </>
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-interface PasskeyRowProps {
-  passkey: { id: string; name?: string | null };
-  isDeleting: boolean;
-  onDelete: (id: string) => void;
-  dict: Dictionary;
-}
-
-const PasskeyRow = memo(function PasskeyRow({
-  passkey,
-  isDeleting,
-  onDelete,
-  dict,
-}: PasskeyRowProps) {
-  const handleDelete = useCallback(() => {
-    onDelete(passkey.id);
-  }, [passkey.id, onDelete]);
-
-  return (
-    <TableRow className="flex items-center justify-between">
-      <TableCell>
-        {passkey.name || dict.dashboard.passkeys.defaultName}
-      </TableCell>
-      <TableCell className="text-right">
-        <button type="button" onClick={handleDelete}>
-          {isDeleting ? (
-            <Loader2 size={15} className="animate-spin" />
-          ) : (
-            <Trash size={15} className="cursor-pointer text-red-600" />
-          )}
-        </button>
-      </TableCell>
-    </TableRow>
-  );
-});
-
-function ListPasskeys({ dict }: { dict: Dictionary }) {
-  const { data } = authClient.useListPasskeys();
-  const [isOpen, setIsOpen] = useState(false);
-  const [passkeyName, setPasskeyName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [deletingPasskeyId, setDeletingPasskeyId] = useState<string | null>(
-    null
-  );
-
-  const handleAddPasskey = useCallback(async () => {
-    if (!passkeyName) {
-      toast.error(dict.dashboard.passkeys.nameRequired);
-      return;
-    }
-    setIsLoading(true);
-    const res = await authClient.passkey.addPasskey({
-      name: passkeyName,
-    });
-    setIsLoading(false);
-    if (res?.error) {
-      toast.error(res?.error.message);
-    } else {
-      toast.success(dict.dashboard.passkeys.addedSuccess);
-    }
-  }, [passkeyName, dict]);
-
-  const handleDeletePasskey = useCallback(
-    async (passkeyId: string) => {
-      setDeletingPasskeyId(passkeyId);
-      await authClient.passkey.deletePasskey({
-        fetchOptions: {
-          onError: (error: { error: { message: string } }) => {
-            toast.error(error.error.message);
-            setDeletingPasskeyId(null);
-          },
-          onSuccess: () => {
-            toast(dict.dashboard.passkeys.deletedSuccess);
-            setDeletingPasskeyId(null);
-          },
-        },
-        id: passkeyId,
-      });
-    },
-    [dict]
-  );
-
-  const handleNameChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPasskeyName(e.target.value);
-    },
-    []
-  );
-
-  const handleClose = useCallback(() => setIsOpen(false), []);
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="text-xs md:text-sm">
-          <Fingerprint className="mr-2 h-4 w-4" />
-          <span>
-            {dict.dashboard.passkeys.title}{" "}
-            {data?.length ? `[${data?.length}]` : ""}
-          </span>
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{dict.dashboard.passkeys.listTitle}</DialogTitle>
-          <DialogDescription>
-            {dict.dashboard.passkeys.listDescription}
-          </DialogDescription>
-        </DialogHeader>
-        {data?.length ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{dict.common.name}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((passkey: PasskeyRowProps["passkey"]) => (
-                <PasskeyRow
-                  key={passkey.id}
-                  passkey={passkey}
-                  isDeleting={deletingPasskeyId === passkey.id}
-                  onDelete={handleDeletePasskey}
-                  dict={dict}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-muted-foreground text-sm">
-            {dict.dashboard.passkeys.noPasskeys}
-          </p>
-        )}
-        {!data?.length && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="passkey-name" className="text-sm">
-                {dict.dashboard.passkeys.newPasskey}
-              </Label>
-              <Input
-                id="passkey-name"
-                value={passkeyName}
-                onChange={handleNameChange}
-                placeholder={dict.dashboard.passkeys.defaultName}
-              />
-            </div>
-            <Button type="submit" onClick={handleAddPasskey} className="w-full">
-              {isLoading ? (
-                <Loader2 size={15} className="animate-spin" />
-              ) : (
-                <>
-                  <Fingerprint className="mr-2 h-4 w-4" />
-                  {dict.dashboard.passkeys.createButton}
-                </>
-              )}
-            </Button>
-          </div>
-        )}
-        <DialogFooter>
-          <Button onClick={handleClose}>{dict.common.close}</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}

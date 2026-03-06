@@ -1,12 +1,10 @@
-import type { Metadata } from "next";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
-
-import type { Locale } from "~/i18n/i18n-config";
 
 import { auth } from "~/auth/server";
 import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
 
 import { SelectAccountBtn } from "./_components/account-button";
 import { AnotherAccountBtn } from "./_components/another-account-button";

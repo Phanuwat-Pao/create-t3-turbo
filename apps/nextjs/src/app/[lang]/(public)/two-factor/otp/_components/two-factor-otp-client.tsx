@@ -10,9 +10,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { TwoFactorEmailOtpForm } from "~/components/forms/two-factor-email-otp-form";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface TwoFactorOtpClientProps {
   dict: Dictionary;

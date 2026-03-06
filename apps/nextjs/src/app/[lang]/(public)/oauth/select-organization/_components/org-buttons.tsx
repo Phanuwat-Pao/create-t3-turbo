@@ -1,15 +1,13 @@
 "use client";
 
-import type { Organization } from "better-auth/plugins";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
+import type { Organization } from "better-auth/plugins";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface SelectOrganizationBtnProps {
   organization: Partial<Organization>;
@@ -40,13 +38,13 @@ export function SelectOrganizationBtn({
       const { data, error } = await authClient.oauth2.continue({
         postLogin: true,
       });
-      if (error || !data?.redirect || !data.uri) {
+      if (error || !data?.redirect || !data.url) {
         toast.error(
           error?.message ?? dict.oauth.selectOrganization.failedToContinue
         );
         return;
       }
-      window.location.href = data.uri;
+      window.location.href = data.url;
     } catch (error) {
       toast.error(String(error));
     }

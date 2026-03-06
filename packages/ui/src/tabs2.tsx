@@ -83,6 +83,47 @@ const TabButton = memo(function TabButton({
   );
 });
 
+export const FadeInDiv = ({
+  className,
+  tabs,
+}: {
+  className?: string;
+  key?: string;
+  tabs: Tab[];
+  active: Tab;
+  hovering?: boolean;
+}) => {
+  const isActive = (tab: Tab) => tab.value === tabs[0]?.value;
+  return (
+    <div className="relative h-full w-full">
+      {tabs.map((tab, idx) => (
+        <motion.div
+          key={tab.value}
+          style={{
+            opacity: idx < 3 ? 1 - idx * 0.1 : 0,
+            scale: 1 - idx * 0.1,
+            zIndex: -idx,
+          }}
+          animate={{
+            transition: {
+              delay: 0.1,
+              duration: 0.2,
+              type: "keyframes",
+            },
+          }}
+          className={cn(
+            "h-full w-full",
+            isActive(tab) ? "" : "hidden",
+            className
+          )}
+        >
+          {tab.content}
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
 export const Tabs = ({
   tabs: propTabs,
   containerClassName,
@@ -155,46 +196,5 @@ export const Tabs = ({
         className={cn("", contentClassName)}
       />
     </>
-  );
-};
-
-export const FadeInDiv = ({
-  className,
-  tabs,
-}: {
-  className?: string;
-  key?: string;
-  tabs: Tab[];
-  active: Tab;
-  hovering?: boolean;
-}) => {
-  const isActive = (tab: Tab) => tab.value === tabs[0]?.value;
-  return (
-    <div className="relative h-full w-full">
-      {tabs.map((tab, idx) => (
-        <motion.div
-          key={tab.value}
-          style={{
-            opacity: idx < 3 ? 1 - idx * 0.1 : 0,
-            scale: 1 - idx * 0.1,
-            zIndex: -idx,
-          }}
-          animate={{
-            transition: {
-              delay: 0.1,
-              duration: 0.2,
-              type: "keyframes",
-            },
-          }}
-          className={cn(
-            "h-full w-full",
-            isActive(tab) ? "" : "hidden",
-            className
-          )}
-        >
-          {tab.content}
-        </motion.div>
-      ))}
-    </div>
   );
 };

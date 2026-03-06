@@ -9,7 +9,6 @@ import { Input } from "~/components/ui/input";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
-// eslint-disable-next-line import/no-relative-parent-imports
 import logoImage from "../../images/logo.png";
 
 export default function SignUp() {

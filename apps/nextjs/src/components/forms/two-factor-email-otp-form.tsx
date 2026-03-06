@@ -7,9 +7,8 @@ import { CheckCircle2, Loader2, Mail } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import * as z from "zod";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface OtpFormValues {
   code: string;

@@ -14,9 +14,8 @@ import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { ForgetPasswordForm } from "~/components/forms/forget-password-form";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface ForgetPasswordPageProps {
   dict: Dictionary;

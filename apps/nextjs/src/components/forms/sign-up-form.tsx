@@ -8,10 +8,9 @@ import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
 import { useImagePreview } from "~/hooks/use-image-preview";
+import type { Dictionary } from "~/i18n/get-dictionary";
 import { convertImageToBase64 } from "~/lib/utils";
 
 type SignUpFormErrors = Partial<

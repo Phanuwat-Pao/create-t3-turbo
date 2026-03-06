@@ -1,14 +1,12 @@
-import type { Metadata } from "next";
-
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 
-import type { Locale } from "~/i18n/i18n-config";
-
 import { auth } from "~/auth/server";
 import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
 
 import { GoBackBtn } from "./_components/go-back-button";
 import { SelectOrganizationBtn } from "./_components/org-buttons";

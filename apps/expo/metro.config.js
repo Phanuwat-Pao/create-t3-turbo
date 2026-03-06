@@ -1,3 +1,5 @@
+/* eslint-disable unicorn/prefer-module */
+/* eslint-disable eslint-plugin-node/no-path-concat */
 // Learn more: https://docs.expo.dev/guides/monorepos/
 const { getDefaultConfig } = require("expo/metro-config");
 const { FileStore } = require("metro-cache");

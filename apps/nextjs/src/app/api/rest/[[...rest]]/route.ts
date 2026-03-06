@@ -25,7 +25,7 @@ const handler = new OpenAPIHandler(appRouter, {
 
 async function handleRequest(request: Request) {
   const context = await createContext({
-    auth,
+    auth: auth as Parameters<typeof createContext>[0]["auth"],
     headers: request.headers,
   });
   // Provide initial context if needed

@@ -3,7 +3,11 @@ import { createMcpHandler } from "mcp-handler";
 import { type NextRequest, NextResponse } from "next/server";
 import * as z from "zod";
 
-const baseUrl = process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
+import { env } from "~/env";
+
+const baseUrl = env.VERCEL_URL
+  ? `https://${env.VERCEL_URL}`
+  : "http://localhost:3000";
 
 /**
  * Example derived from https://www.npmjs.com/package/mcp-handler
@@ -28,9 +32,9 @@ const handler = mcpHandler(
             },
           },
           async ({ message }: { message: string }) => {
-            const baseUrl =
+            const authUrl =
               process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
-            const org = jwt?.[`${baseUrl}/org`];
+            const org = jwt?.[`${authUrl}/org`];
             return {
               content: [
                 {
@@ -69,9 +73,9 @@ function addCorsHeaders(headers: Headers) {
   }
 }
 
-function withCors(handler: (req: Request) => Promise<Response>) {
+function withCors(reqHandler: (req: Request) => Promise<Response>) {
   return async (req: Request) => {
-    const res = await handler(req);
+    const res = await reqHandler(req);
     addCorsHeaders(res.headers);
     return res;
   };

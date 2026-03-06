@@ -5,13 +5,19 @@ import React from "react";
 
 import { Logo } from "~/components/logo";
 
-export function Features() {
-  return (
-    <div className="mx-auto flex w-full flex-col gap-4 bg-white px-8 lg:flex-row dark:bg-black">
-      <Card title="Better Auth" icon={<Logo className="w-44" />} />
-    </div>
-  );
-}
+export const Icon = ({ className, ...rest }: any) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth="1.5"
+    stroke="currentColor"
+    className={className}
+    {...rest}
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+  </svg>
+);
 
 const Card = ({
   title,
@@ -60,16 +66,10 @@ const Card = ({
   );
 };
 
-export const Icon = ({ className, ...rest }: any) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth="1.5"
-    stroke="currentColor"
-    className={className}
-    {...rest}
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-  </svg>
-);
+export function Features() {
+  return (
+    <div className="mx-auto flex w-full flex-col gap-4 bg-white px-8 lg:flex-row dark:bg-black">
+      <Card title="Better Auth" icon={<Logo className="w-44" />} />
+    </div>
+  );
+}

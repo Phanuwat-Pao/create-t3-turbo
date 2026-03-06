@@ -8,10 +8,9 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as z from "zod";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { useOrganizationCreateMutation } from "~/data/organization/organization-create-mutation";
 import { useImagePreview } from "~/hooks/use-image-preview";
+import type { Dictionary } from "~/i18n/get-dictionary";
 import { convertImageToBase64 } from "~/lib/utils";
 
 interface CreateOrganizationFormValues {

@@ -8,9 +8,8 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import * as z from "zod";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { useChangePasswordMutation } from "~/data/user/change-password-mutation";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface ChangePasswordFormValues {
   confirmPassword: string;

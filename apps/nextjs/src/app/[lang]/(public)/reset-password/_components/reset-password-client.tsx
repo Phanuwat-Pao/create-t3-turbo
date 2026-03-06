@@ -10,9 +10,8 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { ResetPasswordForm } from "~/components/forms/reset-password-form";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface ResetPasswordClientProps {
   dict: Dictionary;

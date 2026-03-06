@@ -1,11 +1,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import type { Locale } from "~/i18n/i18n-config";
-
 import { auth } from "~/auth/server";
 import AccountSwitcher from "~/components/account-switch";
 import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
 
 import OrganizationCard from "./_components/organization-card";
 import UserCard from "./_components/user-card";

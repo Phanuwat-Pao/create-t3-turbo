@@ -1,5 +1,4 @@
 import type { Auth, AuthApi, Session } from "@acme/auth";
-
 import { type Database, db } from "@acme/db/client";
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:

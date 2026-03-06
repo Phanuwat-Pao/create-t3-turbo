@@ -13,9 +13,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { TwoFactorTotpForm } from "~/components/forms/two-factor-totp-form";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface TwoFactorTotpClientProps {
   dict: Dictionary;

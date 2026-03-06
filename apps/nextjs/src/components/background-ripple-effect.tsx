@@ -15,55 +15,6 @@ const noop = () => {
   /* intentionally empty */
 };
 
-export const BackgroundRippleEffect = ({
-  rows = 8,
-  cols = 27,
-  cellSize = 56,
-}: {
-  rows?: number;
-  cols?: number;
-  cellSize?: number;
-}) => {
-  const [clickedCell, setClickedCell] = useState<{
-    row: number;
-    col: number;
-  } | null>(null);
-  const [rippleKey, setRippleKey] = useState(0);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const handleCellClick = useCallback((row: number, col: number) => {
-    setClickedCell({ col, row });
-    setRippleKey((k) => k + 1);
-  }, []);
-
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        "pointer-events-none absolute inset-0 h-full w-full",
-        "[--cell-border-color:hsl(0_0%_85%)] [--cell-fill-color:hsl(0_0%_97%)] [--cell-shadow-color:hsl(0_0%_80%)]",
-        "dark:[--cell-border-color:hsl(20_14.3%_15%)] dark:[--cell-fill-color:hsl(20_14.3%_7%)] dark:[--cell-shadow-color:hsl(20_14.3%_12%)]"
-      )}
-    >
-      <div className="pointer-events-auto relative h-auto w-auto overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 z-[2] h-full w-full overflow-hidden" />
-        <DivGrid
-          key={`base-${rippleKey}`}
-          className="mask-radial-from-20% mask-radial-at-top"
-          rows={rows}
-          cols={cols}
-          cellSize={cellSize}
-          borderColor="var(--cell-border-color)"
-          fillColor="var(--cell-fill-color)"
-          clickedCell={clickedCell}
-          onCellClick={handleCellClick}
-          interactive
-        />
-      </div>
-    </div>
-  );
-};
-
 interface DivGridProps {
   className?: string;
   rows: number;
@@ -120,9 +71,9 @@ const GridCell = memo(function GridCell({
   );
 
   return (
-    <div
-      role={interactive ? "button" : undefined}
-      tabIndex={interactive ? 0 : undefined}
+    <button
+      type="button"
+      tabIndex={interactive ? 0 : -1}
       className={cn(
         "cell relative border-[0.5px] opacity-50 transition-opacity duration-150 will-change-transform hover:opacity-80",
         isAnimating && "animate-cell-ripple [animation-fill-mode:none]",
@@ -198,6 +149,55 @@ const DivGrid = ({
           />
         );
       })}
+    </div>
+  );
+};
+
+export const BackgroundRippleEffect = ({
+  rows = 8,
+  cols = 27,
+  cellSize = 56,
+}: {
+  rows?: number;
+  cols?: number;
+  cellSize?: number;
+}) => {
+  const [clickedCell, setClickedCell] = useState<{
+    row: number;
+    col: number;
+  } | null>(null);
+  const [rippleKey, setRippleKey] = useState(0);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  const handleCellClick = useCallback((row: number, col: number) => {
+    setClickedCell({ col, row });
+    setRippleKey((k) => k + 1);
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "pointer-events-none absolute inset-0 h-full w-full",
+        "[--cell-border-color:hsl(0_0%_85%)] [--cell-fill-color:hsl(0_0%_97%)] [--cell-shadow-color:hsl(0_0%_80%)]",
+        "dark:[--cell-border-color:hsl(20_14.3%_15%)] dark:[--cell-fill-color:hsl(20_14.3%_7%)] dark:[--cell-shadow-color:hsl(20_14.3%_12%)]"
+      )}
+    >
+      <div className="pointer-events-auto relative h-auto w-auto overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-[2] h-full w-full overflow-hidden" />
+        <DivGrid
+          key={`base-${rippleKey}`}
+          className="mask-radial-from-20% mask-radial-at-top"
+          rows={rows}
+          cols={cols}
+          cellSize={cellSize}
+          borderColor="var(--cell-border-color)"
+          fillColor="var(--cell-fill-color)"
+          clickedCell={clickedCell}
+          onCellClick={handleCellClick}
+          interactive
+        />
+      </div>
     </div>
   );
 };

@@ -6,9 +6,8 @@ import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
 import { authClient } from "~/auth/client";
+import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface ConsentBtnsProps {
   dict: Dictionary;
@@ -23,8 +22,8 @@ export function ConsentBtns({ dict }: ConsentBtnsProps) {
       accept: true,
     });
     setLoading(false);
-    if (res.data?.redirect && res.data?.uri) {
-      window.location.href = res.data?.uri;
+    if (res.data?.redirect && res.data?.url) {
+      window.location.href = res.data?.url;
       return;
     }
     toast.error(dict.oauth.consent.authorizeFailed);
@@ -34,8 +33,8 @@ export function ConsentBtns({ dict }: ConsentBtnsProps) {
     const res = await authClient.oauth2.consent({
       accept: false,
     });
-    if (res.data?.redirect && res.data?.uri) {
-      window.location.href = res.data?.uri;
+    if (res.data?.redirect && res.data?.url) {
+      window.location.href = res.data?.url;
       return;
     }
     toast.error(dict.oauth.consent.cancelFailed);

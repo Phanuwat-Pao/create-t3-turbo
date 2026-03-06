@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
 
 import { queryClient } from "~/utils/api";
+
 import "~/styles.css";
 
 // This is the main layout of the app

@@ -1,6 +1,5 @@
-import type { Locale } from "~/i18n/i18n-config";
-
 import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
 
 import SignInPage from "./_components/sign-in-page";
 
