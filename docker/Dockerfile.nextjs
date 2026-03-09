@@ -39,7 +39,7 @@ FROM installer AS builder
 
 # Build the project
 COPY --from=pruner /app/out/full/ .
-#COPY --from=pruner /app/.env .
+# COPY --from=pruner /app/.env .
 COPY --from=pruner /app/.env.example .env
 COPY turbo.json turbo.json
 
