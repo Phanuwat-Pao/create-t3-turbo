@@ -39,7 +39,7 @@ environments:
         readinessProbe:
           enabled: true
           httpGet:
-            path: /api/rest/health/readiness
+            path: /api/rest/health/liveness
             port: http
 
   production:
