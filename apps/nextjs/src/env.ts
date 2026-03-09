@@ -30,7 +30,8 @@ export const env = createEnv({
     TRUSTED_ORIGINS: z
       .string()
       .optional()
-      .transform((s) => (s ? s.split(",").map((o) => o.trim()) : [])),
+      .transform((s) => (s ? s.split(",").map((o) => o.trim()) : []))
+      .pipe(z.array(z.string())),
   },
   shared: {
     NODE_ENV: z
