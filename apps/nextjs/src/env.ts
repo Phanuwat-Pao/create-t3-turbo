@@ -29,7 +29,7 @@ export const env = createEnv({
     POSTGRES_URL: z.url(),
     TRUSTED_ORIGINS: z
       .string()
-      .default("")
+      .optional()
       .transform((s) => (s ? s.split(",").map((o) => o.trim()) : [])),
   },
   shared: {
