@@ -193,6 +193,10 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       oauthProvider({
         consentPage: "/oauth/consent",
         loginPage: "/sign-in",
+        silenceWarnings: {
+          oauthAuthServerConfig: true,
+          openidConfig: true,
+        },
       }),
       customSession(async (session) => ({
         ...session,
@@ -203,6 +207,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       ...(options.extraPlugins ?? []),
     ],
     secret: options.secret,
+
     socialProviders: {
       discord:
         options.discordClientId && options.discordClientSecret
