@@ -17,7 +17,6 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
     //   },
     // },
     experiments: {
-      reactCanary: true,
       reactCompiler: true,
       tsconfigPaths: true,
       typedRoutes: true,
