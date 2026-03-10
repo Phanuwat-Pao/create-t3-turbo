@@ -7,7 +7,7 @@
     "build": "pnpm with-env next build",
     "clean": "git clean -xdf .cache .next .turbo node_modules",
     "dev": "pnpm with-env next dev",
-    "start": "pnpm with-env next start",
+    "start": "pnpm with-env node .next/standalone/server.js",
     "typecheck": "tsgo --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },
