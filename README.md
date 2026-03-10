@@ -176,6 +176,20 @@ To add a new package, simply run `pnpm turbo gen init` in the monorepo root. Thi
 
 The generator sets up the `package.json`, `tsconfig.json` and a `index.ts`, as well as configures all the necessary configurations for tooling around your package such as formatting, linting and typechecking. When the package is created, you're ready to go build out the package.
 
+### 6. Run the Playwright smoke test
+
+The repo includes a standalone Playwright workspace at `apps/e2e` that starts the Next.js app and exercises a public smoke path.
+
+```bash
+# Install the Chromium browser used by the e2e workspace
+pnpm e2e:install
+
+# Run the smoke suite against the real Next.js app
+pnpm e2e
+```
+
+See [`apps/e2e/README.md`](./apps/e2e/README.md) for the workspace-level setup and commands.
+
 ## FAQ
 
 ### Does the starter include Solito?

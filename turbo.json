@@ -14,6 +14,20 @@
       "cache": false,
       "persistent": false
     },
+    "e2e": {
+      "cache": false
+    },
+    "e2e:debug": {
+      "cache": false,
+      "interactive": true
+    },
+    "e2e:headed": {
+      "cache": false
+    },
+    "e2e:ui": {
+      "cache": false,
+      "persistent": true
+    },
     "typecheck": {
       "dependsOn": ["^topo", "^build"],
       "outputs": [".cache/tsbuildinfo.json"]
