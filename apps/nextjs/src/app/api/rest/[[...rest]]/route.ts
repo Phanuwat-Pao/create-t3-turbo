@@ -6,6 +6,7 @@ import { CORSPlugin } from "@orpc/server/plugins";
 
 import { auth } from "~/auth/server";
 import origins from "~/config/origin";
+import { s3 } from "~/server/s3";
 
 function logError(error: unknown) {
   console.error(error);
@@ -27,6 +28,7 @@ async function handleRequest(request: Request) {
   const context = await createContext({
     auth: auth as Parameters<typeof createContext>[0]["auth"],
     headers: request.headers,
+    s3,
   });
   // Provide initial context if needed
   const { response } = await handler.handle(request, {
