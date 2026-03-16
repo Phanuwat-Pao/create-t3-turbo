@@ -14,6 +14,10 @@ export const appRouter = {
     .tag("post")
     .prefix("/post")
     .lazy(() => import("./router/post")),
+  storage: o
+    .tag("storage")
+    .prefix("/storage")
+    .lazy(() => import("./router/storage")),
 };
 
 // export type definition of API

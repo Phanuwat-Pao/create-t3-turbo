@@ -77,7 +77,7 @@ const withTiming = base.use(async ({ context, next, path }) => {
 });
 
 export const withTransaction = withTiming.use(async ({ context, next }) =>
-  db.transaction(async (tx) =>
+  context.db.transaction(async (tx) =>
     next({
       context: { ...context, db: tx },
     })

@@ -21,3 +21,5 @@ export type RouterOutputs = InferRouterOutputs<AppRouter>;
 export { type AppRouter, appRouter } from "./root";
 export { createContext, ORPCError } from "./orpc";
 export type { Context } from "./orpc";
+export { createS3Service } from "./s3";
+export type { S3Service, S3ServiceConfigInput } from "./s3";

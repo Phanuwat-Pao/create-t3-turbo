@@ -1,0 +1,2 @@
+process.env.POSTGRES_URL ??=
+  "postgresql://postgres:postgres@localhost:5432/test";
