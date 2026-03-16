@@ -13,6 +13,7 @@
 ### Task 1: Add focused Next.js test setup for storage upload helpers
 
 **Files:**
+
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/package.json`
 - Create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/vitest.config.ts`
 - Create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/vitest.setup.ts`
@@ -45,11 +46,13 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees
 ### Task 2: Add failing tests for single, multipart, progress, and abort flows
 
 **Files:**
+
 - Create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/src/data/storage/upload-file.test.ts`
 
 **Step 1: Write the failing test**
 
 Cover:
+
 - single upload below threshold calls `createUploadUrl` and uploads once
 - multipart upload above threshold calls multipart procedures and completes with ordered parts
 - progress callback receives aggregate bytes and reaches 100%
@@ -82,6 +85,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees
 ### Task 3: Implement the browser-side upload helper
 
 **Files:**
+
 - Create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/src/data/storage/upload-file.ts`
 - Optionally modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/src/data/storage/keys.ts`
 - Optionally modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/src/data/storage/storage-mutations.ts`
@@ -89,6 +93,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees
 **Step 1: Write the failing test**
 
 Use the existing test file to drive the public contract:
+
 - `uploadFile`
 - `StorageUploadError`
 - progress payload shape
@@ -102,6 +107,7 @@ Expected: fail because the helper behavior is not implemented yet.
 **Step 3: Write minimal implementation**
 
 Implement:
+
 - threshold-based single versus multipart selection
 - `XMLHttpRequest` upload helper with progress and abort support
 - multipart part slicing and bounded concurrency
@@ -127,6 +133,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees
 ### Task 4: Document and verify the new helper
 
 **Files:**
+
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/apps/nextjs/src/data/storage/README.md`
 - Optionally modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3/README.md`
 
@@ -141,6 +148,7 @@ Run the full verification set after implementation and note any missing docs or 
 **Step 3: Write minimal implementation**
 
 Document:
+
 - `uploadFile(file, options)` usage
 - threshold behavior
 - progress callback shape
@@ -149,6 +157,7 @@ Document:
 **Step 4: Run verification**
 
 Run:
+
 - `pnpm -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3 -F @acme/nextjs test`
 - `pnpm -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3 -F @acme/nextjs typecheck`
 - `pnpm -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/.worktrees/presigned-s3 -F @acme/nextjs build`

@@ -13,12 +13,14 @@
 ### Task 1: Add shared storage validation schemas
 
 **Files:**
+
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/validators/src/index.ts`
 - Test: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/validators/src/index.test.ts`
 
 **Step 1: Write the failing test**
 
 Write a focused test file for:
+
 - valid upload input with filename and content type
 - invalid key outside `users/<userId>/`
 - invalid multipart part numbers
@@ -45,6 +47,7 @@ Expected: fail because the schemas/helpers and test script do not exist yet.
 **Step 3: Write minimal implementation**
 
 Add Zod schemas and small helper utilities for:
+
 - filename normalization
 - user-scoped key validation
 - upload request payloads
@@ -68,6 +71,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 ### Task 2: Add S3 env support in the Next.js server runtime
 
 **Files:**
+
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/apps/nextjs/src/env.ts`
 - Reference: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/auth/env.ts`
 
@@ -84,6 +88,7 @@ Expected: fail after temporarily referencing new env fields that are not yet dec
 **Step 3: Write minimal implementation**
 
 Add server env entries for:
+
 - `S3_REGION`
 - `S3_BUCKET`
 - `S3_ACCESS_KEY_ID`
@@ -109,6 +114,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 ### Task 3: Implement the shared S3 service for oRPC context
 
 **Files:**
+
 - Create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/api/src/s3.ts`
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/api/src/orpc.ts`
 - Test: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/api/src/s3.test.ts`
@@ -116,6 +122,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 **Step 1: Write the failing test**
 
 Add service tests for:
+
 - generated keys stay under `users/<userId>/`
 - single upload returns a presigned `PutObject` URL
 - multipart initiation returns `{ key, uploadId }`
@@ -133,6 +140,7 @@ Expected: fail because `src/s3.ts` and the service contract do not exist yet.
 **Step 3: Write minimal implementation**
 
 Create `src/s3.ts` with:
+
 - shared `S3Client`
 - config loader
 - key generation helper
@@ -168,6 +176,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 ### Task 4: Add protected storage procedures to the API router
 
 **Files:**
+
 - Create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/api/src/router/storage.ts`
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/api/src/root.ts`
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/packages/api/src/index.ts`
@@ -176,6 +185,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 **Step 1: Write the failing test**
 
 Add router tests that verify:
+
 - unauthenticated callers are rejected
 - authenticated callers receive upload URLs
 - multipart completion delegates correctly
@@ -190,6 +200,7 @@ Expected: fail because the storage router is not registered yet.
 **Step 3: Write minimal implementation**
 
 Create protected procedures:
+
 - `createUploadUrl`
 - `createMultipartUpload`
 - `signMultipartPart`
@@ -198,6 +209,7 @@ Create protected procedures:
 - `getDownloadUrl`
 
 Each procedure should:
+
 - trust only `context.session.user.id`
 - call `context.s3.*`
 - avoid inline AWS logic
@@ -220,6 +232,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 ### Task 5: Expose the storage API to the Next.js client
 
 **Files:**
+
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/apps/nextjs/src/rpc/react.tsx`
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/apps/nextjs/src/rpc/server.tsx`
 - Create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/apps/nextjs/src/data/storage/storage-mutations.ts`
@@ -238,6 +251,7 @@ Expected: fail when referencing `orpc.storage.*` before the router types propaga
 **Step 3: Write minimal implementation**
 
 Add client helpers for:
+
 - requesting a single upload URL
 - starting multipart uploads
 - signing individual parts
@@ -263,6 +277,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 ### Task 6: Add verification and usage notes
 
 **Files:**
+
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/AGENTS.md`
 - Modify: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/README.md`
 - Optionally create: `/Users/phanuwatluadthai/Documents/repositories/create-t3-turbo/apps/nextjs/src/data/storage/README.md`
@@ -270,6 +285,7 @@ git -C /Users/phanuwatluadthai/Documents/repositories/create-t3-turbo commit -m 
 **Step 1: Write the failing test**
 
 Write a short manual verification checklist covering:
+
 - authenticated single upload flow
 - authenticated multipart flow
 - authenticated download flow
@@ -289,6 +305,7 @@ Expected: note any remaining gaps before final docs are written.
 **Step 3: Write minimal implementation**
 
 Document:
+
 - required S3 env vars
 - example API usage flow
 - direct-to-S3 guarantee
