@@ -38,7 +38,7 @@ export default async function SelectOrganizationPage({ params }: PageProps) {
             </CardHeader>
             <CardContent className="p-6">
               {organizations.length ? (
-                organizations.map((o) => (
+                organizations.map((o: (typeof organizations)[number]) => (
                   <SelectOrganizationBtn
                     key={o.id}
                     organization={o}

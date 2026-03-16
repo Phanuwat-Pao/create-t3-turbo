@@ -1,5 +1,6 @@
 import type { RouterInputs, RouterOutputs } from "@acme/api";
 
+import { orpcClient } from "~/rpc/client";
 import { orpc } from "~/rpc/react";
 
 export type CreateUploadUrlInput = RouterInputs["storage"]["createUploadUrl"];
@@ -59,4 +60,40 @@ export function getDownloadUrlMutationOptions(
   ...args: Parameters<typeof orpc.storage.getDownloadUrl.mutationOptions>
 ) {
   return orpc.storage.getDownloadUrl.mutationOptions(...args);
+}
+
+export async function requestCreateUploadUrl(
+  input: CreateUploadUrlInput
+): Promise<CreateUploadUrlOutput> {
+  return orpcClient.storage.createUploadUrl(input);
+}
+
+export async function requestCreateMultipartUpload(
+  input: CreateMultipartUploadInput
+): Promise<CreateMultipartUploadOutput> {
+  return orpcClient.storage.createMultipartUpload(input);
+}
+
+export async function requestSignMultipartPart(
+  input: SignMultipartPartInput
+): Promise<SignMultipartPartOutput> {
+  return orpcClient.storage.signMultipartPart(input);
+}
+
+export async function requestCompleteMultipartUpload(
+  input: CompleteMultipartUploadInput
+): Promise<CompleteMultipartUploadOutput> {
+  return orpcClient.storage.completeMultipartUpload(input);
+}
+
+export async function requestAbortMultipartUpload(
+  input: AbortMultipartUploadInput
+): Promise<AbortMultipartUploadOutput> {
+  return orpcClient.storage.abortMultipartUpload(input);
+}
+
+export async function requestDownloadUrl(
+  input: GetDownloadUrlInput
+): Promise<GetDownloadUrlOutput> {
+  return orpcClient.storage.getDownloadUrl(input);
 }

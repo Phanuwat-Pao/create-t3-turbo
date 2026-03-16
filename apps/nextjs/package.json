@@ -8,6 +8,7 @@
     "clean": "git clean -xdf .cache .next .turbo node_modules",
     "dev": "pnpm with-env next dev",
     "start": "pnpm with-env node .next/standalone/server.js",
+    "test": "../../node_modules/.pnpm/node_modules/.bin/vitest run --config vitest.config.ts",
     "typecheck": "tsgo --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },

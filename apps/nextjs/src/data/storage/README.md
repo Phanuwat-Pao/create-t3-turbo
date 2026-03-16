@@ -4,6 +4,8 @@ The storage client helpers live in:
 
 - `apps/nextjs/src/data/storage/storage-mutations.ts`
 - `apps/nextjs/src/data/storage/keys.ts`
+- `apps/nextjs/src/data/storage/upload-file.ts`
+- `apps/nextjs/src/rpc/client.ts`
 
 They wrap the authenticated `orpc.storage.*` procedures exposed by `@acme/api`.
 
@@ -27,9 +29,30 @@ They wrap the authenticated `orpc.storage.*` procedures exposed by `@acme/api`.
 
 The app server never proxies file bytes. It only authenticates the caller, scopes keys to `users/<userId>/...`, and signs the S3 operations.
 
+## Browser upload helper
+
+Use `uploadFile(file, options)` from `apps/nextjs/src/data/storage/upload-file.ts` when the browser should upload directly to S3 and you want the helper to choose single-request or multipart mode automatically.
+
+Supported options:
+
+- `onProgress(progress)` for aggregate upload progress
+- `signal` for cancellation
+- `multipartThresholdBytes` default `8 MiB`
+- `partSizeBytes` default `8 MiB`
+- `concurrency` default `3`
+
+The progress callback receives:
+
+- `loadedBytes`
+- `totalBytes`
+- `percent`
+- `uploadType`
+- `stage`
+
 ## Manual verification
 
-1. Call `storage.createUploadUrl`, upload a small file with the returned URL, and confirm the object lands under your user prefix.
-2. Call `storage.createMultipartUpload`, sign two or more parts, upload them directly to S3, complete the upload, and confirm the final object is readable.
-3. Call `storage.getDownloadUrl` for one of your own keys and confirm the signed URL downloads the object.
-4. Try `storage.getDownloadUrl` or `storage.signMultipartPart` with a key under another user prefix and confirm the API returns `FORBIDDEN`.
+1. Call `uploadFile(file)` with a small file, confirm it uses a single signed `PUT`, and verify the object lands under your user prefix.
+2. Call `uploadFile(file)` with a file above the multipart threshold, confirm progress updates while parts upload, and verify the final object is readable.
+3. Abort a multipart upload with `AbortController` and confirm the helper rejects with `ABORTED`.
+4. Call `storage.getDownloadUrl` for one of your own keys and confirm the signed URL downloads the object.
+5. Try `storage.getDownloadUrl` or `storage.signMultipartPart` with a key under another user prefix and confirm the API returns `FORBIDDEN`.
