@@ -23,7 +23,9 @@ describe("storage validators", () => {
     expect(
       isUserScopedKey("users/other/uploads/2026/03/file.png", "user_123")
     ).toBeFalsy();
-    expect(isUserScopedKey("../users/user_123/file.png", "user_123")).toBeFalsy();
+    expect(
+      isUserScopedKey("../users/user_123/file.png", "user_123")
+    ).toBeFalsy();
   });
 
   it("sanitizeFilename removes unsafe path segments", () => {
