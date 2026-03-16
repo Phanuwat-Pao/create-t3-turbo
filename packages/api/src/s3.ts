@@ -1,5 +1,3 @@
-import { randomUUID } from "node:crypto";
-
 import type {
   CompleteMultipartUploadRequest,
   DownloadUrlRequest,
@@ -23,6 +21,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { ORPCError } from "@orpc/server";
+import { nanoid } from "nanoid";
 
 const DEFAULT_DOWNLOAD_URL_EXPIRES_IN = 900;
 const DEFAULT_UPLOAD_URL_EXPIRES_IN = 900;
@@ -236,7 +235,7 @@ export function createS3Service(
   const sharedClient = config ? getSharedS3Client(config) : null;
   const client = dependencies.client ?? sharedClient;
   const now = dependencies.now ?? (() => new Date());
-  const createRandomId = dependencies.randomId ?? randomUUID;
+  const createRandomId = dependencies.randomId ?? nanoid;
   const presign =
     dependencies.presign ??
     ((command: object, expiresIn: number) => {

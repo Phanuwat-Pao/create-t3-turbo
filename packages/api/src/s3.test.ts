@@ -30,7 +30,7 @@ function getFirstCall<TArgs>(calls: TArgs[]): TArgs {
   return firstCall;
 }
 
-function createHarness() {
+function createHarness(options?: { randomId?: () => string }) {
   const send = vi.fn();
   const presign = vi
     .fn()
@@ -44,7 +44,7 @@ function createHarness() {
       client: { send },
       now: () => fixedDate,
       presign,
-      randomId: () => "abc123",
+      ...(options?.randomId ? { randomId: options.randomId } : {}),
     }
   );
 
@@ -59,7 +59,9 @@ describe("s3 storage service", () => {
   let harness: ReturnType<typeof createHarness>;
 
   beforeEach(() => {
-    harness = createHarness();
+    harness = createHarness({
+      randomId: () => "abc123",
+    });
   });
 
   it("creates a single upload URL inside the authenticated user prefix", async () => {
@@ -84,6 +86,25 @@ describe("s3 storage service", () => {
       Key: "users/user_123/uploads/2026/03/abc123-Avatar-Profile.png",
     });
     expect(expiresIn).toBe(123);
+  });
+
+  it("uses nanoid for storage keys when no randomId dependency is injected", async () => {
+    const defaultHarness = createHarness();
+
+    const result = await defaultHarness.service.createUploadUrl({
+      contentType: "image/png",
+      filename: "avatar.png",
+      userId: "user_123",
+    });
+
+    const keyId = result.key
+      .replace("users/user_123/uploads/2026/03/", "")
+      .replace("-avatar.png", "");
+
+    expect(keyId).toHaveLength(21);
+    expect(keyId).not.toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    );
   });
 
   it("creates multipart uploads inside the authenticated user prefix", async () => {
