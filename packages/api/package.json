@@ -18,6 +18,7 @@
     "build": "tsgo",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsgo --watch",
+    "test": "vitest run",
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
@@ -31,7 +32,9 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
     "@types/pg": "^8.18.0",
-    "@typescript/native-preview": "catalog:"
+    "@typescript/native-preview": "catalog:",
+    "vitest": "^4.0.8"
   }
 }

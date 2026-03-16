@@ -8,6 +8,7 @@
     "declaration": false,
     "declarationMap": false,
     "emitDeclarationOnly": false,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node", "vitest/globals"]
   }
 }

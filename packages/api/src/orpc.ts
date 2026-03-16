@@ -10,6 +10,8 @@ import { type Database, db } from "@acme/db/client";
  */
 import { ORPCError, os } from "@orpc/server";
 
+import { createS3Service, type S3Service } from "./s3";
+
 /**
  * 1. CONTEXT
  *
@@ -27,11 +29,13 @@ export interface Context {
   authApi: AuthApi;
   session: Session | null;
   db: Database;
+  s3: S3Service;
 }
 
 export async function createContext(opts: {
   headers: Headers;
   auth: Auth;
+  s3?: S3Service;
 }): Promise<Context> {
   const authApi = opts.auth.api;
   const session = await authApi.getSession({
@@ -40,6 +44,7 @@ export async function createContext(opts: {
   return {
     authApi,
     db,
+    s3: opts.s3 ?? createS3Service(),
     session,
   };
 }
