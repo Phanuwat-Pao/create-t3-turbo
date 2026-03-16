@@ -96,6 +96,25 @@ cp .env.example .env
 pnpm db:push
 ```
 
+#### Optional: configure presigned S3 storage
+
+The Next.js app can issue authenticated presigned upload and download URLs without proxying file bytes through the app server. Add these server-side variables when you want to enable storage:
+
+```bash
+S3_REGION=us-east-1
+S3_BUCKET=your-bucket
+S3_ACCESS_KEY_ID=...
+S3_SECRET_ACCESS_KEY=...
+
+# Optional
+S3_ENDPOINT=https://s3.amazonaws.com
+S3_FORCE_PATH_STYLE=false
+S3_UPLOAD_URL_EXPIRES_IN=900
+S3_DOWNLOAD_URL_EXPIRES_IN=900
+```
+
+The storage API is authenticated, generates keys under `users/<userId>/...`, and supports both single-request uploads and multipart uploads.
+
 ### 2. Generate Better Auth Schema
 
 This project uses [Better Auth](https://www.better-auth.com) for authentication. The auth schema needs to be generated using the Better Auth CLI before you can use the authentication features.
