@@ -18,9 +18,9 @@
   "dependencies": {
     "@acme/db": "workspace:*",
     "@better-auth/expo": "catalog:",
-    "@better-auth/oauth-provider": "^1.5.4",
-    "@better-auth/passkey": "^1.5.4",
-    "@t3-oss/env-core": "^0.13.10",
+    "@better-auth/oauth-provider": "^1.5.6",
+    "@better-auth/passkey": "^1.5.6",
+    "@t3-oss/env-core": "^0.13.11",
     "better-auth": "catalog:",
     "zod": "catalog:"
   },

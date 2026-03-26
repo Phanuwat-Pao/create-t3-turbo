@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "~/auth/server";
 import AccountSwitcher from "~/components/account-switch";
+import type { SessionData } from "~/data/user/session-query";
 import { getDictionary } from "~/i18n/get-dictionary";
 import type { Locale } from "~/i18n/i18n-config";
 
@@ -17,9 +18,9 @@ export default async function Page({ params }: PageProps) {
   const { lang } = await params;
   const requestHeaders = await headers();
 
-  const session = await auth.api.getSession({
+  const session = (await auth.api.getSession({
     headers: requestHeaders,
-  });
+  })) as SessionData | null;
   if (!session) {
     redirect("/sign-in");
   }

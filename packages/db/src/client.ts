@@ -1,5 +1,9 @@
 import type { ExtractTablesWithRelations } from "drizzle-orm";
-import { type NodePgQueryResultHKT, drizzle } from "drizzle-orm/node-postgres";
+import {
+  type NodePgDatabase,
+  type NodePgQueryResultHKT,
+  drizzle,
+} from "drizzle-orm/node-postgres";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 
 import * as schema from "./schema";
@@ -8,10 +12,13 @@ if (!process.env.POSTGRES_URL) {
   throw new Error("Missing POSTGRES_URL");
 }
 
-export const db = drizzle(process.env.POSTGRES_URL, {
-  casing: "snake_case",
-  schema,
-});
+export const db: NodePgDatabase<typeof schema> = drizzle(
+  process.env.POSTGRES_URL,
+  {
+    casing: "snake_case",
+    schema,
+  }
+);
 
 // Define the structure of your schema and its relations
 type Schema = typeof schema;

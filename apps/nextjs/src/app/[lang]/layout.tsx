@@ -7,7 +7,6 @@ import Header from "~/components/header";
 import Providers from "~/components/providers";
 import { createMetadata } from "~/lib/metadata";
 
-// @ts-expect-error -- CSS side-effect import handled by Next.js bundler
 import "~/app/styles.css";
 
 export const metadata: Metadata = createMetadata({

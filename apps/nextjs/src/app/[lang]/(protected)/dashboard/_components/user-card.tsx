@@ -199,7 +199,7 @@ function AddPasskey({ dict }: { dict: Dictionary }) {
       name: passkeyName,
     });
     if (res?.error) {
-      toast.error(res?.error.message);
+      toast.error(String(res?.error.message));
     } else {
       setIsOpen(false);
       toast.success(dict.dashboard.passkeys.addedSuccess);
@@ -316,7 +316,7 @@ function ListPasskeys({ dict }: { dict: Dictionary }) {
     });
     setIsLoading(false);
     if (res?.error) {
-      toast.error(res?.error.message);
+      toast.error(String(res?.error.message));
     } else {
       toast.success(dict.dashboard.passkeys.addedSuccess);
     }

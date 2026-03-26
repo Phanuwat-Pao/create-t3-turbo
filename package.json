@@ -21,27 +21,28 @@
     "check:fix": "ultracite fix",
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
+    "prepare": "lefthook install",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
   "devDependencies": {
-    "@turbo/gen": "^2.8.13",
+    "@turbo/gen": "^2.8.20",
     "@typescript/native-preview": "catalog:",
     "dotenv-cli": "^11.0.0",
-    "lefthook": "^2.1.2",
-    "npm-check-updates": "^19.6.3",
-    "oxfmt": "^0.36.0",
-    "oxlint": "^1.51.0",
-    "turbo": "^2.8.13",
-    "ultracite": "7.2.5"
+    "lefthook": "^2.1.4",
+    "npm-check-updates": "^19.6.5",
+    "oxfmt": "^0.42.0",
+    "oxlint": "^1.57.0",
+    "turbo": "^2.8.20",
+    "ultracite": "7.3.2"
   },
   "engines": {
     "node": ">=22.12.0",
     "pnpm": ">=9.15.4"
   },
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.33.0",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@tailwindcss/oxide",
