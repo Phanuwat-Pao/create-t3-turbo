@@ -53,6 +53,7 @@ export interface InitAuthOptions<
 
   appName?: string;
   extraPlugins?: TExtraPlugins;
+  trustedOrigins?: string[];
 
   sendEmail?: (options: {
     to: string;
@@ -277,6 +278,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     trustedOrigins: [
       "expo://",
       `https://*.${new URL(options.productionUrl).hostname}`,
+      ...(options.trustedOrigins ?? []),
     ],
   } satisfies BetterAuthOptions;
 

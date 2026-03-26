@@ -23,6 +23,7 @@ export const auth = initAuth({
   productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL ?? "turbo.t3.gg"}`,
   secret: env.AUTH_SECRET,
   sendEmail,
+  trustedOrigins: env.TRUSTED_ORIGINS,
 });
 
 export const getSession = cache(async () =>
