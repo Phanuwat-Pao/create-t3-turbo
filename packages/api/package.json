@@ -17,7 +17,7 @@
     "ncu": "ncu -u",
     "build": "tsgo",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsgo --watch",
+    "dev": "tsgo",
     "test": "vitest run",
     "typecheck": "tsgo --noEmit"
   },
