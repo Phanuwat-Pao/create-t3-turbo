@@ -25,8 +25,8 @@
     "@acme/auth": "workspace:*",
     "@acme/db": "workspace:*",
     "@acme/validators": "workspace:*",
-    "@aws-sdk/client-s3": "^3.1016.0",
-    "@aws-sdk/s3-request-presigner": "^3.1016.0",
+    "@aws-sdk/client-s3": "^3.1025.0",
+    "@aws-sdk/s3-request-presigner": "^3.1025.0",
     "@orpc/server": "catalog:",
     "nanoid": "^5.1.7",
     "zod": "catalog:"
@@ -36,6 +36,6 @@
     "@types/node": "catalog:",
     "@types/pg": "^8.20.0",
     "@typescript/native-preview": "catalog:",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.2"
   }
 }

@@ -22,6 +22,7 @@ export const orpc = createTanstackQueryUtils(orpcClient);
 
 // Provider only needs QueryClientProvider (no TRPCProvider needed in oRPC)
 export function ORPCReactProvider(props: { children: React.ReactNode }) {
+  // eslint-disable-next-line react/hook-use-state -- intentionally read-only; singleton query client
   const [queryClient] = useState(() => getQueryClient());
 
   return (

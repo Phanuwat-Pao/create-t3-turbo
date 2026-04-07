@@ -10,8 +10,9 @@
     "auth:generate": "pnpm -F @acme/auth generate",
     "db:push": "turbo -F @acme/db push",
     "db:studio": "turbo -F @acme/db studio",
-    "dev": "turbo watch dev --continue",
+    "dev": "turbo watch dev --continue -F !@acme/expo",
     "dev:next": "turbo watch dev -F @acme/nextjs...",
+    "dev:tui": "TURBO_UI=tui turbo watch dev --continue",
     "e2e": "turbo run e2e -F @acme/e2e",
     "e2e:debug": "turbo run e2e:debug -F @acme/e2e",
     "e2e:headed": "turbo run e2e:headed -F @acme/e2e",
@@ -28,15 +29,15 @@
     "ios": "expo run:ios"
   },
   "devDependencies": {
-    "@turbo/gen": "^2.8.20",
+    "@turbo/gen": "^2.9.4",
     "@typescript/native-preview": "catalog:",
     "dotenv-cli": "^11.0.0",
-    "lefthook": "^2.1.4",
-    "npm-check-updates": "^19.6.5",
-    "oxfmt": "^0.42.0",
-    "oxlint": "^1.57.0",
-    "turbo": "^2.8.20",
-    "ultracite": "7.3.2"
+    "lefthook": "^2.1.5",
+    "npm-check-updates": "^20.0.0",
+    "oxfmt": "^0.44.0",
+    "oxlint": "^1.59.0",
+    "turbo": "^2.9.4",
+    "ultracite": "7.4.3"
   },
   "engines": {
     "node": ">=22.12.0",
@@ -53,10 +54,6 @@
       "lightningcss": "1.30.1",
       "vite": "7.1.12"
     },
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "@better-auth/utils": "0.3.1"
-      }
-    }
+    "peerDependencyRules": {}
   }
 }
