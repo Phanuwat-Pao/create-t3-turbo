@@ -33,8 +33,8 @@ COPY .gitignore .gitignore
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
-# Skip lifecycle scripts (prepare requires git for lefthook) then rebuild native addons
-RUN pnpm install --ignore-scripts && pnpm rebuild
+# Skip lifecycle scripts (prepare requires git for lefthook)
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 FROM installer AS builder
 
