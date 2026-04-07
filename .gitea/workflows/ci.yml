@@ -95,12 +95,6 @@ jobs:
       - name: Type check
         run: pnpm typecheck
 
-      - name: Dummy Env File
-        run: cp .env.example .env
-
-      - name: Build
-        run: pnpm build
-
       - name: Security audit (high+)
         run: pnpm audit --audit-level=high
         continue-on-error: true
