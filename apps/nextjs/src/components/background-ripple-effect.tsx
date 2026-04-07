@@ -81,7 +81,7 @@ const GridCell = memo(function GridCell({
       )}
       style={{
         backgroundColor: fillColor,
-        borderColor: borderColor,
+        borderColor,
         ...style,
       }}
       onClick={interactive ? handleClick : undefined}

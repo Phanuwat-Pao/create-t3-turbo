@@ -12,7 +12,7 @@
     "db:studio": "turbo -F @acme/db studio",
     "dev": "turbo watch dev --continue -F !@acme/expo",
     "dev:next": "turbo watch dev -F @acme/nextjs...",
-    "dev:tui": "TURBO_UI=tui turbo watch dev --continue",
+    "dev:tui": "turbo watch dev --continue --ui tui",
     "e2e": "turbo run e2e -F @acme/e2e",
     "e2e:debug": "turbo run e2e:debug -F @acme/e2e",
     "e2e:headed": "turbo run e2e:headed -F @acme/e2e",
