@@ -31,7 +31,7 @@ async function handleRequest(request: Request) {
   // Provide initial context if needed
   const { response } = await handler.handle(request, {
     context,
-    prefix: `/api/rest`,
+    prefix: `/api/rpc`,
   });
 
   return response ?? new Response("Not found", { status: 404 });
