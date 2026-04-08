@@ -33,8 +33,7 @@ COPY .gitignore .gitignore
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
-# Skip lifecycle scripts (prepare requires git for lefthook)
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm install --frozen-lockfile
 
 from installer AS builder
 # Build the project
@@ -59,7 +58,7 @@ COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 
-RUN pnpm install --prod --ignore-scripts
+RUN pnpm install --prod --frozen-lockfile
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs

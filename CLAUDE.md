@@ -51,6 +51,8 @@ For behavior changes, include clear manual verification steps in your PR. If you
 
 ## Commit & Pull Request Guidelines
 
+**Never use `--no-verify` to bypass pre-commit hooks.** If a hook fails, fix the underlying code or configuration issue instead of skipping it.
+
 Follow the existing Conventional Commit pattern from history (for example: `feat: ...`, `fix: ...`, `refactor: ...`, `chore: ...`). Keep each commit scoped to one logical change.
 
 PRs should include:
