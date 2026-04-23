@@ -16,6 +16,7 @@ import { auth } from "~/auth/server";
 import { Logo } from "~/components/logo";
 import { getDictionary } from "~/i18n/get-dictionary";
 import type { Locale } from "~/i18n/i18n-config";
+import { getAvatarUrl } from "~/lib/avatar";
 
 import { ConsentBtns } from "./_components/consent-buttons";
 
@@ -89,7 +90,7 @@ export default async function AuthorizePage({
             <div className="h-16 w-16 overflow-hidden rounded-full">
               <Avatar className="hidden h-16 w-16 sm:flex">
                 <AvatarImage
-                  src={session?.user.image || "#"}
+                  src={session?.user.id ? getAvatarUrl(session.user.id) : "#"}
                   alt="Avatar"
                   className="object-cover"
                 />

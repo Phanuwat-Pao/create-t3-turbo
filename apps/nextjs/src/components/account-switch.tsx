@@ -20,6 +20,7 @@ import { getQueryClient } from "~/data/query-client";
 import { userKeys } from "~/data/user/keys";
 import { type SessionData, useSessionQuery } from "~/data/user/session-query";
 import type { Dictionary } from "~/i18n/get-dictionary";
+import { getAvatarUrl } from "~/lib/avatar";
 
 const noop = () => {
   /* intentionally empty */
@@ -43,7 +44,7 @@ const AccountItem = memo(function AccountItem({
   return (
     <CommandItem onSelect={handleSelect} className="text-sm">
       <Avatar className="mr-2 h-5 w-5">
-        <AvatarImage src={user.image || undefined} alt={user.name} />
+        <AvatarImage src={getAvatarUrl(user.id)} alt={user.name} />
         <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="flex w-full items-center justify-between">
@@ -104,7 +105,11 @@ export default function AccountSwitcher({
         >
           <Avatar className="mr-2 h-6 w-6">
             <AvatarImage
-              src={currentUser?.user.image || undefined}
+              src={
+                currentUser?.user.id
+                  ? getAvatarUrl(currentUser.user.id)
+                  : undefined
+              }
               alt={currentUser?.user.name}
             />
             <AvatarFallback>{currentUser?.user.name.charAt(0)}</AvatarFallback>
@@ -125,7 +130,11 @@ export default function AccountSwitcher({
                 <div className="flex items-center">
                   <Avatar className="mr-2 h-5 w-5">
                     <AvatarImage
-                      src={currentUser?.user.image || undefined}
+                      src={
+                        currentUser?.user.id
+                          ? getAvatarUrl(currentUser.user.id)
+                          : undefined
+                      }
                       alt={currentUser?.user.name}
                     />
                     <AvatarFallback>

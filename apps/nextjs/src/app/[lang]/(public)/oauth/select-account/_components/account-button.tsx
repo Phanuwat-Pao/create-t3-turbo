@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
 import type { Dictionary } from "~/i18n/get-dictionary";
+import { getAvatarUrl } from "~/lib/avatar";
 
 interface SelectAccountBtnProps {
   session: Partial<Session>;
@@ -59,7 +60,7 @@ export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
     >
       <Avatar className="mr-2 h-5 w-5">
         <AvatarImage
-          src={session.user?.image || undefined}
+          src={session.user?.id ? getAvatarUrl(session.user.id) : undefined}
           alt={session.user?.name}
         />
         <AvatarFallback>{session.user?.name?.charAt(0)}</AvatarFallback>

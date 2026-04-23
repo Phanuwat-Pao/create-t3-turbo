@@ -59,6 +59,7 @@ import { useRevokeSessionMutation } from "~/data/user/revoke-session-mutation";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
 import type { Dictionary } from "~/i18n/get-dictionary";
+import { getAvatarUrl } from "~/lib/avatar";
 
 // Extended user type with twoFactor plugin fields
 type ExtendedUser = Session["user"] & { twoFactorEnabled?: boolean };
@@ -527,7 +528,9 @@ const UserCard = (props: {
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
                 <AvatarImage
-                  src={session?.user.image || undefined}
+                  src={
+                    session?.user.id ? getAvatarUrl(session.user.id) : undefined
+                  }
                   alt={dict.dashboard.user.avatarAlt}
                   className="object-cover"
                 />

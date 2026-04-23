@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
 import type { Dictionary } from "~/i18n/get-dictionary";
+import { getOrgLogoUrl } from "~/lib/avatar";
 
 interface SelectOrganizationBtnProps {
   organization: Partial<Organization>;
@@ -63,7 +64,7 @@ export function SelectOrganizationBtn({
     >
       <Avatar className="mr-2 h-5 w-5">
         <AvatarImage
-          src={organization.logo || undefined}
+          src={organization.id ? getOrgLogoUrl(organization.id) : undefined}
           alt={organization?.name}
         />
         <AvatarFallback>{organization?.name?.charAt(0)}</AvatarFallback>

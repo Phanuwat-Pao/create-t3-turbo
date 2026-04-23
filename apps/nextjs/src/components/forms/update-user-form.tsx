@@ -8,10 +8,10 @@ import Image from "next/image";
 import { useCallback, useState } from "react";
 import * as z from "zod";
 
+import { uploadFile } from "~/data/storage/upload-file";
 import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import type { Dictionary } from "~/i18n/get-dictionary";
-import { convertImageToBase64 } from "~/lib/utils";
 
 interface UpdateUserFormValues {
   name: string;
@@ -72,13 +72,15 @@ export function UpdateUserForm({
       }
 
       try {
-        const imageBase64 = image
-          ? await convertImageToBase64(image)
-          : undefined;
+        let imageKey: string | undefined;
+        if (image) {
+          const result = await uploadFile(image);
+          imageKey = result.key;
+        }
 
         updateUserMutation.mutate(
           {
-            image: imageBase64,
+            image: imageKey,
             name: name || undefined,
           },
           {

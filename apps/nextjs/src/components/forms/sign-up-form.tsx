@@ -9,9 +9,9 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
+import { uploadFile } from "~/data/storage/upload-file";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import type { Dictionary } from "~/i18n/get-dictionary";
-import { convertImageToBase64 } from "~/lib/utils";
 
 type SignUpFormErrors = Partial<
   Record<
@@ -101,11 +101,19 @@ export function SignUpForm({
               toast.error(ctx.error.message);
             },
             onSuccess: async () => {
+              if (image) {
+                try {
+                  const result = await uploadFile(image);
+                  await authClient.updateUser({ image: result.key });
+                } catch {
+                  // Sign-up succeeded but avatar upload failed — non-blocking
+                }
+              }
               toast.success(dict.auth.signUp.successMessage);
               onSuccess?.();
             },
           },
-          image: image ? await convertImageToBase64(image) : "",
+          image: "",
           name: `${firstName} ${lastName}`,
           password,
         });

@@ -9,9 +9,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as z from "zod";
 
 import { useOrganizationCreateMutation } from "~/data/organization/organization-create-mutation";
+import { uploadFile } from "~/data/storage/upload-file";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import type { Dictionary } from "~/i18n/get-dictionary";
-import { convertImageToBase64 } from "~/lib/utils";
 
 interface CreateOrganizationFormValues {
   name: string;
@@ -88,13 +88,15 @@ export function CreateOrganizationForm({
       }
 
       try {
-        const logoBase64 = image
-          ? await convertImageToBase64(image)
-          : undefined;
+        let logoKey: string | undefined;
+        if (image) {
+          const result = await uploadFile(image);
+          logoKey = result.key;
+        }
 
         createMutation.mutate(
           {
-            logo: logoBase64,
+            logo: logoKey,
             name,
             slug,
           },

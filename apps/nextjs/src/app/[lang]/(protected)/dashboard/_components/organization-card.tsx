@@ -35,6 +35,7 @@ import { useOrganizationDetailQuery } from "~/data/organization/organization-det
 import { useOrganizationListQuery } from "~/data/organization/organization-list-query";
 import { useSessionQuery } from "~/data/user/session-query";
 import type { Dictionary } from "~/i18n/get-dictionary";
+import { getAvatarUrl, getOrgLogoUrl } from "~/lib/avatar";
 
 const ORGANIZATION_ROLES = {
   ADMIN: "admin",
@@ -73,7 +74,7 @@ interface MemberItemProps {
   member: {
     id: string;
     role: OrganizationRole;
-    user: { name: string | null; image?: string | null };
+    user: { id: string; name: string | null; image?: string | null };
   };
   currentMember: { id: string; role: OrganizationRole } | undefined;
   isRemoving: boolean;
@@ -97,7 +98,7 @@ const MemberItem = memo(function MemberItem({
       <div className="flex items-center gap-2">
         <Avatar className="h-9 w-9 sm:flex">
           <AvatarImage
-            src={member.user.image || undefined}
+            src={getAvatarUrl(member.user.id)}
             className="object-cover"
           />
           <AvatarFallback>{member.user.name?.charAt(0)}</AvatarFallback>
@@ -369,7 +370,11 @@ const OrganizationCard = (props: {
           <Avatar className="rounded-none">
             <AvatarImage
               className="h-full w-full rounded-none object-cover"
-              src={activeOrganization?.logo || undefined}
+              src={
+                activeOrganization?.id
+                  ? getOrgLogoUrl(activeOrganization.id)
+                  : undefined
+              }
             />
             <AvatarFallback className="rounded-none">
               {activeOrganization?.name?.charAt(0) || "P"}
@@ -411,7 +416,13 @@ const OrganizationCard = (props: {
                 <div>
                   <div className="flex items-center gap-2">
                     <Avatar>
-                      <AvatarImage src={session?.user.image || undefined} />
+                      <AvatarImage
+                        src={
+                          session?.user.id
+                            ? getAvatarUrl(session.user.id)
+                            : undefined
+                        }
+                      />
                       <AvatarFallback>
                         {session?.user.name?.charAt(0)}
                       </AvatarFallback>

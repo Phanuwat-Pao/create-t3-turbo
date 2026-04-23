@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
+import { getAvatarUrl } from "~/lib/avatar";
 
 export default function Page() {
   const [email, setEmail] = useState("");
@@ -140,21 +141,12 @@ export default function Page() {
             {!isPending && !error && session && (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  {session.user.image ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={session.user.image}
-                      alt="Profile"
-                      className="h-12 w-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-full">
-                      <span className="text-lg font-medium">
-                        {session.user.name?.charAt(0) ||
-                          session.user.email?.charAt(0)}
-                      </span>
-                    </div>
-                  )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={getAvatarUrl(session.user.id)}
+                    alt="Profile"
+                    className="h-12 w-12 rounded-full object-cover"
+                  />
                   <div>
                     <p className="font-medium">{session.user.name}</p>
                     <p className="text-muted-foreground text-sm">
