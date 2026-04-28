@@ -1,34 +1,23 @@
-import type { EmptyRelations } from "drizzle-orm";
-import type { ExtractTablesWithRelations } from "drizzle-orm/_relations";
-import {
-  type NodePgDatabase,
-  type NodePgTransaction,
-  drizzle,
-} from "drizzle-orm/node-postgres";
+import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 
+import { relations } from "./relations";
 import * as schema from "./schema";
 
 if (!process.env.POSTGRES_URL) {
   throw new Error("Missing POSTGRES_URL");
 }
 
-export const db: NodePgDatabase<typeof schema> = drizzle(
+export const db: NodePgDatabase<typeof schema, typeof relations> = drizzle(
   process.env.POSTGRES_URL,
   {
     casing: "snake_case",
+    relations,
     schema,
   }
 );
 
-// Define the structure of your schema and its relations
-type Schema = typeof schema;
-
-// Define the reusable Transaction type
-export type Transaction = NodePgTransaction<
-  Schema,
-  EmptyRelations,
-  ExtractTablesWithRelations<Schema>
->;
+// Reusable Transaction type derived from db.transaction's callback parameter
+export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 // Union type for db or transaction - useful for context typing
 export type Database = typeof db | Transaction;

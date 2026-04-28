@@ -1,5 +1,5 @@
 import { protectedProcedure, publicProcedure } from "@acme/api/procedures";
-import { desc, eq } from "@acme/db";
+import { eq } from "@acme/db";
 import { CreatePostSchema, Post } from "@acme/db/schema";
 import { z } from "zod/v4";
 
@@ -10,9 +10,9 @@ export default {
       path: "/all",
     })
     .handler(({ context }) =>
-      context.db._query.Post.findMany({
+      context.db.query.Post.findMany({
         limit: 10,
-        orderBy: desc(Post.id),
+        orderBy: { id: "desc" },
       })
     ),
 
@@ -23,8 +23,8 @@ export default {
     })
     .input(z.object({ id: z.string() }))
     .handler(({ context, input }) =>
-      context.db._query.Post.findFirst({
-        where: eq(Post.id, input.id),
+      context.db.query.Post.findFirst({
+        where: { id: input.id },
       })
     ),
 
