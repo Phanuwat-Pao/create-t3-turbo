@@ -10,7 +10,7 @@ export default {
       path: "/all",
     })
     .handler(({ context }) =>
-      context.db.query.Post.findMany({
+      context.db._query.Post.findMany({
         limit: 10,
         orderBy: desc(Post.id),
       })
@@ -23,7 +23,7 @@ export default {
     })
     .input(z.object({ id: z.string() }))
     .handler(({ context, input }) =>
-      context.db.query.Post.findFirst({
+      context.db._query.Post.findFirst({
         where: eq(Post.id, input.id),
       })
     ),

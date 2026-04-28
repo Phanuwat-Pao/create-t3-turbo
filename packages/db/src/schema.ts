@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { pgTable } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { createInsertSchema } from "drizzle-orm/zod";
 import { nanoid } from "nanoid";
 import { z } from "zod/v4";
 

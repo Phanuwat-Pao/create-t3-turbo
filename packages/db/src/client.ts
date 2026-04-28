@@ -1,10 +1,10 @@
-import type { ExtractTablesWithRelations } from "drizzle-orm";
+import type { EmptyRelations } from "drizzle-orm";
+import type { ExtractTablesWithRelations } from "drizzle-orm/_relations";
 import {
   type NodePgDatabase,
-  type NodePgQueryResultHKT,
+  type NodePgTransaction,
   drizzle,
 } from "drizzle-orm/node-postgres";
-import type { PgTransaction } from "drizzle-orm/pg-core";
 
 import * as schema from "./schema";
 
@@ -24,9 +24,9 @@ export const db: NodePgDatabase<typeof schema> = drizzle(
 type Schema = typeof schema;
 
 // Define the reusable Transaction type
-export type Transaction = PgTransaction<
-  NodePgQueryResultHKT,
+export type Transaction = NodePgTransaction<
   Schema,
+  EmptyRelations,
   ExtractTablesWithRelations<Schema>
 >;
 
