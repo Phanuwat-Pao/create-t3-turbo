@@ -12,7 +12,7 @@ const CACHE_MAX_AGE = 3600;
  * Keys follow the pattern: users/{userId}/uploads/...
  */
 function extractUserIdFromKey(key: string): string | null {
-  const match = key.match(/^users\/([^/]+)\//);
+  const match = key.match(/^users\/([^/]+)\//u);
   return match?.[1] ?? null;
 }
 

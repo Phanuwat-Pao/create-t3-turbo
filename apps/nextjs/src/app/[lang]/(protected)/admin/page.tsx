@@ -492,7 +492,7 @@ function AdminDashboard() {
                         mode="single"
                         selected={banForm.expirationDate}
                         onSelect={handleBanDateSelect}
-                        initialFocus
+                        autoFocus
                       />
                     </PopoverContent>
                   </Popover>

@@ -29,6 +29,9 @@ export default defineConfig({
     "import/namespace": "off",
     // Allow relative parent imports (expo build doesn't resolve ~ alias)
     "import/no-relative-parent-imports": "off",
+    // shadcn primitives intentionally apply role on div for styling control
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
     "max-statements": "off",
     // Disable no-multi-comp - allows multiple components per file (shadcn pattern)
     "react/no-multi-comp": "off",

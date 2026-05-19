@@ -50,7 +50,7 @@ export function CreateOrganizationForm({
       .string()
       .min(2, dict.validation.slugMinLength)
       .max(50, dict.validation.slugMaxLength)
-      .regex(/^[a-z0-9-]+$/, dict.validation.slugInvalidChars),
+      .regex(/^[a-z0-9-]+$/u, dict.validation.slugInvalidChars),
   });
 
   // Auto-generate slug from name if slug hasn't been manually edited
@@ -59,8 +59,8 @@ export function CreateOrganizationForm({
       const generatedSlug = name
         .trim()
         .toLowerCase()
-        .replaceAll(/\s+/g, "-")
-        .replaceAll(/[^a-z0-9-]/g, "");
+        .replaceAll(/\s+/gu, "-")
+        .replaceAll(/[^a-z0-9-]/gu, "");
       setSlug(generatedSlug);
     }
   }, [name]);

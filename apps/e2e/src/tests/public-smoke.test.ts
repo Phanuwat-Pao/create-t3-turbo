@@ -15,7 +15,7 @@ test("public sign-in flow is reachable for unauthenticated users", async ({
 
   await page.goto("/en/dashboard");
 
-  await expect(page).toHaveURL(/\/en\/sign-in(?:\?.*)?$/);
+  await expect(page).toHaveURL(/\/en\/sign-in(?:\?.*)?$/u);
   await expect(
     page.getByText("Enter your email below to login to your account")
   ).toBeVisible();

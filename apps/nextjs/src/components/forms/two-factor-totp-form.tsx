@@ -35,7 +35,7 @@ export function TwoFactorTotpForm({
     code: z
       .string()
       .length(6, dict.auth.twoFactor.codeMustBe6Digits)
-      .regex(/^\d+$/, dict.auth.twoFactor.codeMustBeDigitsOnly),
+      .regex(/^\d+$/u, dict.auth.twoFactor.codeMustBeDigitsOnly),
   });
 
   const validate = useCallback((): boolean => {

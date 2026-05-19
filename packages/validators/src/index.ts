@@ -2,20 +2,20 @@ import { z } from "zod/v4";
 
 export function sanitizeFilename(filename: string): string {
   const lastSegment = filename
-    .split(/[/\\]/)
+    .split(/[/\\]/u)
     .map((segment) => segment.trim())
     .findLast((segment) => segment.length > 0);
 
   const sanitized = (lastSegment ?? "")
-    .replaceAll(/[^A-Za-z0-9._-]+/g, "-")
-    .replaceAll(/-+/g, "-")
-    .replaceAll(/^[-.]+|[-.]+$/g, "");
+    .replaceAll(/[^A-Za-z0-9._-]+/gu, "-")
+    .replaceAll(/-+/gu, "-")
+    .replaceAll(/^[-.]+|[-.]+$/gu, "");
 
   return sanitized || "file";
 }
 
 export function buildUserStoragePrefix(userId: string): string {
-  const safeUserId = userId.trim().replaceAll(/[^A-Za-z0-9_-]+/g, "-");
+  const safeUserId = userId.trim().replaceAll(/[^A-Za-z0-9_-]+/gu, "-");
   return `users/${safeUserId}/`;
 }
 

@@ -73,6 +73,7 @@ const GridCell = memo(function GridCell({
   return (
     <button
       type="button"
+      aria-label="Trigger ripple cell"
       tabIndex={interactive ? 0 : -1}
       className={cn(
         "cell relative border-[0.5px] opacity-50 transition-opacity duration-150 will-change-transform hover:opacity-80",

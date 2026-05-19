@@ -41,7 +41,7 @@ export function TwoFactorEmailOtpForm({
     code: z
       .string()
       .length(6, dict.auth.twoFactor.otpMustBe6Digits)
-      .regex(/^\d+$/, dict.auth.twoFactor.otpMustBeDigitsOnly),
+      .regex(/^\d+$/u, dict.auth.twoFactor.otpMustBeDigitsOnly),
   });
 
   const validate = useCallback((): boolean => {

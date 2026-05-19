@@ -1,4 +1,4 @@
-import { render } from "@react-email/components";
+import { render } from "react-email";
 
 import { reactInvitationEmail } from "./invitation";
 import { reactMagicLinkEmail } from "./magic-link";
