@@ -18,6 +18,7 @@ function getBaseUrl() {
 }
 
 export const auth = initAuth({
+  adminUserIds: env.ADMIN_USER_IDS,
   baseUrl: getBaseUrl(),
   extraPlugins: [nextCookies()],
   productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL ?? "turbo.t3.gg"}`,

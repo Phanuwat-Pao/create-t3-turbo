@@ -32,6 +32,8 @@ export interface InitAuthOptions<
   productionUrl: string;
   secret: string | undefined;
 
+  adminUserIds?: string[];
+
   discordClientId?: string;
   discordClientSecret?: string;
   facebookClientId?: string;
@@ -173,7 +175,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
         disableDefaultReference: true,
       }),
       bearer(),
-      admin(),
+      admin({ adminUserIds: options.adminUserIds }),
       multiSession(),
       oAuthProxy({
         productionURL: options.productionUrl,

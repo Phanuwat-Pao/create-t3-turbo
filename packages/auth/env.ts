@@ -5,6 +5,18 @@ export function authEnv() {
   return createEnv({
     runtimeEnv: process.env,
     server: {
+      ADMIN_USER_IDS: z
+        .string()
+        .optional()
+        .transform((s) =>
+          s
+            ? s
+                .split(",")
+                .map((id) => id.trim())
+                .filter(Boolean)
+            : []
+        )
+        .pipe(z.array(z.string())),
       AUTH_DISCORD_ID: z.string().min(1).optional(),
       AUTH_DISCORD_SECRET: z.string().min(1).optional(),
       AUTH_SECRET:
