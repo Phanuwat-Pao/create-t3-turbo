@@ -6,7 +6,7 @@ import { z } from "zod/v4";
 
 export const Post = pgTable("post", (t) => ({
   content: t.text().notNull(),
-  createdAt: t.timestamp().defaultNow().notNull(),
+  createdAt: t.timestamp({ withTimezone: true }).defaultNow().notNull(),
   id: t.text().notNull().primaryKey().$defaultFn(nanoid),
   title: t.varchar({ length: 256 }).notNull(),
   updatedAt: t
