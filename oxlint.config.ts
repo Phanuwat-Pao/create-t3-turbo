@@ -5,7 +5,11 @@ import react from "ultracite/oxlint/react";
 
 export default defineConfig({
   ...core,
-  ignorePatterns: [...(core.ignorePatterns ?? []), "oxlint.config.ts"],
+  ignorePatterns: [
+    ...(core.ignorePatterns ?? []),
+    "oxlint.config.ts",
+    "**/.pnpm-store/**",
+  ],
   overrides: [...(core.overrides ?? []), ...(next.overrides ?? [])],
   plugins: [
     ...(core.plugins ?? []),
