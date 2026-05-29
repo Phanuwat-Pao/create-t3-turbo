@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main
+      # - main
       - "release/*"
       - "develop"
       - "feature/*"
@@ -297,6 +297,7 @@ jobs:
           {
             "repo": "${{ github.event.repository.name }}",
             "service": "${{ matrix.service }}",
+            "branch": "${{ github.ref_name }}",
             "tag": "${{ steps.meta.outputs.tag }}",
             "image": "${{ steps.meta.outputs.image }}"
           }
@@ -328,64 +329,24 @@ jobs:
             exit 1
           fi
 
-      - name: "🗑️ Harbor Retention (keep last 3)"
+      - name: Harbor retention (keep 3 per branch)
         if: steps.changes.outputs.build == 'true'
         continue-on-error: true
         env:
-          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          HARBOR_USER: ${{ secrets.REGISTRY_USERNAME }}
+          HARBOR_PASS: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
-          PROJECT="${{ github.event.repository.name }}"
-          REPO="${{ matrix.service }}"
-          API="https://${REGISTRY_URL}/api/v2.0"
-
-          echo "🗑️ Harbor Retention"
-          echo "   Registry: ${REGISTRY_URL}"
-          echo "   Project:  ${PROJECT}"
-          echo "   Repo:     ${REPO}"
-          echo ""
-
-          # List all tags sorted by push time (newest first), skip 'latest'
-          echo "::group::Fetching tags from Harbor"
-          RESPONSE=$(curl -s -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
-            "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts?sort=-push_time&page_size=100")
-
-          if echo "${RESPONSE}" | jq empty 2>/dev/null; then
-            TAGS=$(echo "${RESPONSE}" | jq -r '.[].tags[]?.name // empty' | grep -v '^latest$')
-          else
-            echo "::warning::Cannot parse Harbor response: ${RESPONSE}"
-            echo "⚠️ Skipping retention"
-            exit 0
-          fi
-          echo "::endgroup::"
-
-          if [ -z "${TAGS}" ]; then
-            echo "ℹ️ No tags found (or only 'latest') → nothing to clean"
-            exit 0
-          fi
-
-          TOTAL=$(echo "${TAGS}" | wc -l)
-          echo "📋 Found ${TOTAL} tags (excluding latest):"
-
-          COUNT=0
-          DELETED=0
-          for TAG in ${TAGS}; do
-            COUNT=$((COUNT + 1))
-            if [ ${COUNT} -le 3 ]; then
-              echo "   ✅ KEEP  [${COUNT}] ${TAG}"
-            else
-              echo "   🗑️ DEL   [${COUNT}] ${TAG}"
-              DEL_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-                -X DELETE -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
-                "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts/${TAG}")
-              if [ "${DEL_CODE}" -ge 200 ] && [ "${DEL_CODE}" -lt 300 ]; then
-                DELETED=$((DELETED + 1))
-              else
-                echo "   ⚠️ Failed to delete ${TAG} (HTTP ${DEL_CODE})"
-              fi
-            fi
-          done
-
-          echo ""
-          echo "✅ Retention complete: kept 3, deleted ${DELETED}"
+          API="https://${{ secrets.REGISTRY_URL }}/api/v2.0"
+          PAIRS=$(curl -fsS -u "${HARBOR_USER}:${HARBOR_PASS}" \
+            "${API}/projects/${{ github.event.repository.name }}/repositories/${{ matrix.service }}/artifacts?sort=-push_time&page_size=100" \
+            | jq -r '[.[] | (.tags // [])[]?.name | select(. != "latest" and . != null)] | .[] | "\(sub("-sha-[a-f0-9]{7,}$"; ""))|\(.)"')
+          [ -z "${PAIRS}" ] && exit 0
+          declare -A SEEN
+          while IFS='|' read -r BRANCH TAG; do
+            [ -z "${TAG}" ] && continue
+            CURRENT=$(( ${SEEN[${BRANCH}]:-0} + 1 ))
+            SEEN[${BRANCH}]=${CURRENT}
+            [ ${CURRENT} -le 3 ] && continue
+            curl -sS -o /dev/null -X DELETE -u "${HARBOR_USER}:${HARBOR_PASS}" \
+              "${API}/projects/${{ github.event.repository.name }}/repositories/${{ matrix.service }}/artifacts/${TAG}" || true
+          done <<< "${PAIRS}"
