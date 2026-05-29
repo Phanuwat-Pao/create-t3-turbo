@@ -1,5 +1,4 @@
 pre-commit:
-  parallel: true
   jobs:
     - name: lint-format
       run: pnpm check:fix
@@ -12,9 +11,13 @@ pre-commit:
         - "*.jsonc"
         - "*.css"
       stage_fixed: true
-    - name: typecheck
-      run: pnpm typecheck
-    - name: lint-workspace
-      run: pnpm lint:ws
-    - name: build
-      run: pnpm build
+    - name: parallel-checks
+      group:
+        parallel: true
+        jobs:
+          - name: typecheck
+            run: pnpm typecheck
+          - name: lint-workspace
+            run: pnpm lint:ws
+          - name: build
+            run: pnpm build
