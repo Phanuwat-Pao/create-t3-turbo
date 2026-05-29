@@ -71,7 +71,7 @@ export default function LineTabsLayout() {
           options={{
             tabBarIcon: ({ color, size }) => (
               // <Ionicons name="home" color={color} size={size} />
-              <HomeIcon color={color} size={size} />
+              <HomeIcon color={color as string} size={size} />
             ),
             title: t("navigation.home"),
           }}
@@ -81,7 +81,7 @@ export default function LineTabsLayout() {
           options={{
             tabBarIcon: ({ color, size }) => (
               // <Ionicons name="message" color={color} size={size} />
-              <TargetIcon color={color} size={size} />
+              <TargetIcon color={color as string} size={size} />
             ),
             title: t("navigation.rooms"),
           }}
@@ -91,7 +91,7 @@ export default function LineTabsLayout() {
           options={{
             tabBarIcon: ({ color, size }) => (
               // <Ionicons name="dashboard" color={color} size={size} />
-              <AppsIcon color={color} size={size} />
+              <AppsIcon color={color as string} size={size} />
             ),
             title: t("navigation.contacts"),
           }}

@@ -8,6 +8,7 @@ allowBuilds:
   bufferutil: true
   esbuild: true
   lefthook: true
+  msgpackr-extract: true
   sharp: true
   vue-demi: true
 
@@ -97,6 +98,8 @@ overrides:
   path-to-regexp: ">=8.4.0"
   picomatch: ">=2.3.2"
   postcss: ">=8.5.10"
+  qs: ">=6.15.2"
   unhead: ">=2.1.13"
+  uuid: ">=11.1.1"
   vite: 8.0.13
   ws: ">=8.20.1"
