@@ -15,6 +15,8 @@ pre-commit:
       group:
         parallel: true
         jobs:
+          - name: audit-critical
+            run: pnpm audit --audit-level critical
           - name: typecheck
             run: pnpm typecheck
           - name: lint-workspace
