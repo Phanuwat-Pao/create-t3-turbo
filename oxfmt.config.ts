@@ -1,0 +1,43 @@
+// Ultracite oxfmt Configuration
+// https://oxc.rs/docs/guide/usage/formatter/config-file-reference.html
+export default {
+  $schema: "./node_modules/oxfmt/configuration_schema.json",
+  printWidth: 80,
+  tabWidth: 2,
+  useTabs: false,
+  semi: true,
+  singleQuote: false,
+  quoteProps: "as-needed",
+  jsxSingleQuote: false,
+  trailingComma: "es5",
+  bracketSpacing: true,
+  bracketSameLine: false,
+  arrowParens: "always",
+  endOfLine: "lf",
+  experimentalSortPackageJson: true,
+  experimentalTailwindcss: {
+    functions: ["cva", "cx", "cn"],
+  },
+  experimentalSortImports: {
+    ignoreCase: true,
+    newlinesBetween: true,
+    order: "asc",
+  },
+  importOrder: [
+    "<TYPES>",
+    "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
+    "^(next/(.*)$)|^(next$)",
+    "^(expo(.*)$)|^(expo$)",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "<TYPES>^@acme",
+    "^@acme/(.*)$",
+    "",
+    "<TYPES>^[.|..|~]",
+    "^~/",
+    "^[../]",
+    "^[./]",
+  ],
+  importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
+  importOrderTypeScriptVersion: "5.0.0",
+};
