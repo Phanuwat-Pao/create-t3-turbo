@@ -6,6 +6,7 @@ import { CORSPlugin } from "@orpc/server/plugins";
 import { auth } from "~/auth/server";
 import origins from "~/config/origin";
 import { s3 } from "~/server/s3";
+
 function logError(error: unknown) {
   console.error(">>> oRPC Error:", error);
 }

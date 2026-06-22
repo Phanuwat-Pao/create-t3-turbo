@@ -1,18 +1,15 @@
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 
 import { relations } from "./relations";
-import * as schema from "./schema";
 
 if (!process.env.POSTGRES_URL) {
   throw new Error("Missing POSTGRES_URL");
 }
 
-export const db: NodePgDatabase<typeof schema, typeof relations> = drizzle(
+export const db: NodePgDatabase<typeof relations> = drizzle(
   process.env.POSTGRES_URL,
   {
-    casing: "snake_case",
     relations,
-    schema,
   }
 );
 

@@ -22,66 +22,68 @@ interface TabButtonProps {
   activeTabClassName?: string;
 }
 
-const TabButton = memo(function TabButton({
-  tab,
-  idx,
-  active,
-  tabs,
-  moveSelectedTabToTop,
-  onMouseEnter,
-  onMouseLeave,
-  tabClassName,
-  activeTabClassName,
-}: TabButtonProps) {
-  const handleClick = useCallback(() => {
-    moveSelectedTabToTop(idx);
-  }, [moveSelectedTabToTop, idx]);
+const TabButton = memo(
+  ({
+    tab,
+    idx,
+    active,
+    tabs,
+    moveSelectedTabToTop,
+    onMouseEnter,
+    onMouseLeave,
+    tabClassName,
+    activeTabClassName,
+  }: TabButtonProps) => {
+    const handleClick = useCallback(() => {
+      moveSelectedTabToTop(idx);
+    }, [moveSelectedTabToTop, idx]);
 
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={cn(
-        "relative rounded-full px-4 py-2 opacity-80 hover:opacity-100",
-        tabClassName
-      )}
-      style={{
-        transformStyle: "preserve-3d",
-      }}
-    >
-      {active.value === tab.value && (
-        <motion.div
-          transition={{
-            delay: 0.1,
-            duration: 0.2,
-
-            type: "keyframes",
-          }}
-          animate={{
-            x: tabs.indexOf(tab) === 0 ? [0, 0, 0] : [0, 0, 0],
-          }}
-          className={cn(
-            "absolute inset-0 bg-gray-200 opacity-100 dark:bg-zinc-900/90",
-            activeTabClassName
-          )}
-        />
-      )}
-
-      <span
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         className={cn(
-          "relative block text-black dark:text-white",
-          active.value === tab.value
-            ? "text-opacity-100 font-medium"
-            : "opacity-40"
+          "relative rounded-full px-4 py-2 opacity-80 hover:opacity-100",
+          tabClassName
         )}
+        style={{
+          transformStyle: "preserve-3d",
+        }}
       >
-        {tab.title}
-      </span>
-    </button>
-  );
-});
+        {active.value === tab.value && (
+          <motion.div
+            transition={{
+              delay: 0.1,
+              duration: 0.2,
+
+              type: "keyframes",
+            }}
+            animate={{
+              x: tabs.indexOf(tab) === 0 ? [0, 0, 0] : [0, 0, 0],
+            }}
+            className={cn(
+              "absolute inset-0 bg-gray-200 opacity-100 dark:bg-zinc-900/90",
+              activeTabClassName
+            )}
+          />
+        )}
+
+        <span
+          className={cn(
+            "relative block text-black dark:text-white",
+            active.value === tab.value
+              ? "text-opacity-100 font-medium"
+              : "opacity-40"
+          )}
+        >
+          {tab.title}
+        </span>
+      </button>
+    );
+  }
+);
 
 export const FadeInDiv = ({
   className,

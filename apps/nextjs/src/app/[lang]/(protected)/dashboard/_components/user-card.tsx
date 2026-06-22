@@ -74,47 +74,50 @@ interface SessionItemProps {
   dict: Dictionary;
 }
 
-const SessionItem = memo(function SessionItem({
-  session,
-  currentSessionId,
-  isTerminating,
-  onRevoke,
-  dict,
-}: SessionItemProps) {
-  const isCurrentSession = session.id === currentSessionId;
+const SessionItem = memo(
+  ({
+    session,
+    currentSessionId,
+    isTerminating,
+    onRevoke,
+    dict,
+  }: SessionItemProps) => {
+    const isCurrentSession = session.id === currentSessionId;
 
-  const handleRevoke = useCallback(() => {
-    onRevoke(session.token);
-  }, [session.token, onRevoke]);
+    const handleRevoke = useCallback(() => {
+      onRevoke(session.token);
+    }, [session.token, onRevoke]);
 
-  return (
-    <div>
-      <div className="flex items-center gap-2 text-sm font-medium text-black dark:text-white">
-        {new UAParser(session.userAgent || "").getDevice().type === "mobile" ? (
-          <MobileIcon />
-        ) : (
-          <Laptop size={16} />
-        )}
-        {new UAParser(session.userAgent || "").getOS().name ||
-          session.userAgent}
-        , {new UAParser(session.userAgent || "").getBrowser().name}
-        <button
-          type="button"
-          className="cursor-pointer text-xs text-red-500 underline opacity-80"
-          onClick={handleRevoke}
-        >
-          {isTerminating && <Loader2 size={15} className="animate-spin" />}
-          {!isTerminating &&
-            isCurrentSession &&
-            dict.dashboard.sessions.signOut}
-          {!isTerminating &&
-            !isCurrentSession &&
-            dict.dashboard.sessions.terminate}
-        </button>
+    return (
+      <div>
+        <div className="flex items-center gap-2 text-sm font-medium text-black dark:text-white">
+          {new UAParser(session.userAgent || "").getDevice().type ===
+          "mobile" ? (
+            <MobileIcon />
+          ) : (
+            <Laptop size={16} />
+          )}
+          {new UAParser(session.userAgent || "").getOS().name ||
+            session.userAgent}
+          , {new UAParser(session.userAgent || "").getBrowser().name}
+          <button
+            type="button"
+            className="cursor-pointer text-xs text-red-500 underline opacity-80"
+            onClick={handleRevoke}
+          >
+            {isTerminating && <Loader2 size={15} className="animate-spin" />}
+            {!isTerminating &&
+              isCurrentSession &&
+              dict.dashboard.sessions.signOut}
+            {!isTerminating &&
+              !isCurrentSession &&
+              dict.dashboard.sessions.terminate}
+          </button>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 function EditUserDialog({ dict }: { dict: Dictionary }) {
   const { data } = useSessionQuery();
@@ -269,33 +272,30 @@ interface PasskeyRowProps {
   dict: Dictionary;
 }
 
-const PasskeyRow = memo(function PasskeyRow({
-  passkey,
-  isDeleting,
-  onDelete,
-  dict,
-}: PasskeyRowProps) {
-  const handleDelete = useCallback(() => {
-    onDelete(passkey.id);
-  }, [passkey.id, onDelete]);
+const PasskeyRow = memo(
+  ({ passkey, isDeleting, onDelete, dict }: PasskeyRowProps) => {
+    const handleDelete = useCallback(() => {
+      onDelete(passkey.id);
+    }, [passkey.id, onDelete]);
 
-  return (
-    <TableRow className="flex items-center justify-between">
-      <TableCell>
-        {passkey.name || dict.dashboard.passkeys.defaultName}
-      </TableCell>
-      <TableCell className="text-right">
-        <button type="button" onClick={handleDelete}>
-          {isDeleting ? (
-            <Loader2 size={15} className="animate-spin" />
-          ) : (
-            <Trash size={15} className="cursor-pointer text-red-600" />
-          )}
-        </button>
-      </TableCell>
-    </TableRow>
-  );
-});
+    return (
+      <TableRow className="flex items-center justify-between">
+        <TableCell>
+          {passkey.name || dict.dashboard.passkeys.defaultName}
+        </TableCell>
+        <TableCell className="text-right">
+          <button type="button" onClick={handleDelete}>
+            {isDeleting ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <Trash size={15} className="cursor-pointer text-red-600" />
+            )}
+          </button>
+        </TableCell>
+      </TableRow>
+    );
+  }
+);
 
 function ListPasskeys({ dict }: { dict: Dictionary }) {
   const { data } = authClient.useListPasskeys();

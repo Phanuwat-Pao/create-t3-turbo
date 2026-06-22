@@ -2,26 +2,18 @@
 // https://oxc.rs/docs/guide/usage/formatter/config-file-reference.html
 export default {
   $schema: "./node_modules/oxfmt/configuration_schema.json",
-  printWidth: 80,
-  tabWidth: 2,
-  useTabs: false,
-  semi: true,
-  singleQuote: false,
-  quoteProps: "as-needed",
-  jsxSingleQuote: false,
-  trailingComma: "es5",
-  bracketSpacing: true,
-  bracketSameLine: false,
   arrowParens: "always",
+  bracketSameLine: false,
+  bracketSpacing: true,
   endOfLine: "lf",
-  experimentalSortPackageJson: true,
-  experimentalTailwindcss: {
-    functions: ["cva", "cx", "cn"],
-  },
   experimentalSortImports: {
     ignoreCase: true,
     newlinesBetween: true,
     order: "asc",
+  },
+  experimentalSortPackageJson: true,
+  experimentalTailwindcss: {
+    functions: ["cva", "cx", "cn"],
   },
   importOrder: [
     "<TYPES>",
@@ -40,4 +32,12 @@ export default {
   ],
   importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
   importOrderTypeScriptVersion: "5.0.0",
+  jsxSingleQuote: false,
+  printWidth: 80,
+  quoteProps: "as-needed",
+  semi: true,
+  singleQuote: false,
+  tabWidth: 2,
+  trailingComma: "es5",
+  useTabs: false,
 };

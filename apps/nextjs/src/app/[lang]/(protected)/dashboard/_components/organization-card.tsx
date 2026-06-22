@@ -50,25 +50,27 @@ interface OrganizationDropdownItemProps {
   onSelect: (orgId: string) => void;
 }
 
-const OrganizationDropdownItem = memo(function OrganizationDropdownItem({
-  orgId,
-  orgName,
-  activeOrganizationId,
-  onSelect,
-}: OrganizationDropdownItemProps) {
-  const handleClick = useCallback(() => {
-    if (orgId === activeOrganizationId) {
-      return;
-    }
-    onSelect(orgId);
-  }, [orgId, activeOrganizationId, onSelect]);
+const OrganizationDropdownItem = memo(
+  ({
+    orgId,
+    orgName,
+    activeOrganizationId,
+    onSelect,
+  }: OrganizationDropdownItemProps) => {
+    const handleClick = useCallback(() => {
+      if (orgId === activeOrganizationId) {
+        return;
+      }
+      onSelect(orgId);
+    }, [orgId, activeOrganizationId, onSelect]);
 
-  return (
-    <DropdownMenuItem className="py-1" onClick={handleClick}>
-      <p className="sm text-sm">{orgName}</p>
-    </DropdownMenuItem>
-  );
-});
+    return (
+      <DropdownMenuItem className="py-1" onClick={handleClick}>
+        <p className="sm text-sm">{orgName}</p>
+      </DropdownMenuItem>
+    );
+  }
+);
 
 interface MemberItemProps {
   member: {
@@ -82,53 +84,49 @@ interface MemberItemProps {
   dict: Dictionary;
 }
 
-const MemberItem = memo(function MemberItem({
-  member,
-  currentMember,
-  isRemoving,
-  onRemove,
-  dict,
-}: MemberItemProps) {
-  const handleRemove = useCallback(() => {
-    onRemove(member.id);
-  }, [member.id, onRemove]);
+const MemberItem = memo(
+  ({ member, currentMember, isRemoving, onRemove, dict }: MemberItemProps) => {
+    const handleRemove = useCallback(() => {
+      onRemove(member.id);
+    }, [member.id, onRemove]);
 
-  return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <Avatar className="h-9 w-9 sm:flex">
-          <AvatarImage
-            src={getAvatarUrl(member.user.id)}
-            className="object-cover"
-          />
-          <AvatarFallback>{member.user.name?.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <p className="text-sm">{member.user.name}</p>
-          <p className="text-muted-foreground text-xs">{member.role}</p>
+    return (
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Avatar className="h-9 w-9 sm:flex">
+            <AvatarImage
+              src={getAvatarUrl(member.user.id)}
+              className="object-cover"
+            />
+            <AvatarFallback>{member.user.name?.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="text-sm">{member.user.name}</p>
+            <p className="text-muted-foreground text-xs">{member.role}</p>
+          </div>
         </div>
+        {member.role !== ORGANIZATION_ROLES.OWNER &&
+          (currentMember?.role === ORGANIZATION_ROLES.OWNER ||
+            currentMember?.role === ORGANIZATION_ROLES.ADMIN) && (
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={isRemoving}
+              onClick={handleRemove}
+            >
+              {isRemoving && <Loader2 className="animate-spin" size={16} />}
+              {!isRemoving &&
+                currentMember?.id === member.id &&
+                dict.organization.leave}
+              {!isRemoving &&
+                currentMember?.id !== member.id &&
+                dict.organization.remove}
+            </Button>
+          )}
       </div>
-      {member.role !== ORGANIZATION_ROLES.OWNER &&
-        (currentMember?.role === ORGANIZATION_ROLES.OWNER ||
-          currentMember?.role === ORGANIZATION_ROLES.ADMIN) && (
-          <Button
-            size="sm"
-            variant="destructive"
-            disabled={isRemoving}
-            onClick={handleRemove}
-          >
-            {isRemoving && <Loader2 className="animate-spin" size={16} />}
-            {!isRemoving &&
-              currentMember?.id === member.id &&
-              dict.organization.leave}
-            {!isRemoving &&
-              currentMember?.id !== member.id &&
-              dict.organization.remove}
-          </Button>
-        )}
-    </div>
-  );
-});
+    );
+  }
+);
 
 interface InvitationItemProps {
   invitation: { id: string; email: string; role: OrganizationRole };
@@ -137,55 +135,52 @@ interface InvitationItemProps {
   dict: Dictionary;
 }
 
-const InvitationItem = memo(function InvitationItem({
-  invitation,
-  isCanceling,
-  onCancel,
-  dict,
-}: InvitationItemProps) {
-  const handleCancel = useCallback(() => {
-    onCancel(invitation.id);
-  }, [invitation.id, onCancel]);
+const InvitationItem = memo(
+  ({ invitation, isCanceling, onCancel, dict }: InvitationItemProps) => {
+    const handleCancel = useCallback(() => {
+      onCancel(invitation.id);
+    }, [invitation.id, onCancel]);
 
-  return (
-    <motion.div
-      className="flex items-center justify-between"
-      variants={{
-        exit: { height: 0, opacity: 0 },
-        hidden: { height: 0, opacity: 0 },
-        visible: { height: "auto", opacity: 1 },
-      }}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      layout
-    >
-      <div>
-        <p className="text-sm">{invitation.email}</p>
-        <p className="text-muted-foreground text-xs">{invitation.role}</p>
-      </div>
-      <div className="flex items-center gap-2">
-        <Button
-          disabled={isCanceling}
-          size="sm"
-          variant="destructive"
-          onClick={handleCancel}
-        >
-          {isCanceling ? (
-            <Loader2 className="animate-spin" size={16} />
-          ) : (
-            dict.organization.revoke
-          )}
-        </Button>
+    return (
+      <motion.div
+        className="flex items-center justify-between"
+        variants={{
+          exit: { height: 0, opacity: 0 },
+          hidden: { height: 0, opacity: 0 },
+          visible: { height: "auto", opacity: 1 },
+        }}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        layout
+      >
         <div>
-          <CopyButton
-            textToCopy={`${window.location.origin}/accept-invitation/${invitation.id}`}
-          />
+          <p className="text-sm">{invitation.email}</p>
+          <p className="text-muted-foreground text-xs">{invitation.role}</p>
         </div>
-      </div>
-    </motion.div>
-  );
-});
+        <div className="flex items-center gap-2">
+          <Button
+            disabled={isCanceling}
+            size="sm"
+            variant="destructive"
+            onClick={handleCancel}
+          >
+            {isCanceling ? (
+              <Loader2 className="animate-spin" size={16} />
+            ) : (
+              dict.organization.revoke
+            )}
+          </Button>
+          <div>
+            <CopyButton
+              textToCopy={`${window.location.origin}/accept-invitation/${invitation.id}`}
+            />
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+);
 
 function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
   return (

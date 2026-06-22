@@ -1,4 +1,5 @@
 import { db } from "@acme/db/client";
+import * as schema from "@acme/db/schema";
 import { expo } from "@better-auth/expo";
 import { oauthProvider } from "@better-auth/oauth-provider";
 import { passkey } from "@better-auth/passkey";
@@ -96,6 +97,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     baseURL: options.baseUrl,
     database: drizzleAdapter(db, {
       provider: "pg",
+      schema,
     }),
     emailAndPassword: {
       enabled: true,
@@ -184,6 +186,10 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       deviceAuthorization({
         expiresIn: "3min",
         interval: "5s",
+        // better-auth 1.6.20 types this plugin's `schema` option as a
+        // non-optional z.custom, which rejects `undefined` under zod 4.4.x.
+        // An empty object is a no-op in mergeSchema, satisfying the parser.
+        schema: {},
       }),
       lastLoginMethod(),
       jwt({
@@ -196,10 +202,6 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       oauthProvider({
         consentPage: "/oauth/consent",
         loginPage: "/sign-in",
-        silenceWarnings: {
-          oauthAuthServerConfig: true,
-          openidConfig: true,
-        },
       }),
       customSession(async (session) => ({
         ...session,

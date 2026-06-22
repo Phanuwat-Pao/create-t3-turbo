@@ -368,6 +368,7 @@ async function uploadMultipartFile(
           nextIndex += 1;
 
           try {
+            // oxlint-disable-next-line no-await-in-loop -- bounded concurrency: each worker drains parts sequentially while workers run in parallel
             await uploadPart(part);
           } catch (error) {
             if (isStorageUploadError(error)) {

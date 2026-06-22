@@ -1,8 +1,12 @@
 import { sql } from "drizzle-orm";
-import { pgTable } from "drizzle-orm/pg-core";
+import { pgTableCreator } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-orm/zod";
 import { nanoid } from "nanoid";
 import { z } from "zod/v4";
+
+// drizzle-orm v1 moved casing from the `drizzle()` config to table creation,
+// so bind snake_case here to keep camelCase keys mapping to snake_case columns.
+const pgTable = pgTableCreator((name) => name, "snake_case");
 
 export const Post = pgTable("post", (t) => ({
   content: t.text().notNull(),

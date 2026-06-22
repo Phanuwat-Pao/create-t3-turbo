@@ -2,9 +2,47 @@ import Ionicons from "@expo/vector-icons/AntDesign";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, Tabs } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { useColorScheme } from "react-native";
+import { type ColorValue, useColorScheme } from "react-native";
 
 import { AppsIcon, HomeIcon, TargetIcon } from "~/components/icons/icon-tab";
+
+interface TabBarIconProps {
+  color: ColorValue;
+  size: number;
+}
+
+const renderTabBarBackground = () => (
+  <LinearGradient
+    colors={["#244BDD", "#508AEB", "#2B99FF", "#8667F2"]}
+    end={{ x: 3.5, y: 1.4 }}
+    locations={[0.06, 0.15, 0.19, 0.309]}
+    start={{ x: -0.3, y: 0 }}
+    style={{
+      borderRadius: 50,
+      bottom: 0,
+      left: 0,
+      position: "absolute",
+      right: 0,
+      top: 0,
+    }}
+  />
+);
+
+const HomeTabBarIcon = ({ color, size }: TabBarIconProps) => (
+  <HomeIcon color={color as string} size={size} />
+);
+
+const RoomsTabBarIcon = ({ color, size }: TabBarIconProps) => (
+  <TargetIcon color={color as string} size={size} />
+);
+
+const ContactsTabBarIcon = ({ color, size }: TabBarIconProps) => (
+  <AppsIcon color={color as string} size={size} />
+);
+
+const SettingsTabBarIcon = ({ color, size }: TabBarIconProps) => (
+  <Ionicons color={color} name="menu" size={size} />
+);
 
 export default function LineTabsLayout() {
   const colorScheme = useColorScheme();
@@ -25,22 +63,7 @@ export default function LineTabsLayout() {
           headerTintColor: headerTint,
           headerTransparent: true,
           tabBarActiveTintColor: tabTint,
-          tabBarBackground: () => (
-            <LinearGradient
-              colors={["#244BDD", "#508AEB", "#2B99FF", "#8667F2"]}
-              end={{ x: 3.5, y: 1.4 }}
-              locations={[0.06, 0.15, 0.19, 0.309]}
-              start={{ x: -0.3, y: 0 }}
-              style={{
-                borderRadius: 50,
-                bottom: 0,
-                left: 0,
-                position: "absolute",
-                right: 0,
-                top: 0,
-              }}
-            />
-          ),
+          tabBarBackground: renderTabBarBackground,
 
           tabBarIconStyle: {
             marginTop: 15,
@@ -69,39 +92,28 @@ export default function LineTabsLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              // <Ionicons name="home" color={color} size={size} />
-              <HomeIcon color={color as string} size={size} />
-            ),
+            tabBarIcon: HomeTabBarIcon,
             title: t("navigation.home"),
           }}
         />
         <Tabs.Screen
           name="rooms"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              // <Ionicons name="message" color={color} size={size} />
-              <TargetIcon color={color as string} size={size} />
-            ),
+            tabBarIcon: RoomsTabBarIcon,
             title: t("navigation.rooms"),
           }}
         />
         <Tabs.Screen
           name="contacts"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              // <Ionicons name="dashboard" color={color} size={size} />
-              <AppsIcon color={color as string} size={size} />
-            ),
+            tabBarIcon: ContactsTabBarIcon,
             title: t("navigation.contacts"),
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons color={color} name="menu" size={size} />
-            ),
+            tabBarIcon: SettingsTabBarIcon,
             title: t("navigation.settings"),
           }}
         />

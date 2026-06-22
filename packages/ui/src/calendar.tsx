@@ -170,6 +170,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
+        // oxlint-disable-next-line react/no-unstable-nested-components -- react-day-picker render-prop override (shadcn pattern)
         Chevron: ({
           className: chevronClassName,
           orientation,
@@ -201,6 +202,7 @@ function Calendar({
           );
         },
         DayButton: CalendarDayButton,
+        // oxlint-disable-next-line react/no-unstable-nested-components -- react-day-picker render-prop override (shadcn pattern)
         Root: ({ className: rootClassName, rootRef, ...rootProps }) => (
           <div
             data-slot="calendar"
@@ -209,6 +211,7 @@ function Calendar({
             {...rootProps}
           />
         ),
+        // oxlint-disable-next-line react/no-unstable-nested-components -- react-day-picker render-prop override (shadcn pattern)
         WeekNumber: ({ children, ...weekNumberProps }) => (
           <td {...weekNumberProps}>
             <div className="flex size-(--cell-size) items-center justify-center text-center">

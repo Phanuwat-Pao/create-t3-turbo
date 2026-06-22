@@ -49,7 +49,7 @@ interface S3ServiceConfig {
 }
 
 interface S3ClientLike {
-  send(command: object): Promise<any>;
+  send: (command: object) => Promise<any>;
 }
 
 interface CreateS3ServiceDependencies {
@@ -86,29 +86,29 @@ type DownloadInput = DownloadUrlRequest & {
 };
 
 export interface S3Service {
-  abortMultipartUpload(input: AbortMultipartInput): Promise<{
+  abortMultipartUpload: (input: AbortMultipartInput) => Promise<{
     aborted: true;
     key: string;
   }>;
-  completeMultipartUpload(input: CompleteMultipartInput): Promise<{
+  completeMultipartUpload: (input: CompleteMultipartInput) => Promise<{
     key: string;
   }>;
-  createMultipartUpload(input: MultipartInput): Promise<{
+  createMultipartUpload: (input: MultipartInput) => Promise<{
     key: string;
     uploadId: string;
   }>;
-  createUploadUrl(input: UploadInput): Promise<{
+  createUploadUrl: (input: UploadInput) => Promise<{
     expiresIn: number;
     key: string;
     method: "PUT";
     url: string;
   }>;
-  getDownloadUrl(input: DownloadInput): Promise<{
+  getDownloadUrl: (input: DownloadInput) => Promise<{
     expiresIn: number;
     method: "GET";
     url: string;
   }>;
-  signMultipartPart(input: MultipartPartInput): Promise<{
+  signMultipartPart: (input: MultipartPartInput) => Promise<{
     expiresIn: number;
     partNumber: number;
     url: string;

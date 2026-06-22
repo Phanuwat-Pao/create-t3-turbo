@@ -70,6 +70,7 @@ const base = o;
  */
 const withTiming = base.use(async ({ context, next, path }) => {
   const start = Date.now();
+  // oxlint-disable-next-line node/callback-return -- oRPC `next` is awaited so its result can be timed and returned, not a Node-style callback
   const result = await next({ context });
   const end = Date.now();
   console.log(`[ORPC] ${path.join(".")} took ${end - start}ms to execute`);

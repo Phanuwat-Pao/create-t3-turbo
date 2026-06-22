@@ -72,10 +72,12 @@ export const styles = {
   },
 };
 
+const EMPTY_FOOTER_LINKS: NonNullable<BaseEmailProps["footerLinks"]> = [];
+
 export function BaseEmail({
   children,
   previewText,
-  footerLinks = [],
+  footerLinks = EMPTY_FOOTER_LINKS,
   footerText,
   brandName = "Better Auth",
   brandTagline = "Simple, secure authentication for your applications",

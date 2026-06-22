@@ -44,52 +44,54 @@ interface GridCellProps {
   onCellClick: (row: number, col: number) => void;
 }
 
-const GridCell = memo(function GridCell({
-  rowIdx,
-  colIdx,
-  fillColor,
-  borderColor,
-  style,
-  isAnimating,
-  interactive,
-  onCellClick,
-}: GridCellProps) {
-  const handleClick = useCallback(() => {
-    if (interactive) {
-      onCellClick(rowIdx, colIdx);
-    }
-  }, [interactive, onCellClick, rowIdx, colIdx]);
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (interactive && (e.key === "Enter" || e.key === " ")) {
-        e.preventDefault();
+const GridCell = memo(
+  ({
+    rowIdx,
+    colIdx,
+    fillColor,
+    borderColor,
+    style,
+    isAnimating,
+    interactive,
+    onCellClick,
+  }: GridCellProps) => {
+    const handleClick = useCallback(() => {
+      if (interactive) {
         onCellClick(rowIdx, colIdx);
       }
-    },
-    [interactive, onCellClick, rowIdx, colIdx]
-  );
+    }, [interactive, onCellClick, rowIdx, colIdx]);
 
-  return (
-    <button
-      type="button"
-      aria-label="Trigger ripple cell"
-      tabIndex={interactive ? 0 : -1}
-      className={cn(
-        "cell relative border-[0.5px] opacity-50 transition-opacity duration-150 will-change-transform hover:opacity-80",
-        isAnimating && "animate-cell-ripple [animation-fill-mode:none]",
-        !interactive && "pointer-events-none"
-      )}
-      style={{
-        backgroundColor: fillColor,
-        borderColor,
-        ...style,
-      }}
-      onClick={interactive ? handleClick : undefined}
-      onKeyDown={interactive ? handleKeyDown : undefined}
-    />
-  );
-});
+    const handleKeyDown = useCallback(
+      (e: React.KeyboardEvent) => {
+        if (interactive && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          onCellClick(rowIdx, colIdx);
+        }
+      },
+      [interactive, onCellClick, rowIdx, colIdx]
+    );
+
+    return (
+      <button
+        type="button"
+        aria-label="Trigger ripple cell"
+        tabIndex={interactive ? 0 : -1}
+        className={cn(
+          "cell relative border-[0.5px] opacity-50 transition-opacity duration-150 will-change-transform hover:opacity-80",
+          isAnimating && "animate-cell-ripple [animation-fill-mode:none]",
+          !interactive && "pointer-events-none"
+        )}
+        style={{
+          backgroundColor: fillColor,
+          borderColor,
+          ...style,
+        }}
+        onClick={interactive ? handleClick : undefined}
+        onKeyDown={interactive ? handleKeyDown : undefined}
+      />
+    );
+  }
+);
 
 const DivGrid = ({
   className,

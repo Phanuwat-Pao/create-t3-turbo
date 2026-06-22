@@ -63,101 +63,103 @@ interface UserRowProps {
   onBanToggle: (user: User) => void;
 }
 
-const UserRow = memo(function UserRow({
-  user,
-  isLoading,
-  onDelete,
-  onRevoke,
-  onImpersonate,
-  onBanToggle,
-}: UserRowProps) {
-  const handleDelete = useCallback(
-    () => onDelete(user.id),
-    [onDelete, user.id]
-  );
-  const handleRevoke = useCallback(
-    () => onRevoke(user.id),
-    [onRevoke, user.id]
-  );
-  const handleImpersonate = useCallback(
-    () => onImpersonate(user.id),
-    [onImpersonate, user.id]
-  );
-  const handleBanToggle = useCallback(
-    () => onBanToggle(user),
-    [onBanToggle, user]
-  );
+const UserRow = memo(
+  ({
+    user,
+    isLoading,
+    onDelete,
+    onRevoke,
+    onImpersonate,
+    onBanToggle,
+  }: UserRowProps) => {
+    const handleDelete = useCallback(
+      () => onDelete(user.id),
+      [onDelete, user.id]
+    );
+    const handleRevoke = useCallback(
+      () => onRevoke(user.id),
+      [onRevoke, user.id]
+    );
+    const handleImpersonate = useCallback(
+      () => onImpersonate(user.id),
+      [onImpersonate, user.id]
+    );
+    const handleBanToggle = useCallback(
+      () => onBanToggle(user),
+      [onBanToggle, user]
+    );
 
-  return (
-    <TableRow>
-      <TableCell>{user.email}</TableCell>
-      <TableCell>{user.name}</TableCell>
-      <TableCell>{user.role || "user"}</TableCell>
-      <TableCell>
-        {user.banned ? (
-          <Badge variant="destructive">Yes</Badge>
-        ) : (
-          <Badge variant="outline">No</Badge>
-        )}
-      </TableCell>
-      <TableCell>
-        <div className="flex space-x-2">
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={isLoading?.startsWith("delete")}
-          >
-            {isLoading === `delete-${user.id}` ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Trash className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRevoke}
-            disabled={isLoading?.startsWith("revoke")}
-          >
-            {isLoading === `revoke-${user.id}` ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <RefreshCw className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={handleImpersonate}
-            disabled={isLoading?.startsWith("impersonate")}
-          >
-            {isLoading === `impersonate-${user.id}` ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <UserCircle className="mr-2 h-4 w-4" />
-                Impersonate
-              </>
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleBanToggle}
-            disabled={isLoading?.startsWith("ban")}
-          >
-            {isLoading === `ban-${user.id}` && (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            )}
-            {isLoading !== `ban-${user.id}` && user.banned && "Unban"}
-            {isLoading !== `ban-${user.id}` && !user.banned && "Ban"}
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-});
+    return (
+      <TableRow>
+        <TableCell>{user.email}</TableCell>
+        <TableCell>{user.name}</TableCell>
+        <TableCell>{user.role || "user"}</TableCell>
+        <TableCell>
+          {user.banned ? (
+            <Badge variant="destructive">Yes</Badge>
+          ) : (
+            <Badge variant="outline">No</Badge>
+          )}
+        </TableCell>
+        <TableCell>
+          <div className="flex space-x-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={isLoading?.startsWith("delete")}
+            >
+              {isLoading === `delete-${user.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRevoke}
+              disabled={isLoading?.startsWith("revoke")}
+            >
+              {isLoading === `revoke-${user.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleImpersonate}
+              disabled={isLoading?.startsWith("impersonate")}
+            >
+              {isLoading === `impersonate-${user.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  Impersonate
+                </>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleBanToggle}
+              disabled={isLoading?.startsWith("ban")}
+            >
+              {isLoading === `ban-${user.id}` && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              {isLoading !== `ban-${user.id}` && user.banned && "Unban"}
+              {isLoading !== `ban-${user.id}` && !user.banned && "Ban"}
+            </Button>
+          </div>
+        </TableCell>
+      </TableRow>
+    );
+  }
+);
 
 function AdminDashboard() {
   const queryClient = useQueryClient();

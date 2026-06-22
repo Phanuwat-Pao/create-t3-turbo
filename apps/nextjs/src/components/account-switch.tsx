@@ -32,30 +32,28 @@ interface AccountItemProps {
   onSelect: (token: string) => void;
 }
 
-const AccountItem = memo(function AccountItem({
-  user,
-  sessionToken,
-  onSelect,
-}: AccountItemProps) {
-  const handleSelect = useCallback(() => {
-    onSelect(sessionToken);
-  }, [onSelect, sessionToken]);
+const AccountItem = memo(
+  ({ user, sessionToken, onSelect }: AccountItemProps) => {
+    const handleSelect = useCallback(() => {
+      onSelect(sessionToken);
+    }, [onSelect, sessionToken]);
 
-  return (
-    <CommandItem onSelect={handleSelect} className="text-sm">
-      <Avatar className="mr-2 h-5 w-5">
-        <AvatarImage src={getAvatarUrl(user.id)} alt={user.name} />
-        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-      </Avatar>
-      <div className="flex w-full items-center justify-between">
-        <div>
-          <p>{user.name}</p>
-          <p className="text-xs">({user.email})</p>
+    return (
+      <CommandItem onSelect={handleSelect} className="text-sm">
+        <Avatar className="mr-2 h-5 w-5">
+          <AvatarImage src={getAvatarUrl(user.id)} alt={user.name} />
+          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+        </Avatar>
+        <div className="flex w-full items-center justify-between">
+          <div>
+            <p>{user.name}</p>
+            <p className="text-xs">({user.email})</p>
+          </div>
         </div>
-      </div>
-    </CommandItem>
-  );
-});
+      </CommandItem>
+    );
+  }
+);
 
 export default function AccountSwitcher({
   deviceSessions,
