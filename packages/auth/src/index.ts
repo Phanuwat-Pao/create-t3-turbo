@@ -30,6 +30,7 @@ import {
   username,
 } from "better-auth/plugins";
 
+import { auditLog } from "./audit-log";
 import { translations } from "./translations";
 
 const SUPPORTED_LOCALES = new Set(["th", "en"]);
@@ -207,6 +208,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       sso(),
       scim(),
       username(),
+      auditLog(),
       i18n({
         // The web app's locale is path-based (/th, /en), so the Referer path
         // is the source of truth there; Accept-Language covers Expo and

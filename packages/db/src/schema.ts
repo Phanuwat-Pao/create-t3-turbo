@@ -4,6 +4,8 @@ import { createInsertSchema } from "drizzle-orm/zod";
 import { nanoid } from "nanoid";
 import { z } from "zod/v4";
 
+import { user } from "./auth-schema";
+
 // drizzle-orm v1 moved casing from the `drizzle()` config to table creation,
 // so bind snake_case here to keep camelCase keys mapping to snake_case columns.
 const pgTable = pgTableCreator((name) => name, "snake_case");
@@ -16,6 +18,20 @@ export const Post = pgTable("post", (t) => ({
   updatedAt: t
     .timestamp({ mode: "date", withTimezone: true })
     .$onUpdateFn(() => sql`now()`),
+}));
+
+/**
+ * Self-hosted audit trail for auth events, captured by the auditLog plugin in
+ * packages/auth. Rows outlive their user (userId is nulled on user deletion).
+ */
+export const AuditLog = pgTable("audit_log", (t) => ({
+  action: t.text().notNull(),
+  createdAt: t.timestamp({ withTimezone: true }).defaultNow().notNull(),
+  id: t.text().notNull().primaryKey().$defaultFn(nanoid),
+  ipAddress: t.text(),
+  metadata: t.jsonb().$type<Record<string, unknown>>(),
+  userAgent: t.text(),
+  userId: t.text().references(() => user.id, { onDelete: "set null" }),
 }));
 
 export const CreatePostSchema = createInsertSchema(Post, {

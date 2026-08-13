@@ -2,6 +2,10 @@ import { o } from "./orpc";
 
 // In oRPC, routers use prefix and router for grouping
 export const appRouter = {
+  auditLog: o
+    .tag("audit-log")
+    .prefix("/audit-log")
+    .lazy(() => import("./router/audit-log")),
   auth: o
     .tag("auth")
     .prefix("/auth")

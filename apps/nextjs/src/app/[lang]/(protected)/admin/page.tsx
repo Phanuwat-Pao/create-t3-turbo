@@ -46,6 +46,8 @@ import { Toaster, toast } from "sonner";
 import { authClient } from "~/auth/client";
 import { cn } from "~/lib/utils";
 
+import { AuditLogCard } from "./_components/audit-log-card";
+
 interface User {
   id: string;
   email: string;
@@ -551,6 +553,7 @@ function AdminDashboard() {
           )}
         </CardContent>
       </Card>
+      <AuditLogCard />
     </div>
   );
 }
