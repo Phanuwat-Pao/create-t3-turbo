@@ -72,7 +72,7 @@ most common defect. Before calling work done, walk this list:
 
 - `apps/nextjs` — Next.js 16 App Router under `src/`, React 19 + React
   Compiler, Tailwind CSS 4, oRPC client + TanStack Query/Form, Better Auth
-  client, MCP endpoint (`mcp-handler`), presigned-S3 storage helpers.
+  client, presigned-S3 storage helpers.
 - `apps/expo` — Expo SDK 57 (expo-router, React Native 0.86, uniwind) under
   `src/`.
 - `apps/e2e` — Playwright end-to-end tests.

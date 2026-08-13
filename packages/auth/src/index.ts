@@ -275,7 +275,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
             return allSessions.length >= 1;
           },
         },
-        validAudiences: [options.baseUrl, `${options.baseUrl}/api/mcp`],
+        validAudiences: [options.baseUrl],
       }),
       ...(options.extraPlugins ?? []),
     ],
