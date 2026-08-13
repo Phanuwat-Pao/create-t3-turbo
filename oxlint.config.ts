@@ -27,6 +27,9 @@ export default defineConfig({
     "eslint/complexity": "off",
     // Required: ultracite core has func-style config incompatible with project conventions
     "func-style": "off",
+    // Repo convention is `function Component()` declarations (shadcn ui-add
+    // generates them too); this rule demands arrow components and fights both
+    "react/function-component-definition": "off",
     // Use no-import-type-side-effects instead (requires `import type { X }` format)
     "import/consistent-type-specifier-style": "off",
     // Disable import/namespace - false positives with @rn-primitives packages

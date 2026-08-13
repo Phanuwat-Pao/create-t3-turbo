@@ -100,6 +100,7 @@ function Carousel({
     if (!api) {
       return;
     }
+    // oxlint-disable-next-line react/react-compiler -- vendored shadcn embla wiring syncs scroll state on mount before subscribing
     onSelect(api);
     api.on("reInit", onSelect);
     api.on("select", onSelect);

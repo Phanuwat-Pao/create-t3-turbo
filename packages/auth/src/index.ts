@@ -6,12 +6,10 @@ import { passkey } from "@better-auth/passkey";
 import {
   type BetterAuthOptions,
   type BetterAuthPlugin,
-  APIError,
   betterAuth,
 } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
-  type Organization,
   admin,
   bearer,
   customSession,
@@ -291,8 +289,8 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
   return auth;
 }
 
-export { APIError };
-export type { Organization };
+export { APIError } from "better-auth";
+export type { Organization } from "better-auth/plugins";
 
 export type Auth = ReturnType<typeof initAuth>;
 export type AuthApi = Auth["api"];

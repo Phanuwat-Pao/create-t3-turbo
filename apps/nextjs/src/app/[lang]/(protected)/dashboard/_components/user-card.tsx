@@ -118,6 +118,7 @@ const SessionItem = memo(
     );
   }
 );
+SessionItem.displayName = "SessionItem";
 
 function EditUserDialog({ dict }: { dict: Dictionary }) {
   const { data } = useSessionQuery();
@@ -296,6 +297,7 @@ const PasskeyRow = memo(
     );
   }
 );
+PasskeyRow.displayName = "PasskeyRow";
 
 function ListPasskeys({ dict }: { dict: Dictionary }) {
   const { data } = authClient.useListPasskeys();

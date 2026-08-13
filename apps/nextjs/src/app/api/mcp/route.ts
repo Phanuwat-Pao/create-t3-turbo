@@ -27,11 +27,11 @@ const handler = mcpHandler(
           "echo",
           {
             description: "Echo a message",
-            inputSchema: {
+            inputSchema: z.object({
               message: z.string(),
-            },
+            }),
           },
-          async ({ message }: { message: string }) => {
+          async ({ message }) => {
             const authUrl =
               process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
             const org = jwt?.[`${authUrl}/org`];
@@ -53,10 +53,6 @@ const handler = mcpHandler(
           name: "demo-better-auth",
           version: "1.0.0",
         },
-      },
-      {
-        basePath: "/api",
-        maxDuration: 60,
         verboseLogs: true,
       }
     )(req)

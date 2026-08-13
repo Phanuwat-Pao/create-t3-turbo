@@ -8,24 +8,31 @@ import { CheckIcon } from "@radix-ui/react-icons";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import { cn } from "~/lib/utils";
 
 function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const media = window.matchMedia(query);
+      media.addEventListener("change", onChange);
+      return () => media.removeEventListener("change", onChange);
+    },
+    [query]
+  );
 
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    setMatches(media.matches);
-
-    const listener = () => setMatches(media.matches);
-    media.addEventListener("change", listener);
-
-    return () => media.removeEventListener("change", listener);
-  }, [query]);
-
-  return matches;
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => false
+  );
 }
 
 interface PricingPlan {
@@ -175,6 +182,7 @@ const PlanCard = memo(
     );
   }
 );
+PlanCard.displayName = "PlanCard";
 
 interface PricingProps {
   plans: PricingPlan[];

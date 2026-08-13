@@ -71,6 +71,7 @@ const OrganizationDropdownItem = memo(
     );
   }
 );
+OrganizationDropdownItem.displayName = "OrganizationDropdownItem";
 
 interface MemberItemProps {
   member: {
@@ -127,6 +128,7 @@ const MemberItem = memo(
     );
   }
 );
+MemberItem.displayName = "MemberItem";
 
 interface InvitationItemProps {
   invitation: { id: string; email: string; role: OrganizationRole };
@@ -181,6 +183,7 @@ const InvitationItem = memo(
     );
   }
 );
+InvitationItem.displayName = "InvitationItem";
 
 function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
   return (

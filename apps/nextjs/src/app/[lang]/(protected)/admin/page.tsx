@@ -160,6 +160,7 @@ const UserRow = memo(
     );
   }
 );
+UserRow.displayName = "UserRow";
 
 function AdminDashboard() {
   const queryClient = useQueryClient();

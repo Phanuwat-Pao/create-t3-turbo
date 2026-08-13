@@ -54,6 +54,7 @@ const AccountItem = memo(
     );
   }
 );
+AccountItem.displayName = "AccountItem";
 
 export default function AccountSwitcher({
   deviceSessions,

@@ -12,12 +12,13 @@ import {
 import { Key } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
 import { SignInForm } from "~/components/forms/sign-in-form";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
+import { useIsHydrated } from "~/hooks/use-hydrated";
 import type { Dictionary } from "~/i18n/get-dictionary";
 import { getCallbackURL } from "~/lib/shared";
 import { cn } from "~/lib/utils";
@@ -27,13 +28,9 @@ interface SignInProps {
 }
 
 export default function SignIn({ dict }: SignInProps) {
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useIsHydrated();
   const router = useRouter();
   const params = useSearchParams();
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const handleSuccess = useCallback(() => {
     router.push(getCallbackURL(params));

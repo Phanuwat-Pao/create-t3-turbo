@@ -115,4 +115,4 @@ export const protectedProcedure = withTransaction.use(({ context, next }) => {
 });
 
 // Re-export ORPCError for use in client-side error handling
-export { ORPCError };
+export { ORPCError } from "@orpc/server";

@@ -84,6 +84,7 @@ const TabButton = memo(
     );
   }
 );
+TabButton.displayName = "TabButton";
 
 export const FadeInDiv = ({
   className,

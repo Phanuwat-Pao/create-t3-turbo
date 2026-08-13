@@ -28,15 +28,15 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "drizzle-orm": "1.0.0-rc.3",
-    "nanoid": "^5.1.15",
-    "pg": "^8.22.0",
+    "drizzle-orm": "1.0.0-rc.4",
+    "nanoid": "^6.0.1",
+    "pg": "^8.23.0",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "@types/pg": "^8.20.0",
+    "@types/pg": "^8.21.0",
     "@typescript/native-preview": "catalog:",
-    "drizzle-kit": "1.0.0-rc.3"
+    "drizzle-kit": "1.0.0-rc.4"
   }
 }

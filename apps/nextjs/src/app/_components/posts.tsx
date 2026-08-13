@@ -20,7 +20,7 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 
 import { orpc } from "~/rpc/react";
 
@@ -72,7 +72,6 @@ function TextField(props: {
 
 export function CreatePostForm() {
   const queryClient = useQueryClient();
-  const formRef = useRef<{ reset: () => void } | null>(null);
 
   const createPost = useMutation(
     orpc.post.create.mutationOptions({
@@ -86,7 +85,6 @@ export function CreatePostForm() {
         );
       },
       onSuccess: async () => {
-        formRef.current?.reset();
         await queryClient.invalidateQueries({ queryKey: orpc.post.key() });
       },
     })
@@ -97,12 +95,18 @@ export function CreatePostForm() {
       content: "",
       title: "",
     },
-    onSubmit: (data) => createPost.mutate(data.value),
+    onSubmit: async (data) => {
+      try {
+        await createPost.mutateAsync(data.value);
+        form.reset();
+      } catch {
+        // Error feedback is handled by the mutation's onError toast.
+      }
+    },
     validators: {
       onSubmit: CreatePostSchema,
     },
   });
-  formRef.current = form;
 
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {

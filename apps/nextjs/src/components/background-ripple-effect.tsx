@@ -92,6 +92,7 @@ const GridCell = memo(
     );
   }
 );
+GridCell.displayName = "GridCell";
 
 const DivGrid = ({
   className,

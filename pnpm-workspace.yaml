@@ -13,33 +13,33 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  "@better-auth/expo": ^1.6.20
-  "@orpc/client": ^1.14.6
-  "@orpc/server": ^1.14.6
-  "@orpc/tanstack-query": ^1.14.6
-  "@tailwindcss/postcss": ^4.3.1
-  "@tailwindcss/vite": ^4.3.1
-  "@tanstack/react-form": ^1.33.0
-  "@tanstack/react-query": ^5.101.0
-  "@types/node": ^26.0.0
-  "@typescript/native-preview": 7.0.0-dev.20260620.1
-  "@vitejs/plugin-react": ^6.0.2
-  better-auth: ^1.6.20
-  tailwindcss: ^4.3.1
-  vite: ^8.0.16
+  "@better-auth/expo": ^1.6.27
+  "@orpc/client": ^1.15.0
+  "@orpc/server": ^1.15.0
+  "@orpc/tanstack-query": ^1.15.0
+  "@tailwindcss/postcss": ^4.3.3
+  "@tailwindcss/vite": ^4.3.3
+  "@tanstack/react-form": ^1.33.5
+  "@tanstack/react-query": ^5.101.4
+  "@types/node": ^26.2.0
+  "@typescript/native-preview": 7.0.0-dev.20260707.2
+  "@vitejs/plugin-react": ^6.0.5
+  better-auth: ^1.6.27
+  tailwindcss: ^4.3.3
+  vite: ^8.2.1
   zod: ^4.4.3
 
 catalogs:
   react19:
-    "@types/react": ^19.2.17
-    "@types/react-dom": ^19.2.3
-    react: ^19.2.7
-    react-dom: ^19.2.7
+    "@types/react": ^19.2.18
+    "@types/react-dom": ^19.2.4
+    react: ^19.2.8
+    react-dom: ^19.2.8
 
 linkWorkspacePackages: true
 
 minimumReleaseAgeExclude:
-  - "@aws-sdk/client-s3@3.1049.0"
+  - "@aws-sdk/client-s3@3.1049.0 || 3.1109.0"
   - "@aws-sdk/core@3.974.12"
   - "@aws-sdk/credential-provider-env@3.972.38"
   - "@aws-sdk/credential-provider-http@3.972.40"
@@ -53,7 +53,7 @@ minimumReleaseAgeExclude:
   - "@aws-sdk/middleware-flexible-checksums@3.974.20"
   - "@aws-sdk/middleware-sdk-s3@3.972.41"
   - "@aws-sdk/nested-clients@3.997.10"
-  - "@aws-sdk/s3-request-presigner@3.1049.0"
+  - "@aws-sdk/s3-request-presigner@3.1049.0 || 3.1109.0"
   - "@aws-sdk/token-providers@3.1049.0"
   - "@tanstack/query-core@5.100.11"
   - "@tanstack/query-devtools@5.100.11"
@@ -72,6 +72,7 @@ minimumReleaseAgeExclude:
   - react-native-safe-area-context@5.8.0
   - react-native-screens@4.25.1
   - react-email@6.1.5
+  - ultracite@7.10.3
 
 overrides:
   "@hono/node-server": ">=1.19.13"
@@ -84,7 +85,7 @@ overrides:
   flatted: ">=3.4.2"
   hono: ">=4.12.18"
   ip-address: ">=10.1.1"
-  lightningcss: 1.32.0
+  lightningcss: 1.33.0
   lodash: ">=4.18.0"
   node-forge: ">=1.4.0"
   path-to-regexp: ">=8.4.0"
@@ -94,5 +95,5 @@ overrides:
   shell-quote: ">=1.8.4"
   unhead: ">=2.1.13"
   uuid: ">=11.1.1"
-  vite: 8.0.16
+  vite: 8.2.1
   ws: ">=8.20.1"

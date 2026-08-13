@@ -32,7 +32,7 @@ export const env = createEnv({
     S3_DOWNLOAD_URL_EXPIRES_IN: z
       .string()
       .optional()
-      .transform((value) => (value ? Number.parseInt(value, 10) : 900))
+      .transform((value) => (value ? Math.trunc(Number(value)) : 900))
       .pipe(z.int().positive()),
     S3_ENDPOINT: z
       .string()
@@ -48,7 +48,7 @@ export const env = createEnv({
     S3_UPLOAD_URL_EXPIRES_IN: z
       .string()
       .optional()
-      .transform((value) => (value ? Number.parseInt(value, 10) : 900))
+      .transform((value) => (value ? Math.trunc(Number(value)) : 900))
       .pipe(z.int().positive()),
     TRUSTED_ORIGINS: z
       .string()

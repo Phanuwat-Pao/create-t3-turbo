@@ -1,5 +1,6 @@
 import { getLocales } from "expo-localization";
 import { Storage } from "expo-sqlite/kv-store";
+// oxlint-disable-next-line unicorn/prefer-export-from -- the exported instance is configured via i18n.use().init() below, so the local binding must stay
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 

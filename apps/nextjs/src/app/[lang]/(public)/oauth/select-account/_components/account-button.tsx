@@ -3,7 +3,6 @@
 import type { Session } from "@acme/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
-import { useCallback } from "react";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -16,7 +15,9 @@ interface SelectAccountBtnProps {
 }
 
 export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
-  const handleClick = useCallback(async () => {
+  // No manual useCallback: the React Compiler memoizes this itself and flags
+  // manual memoization it cannot preserve (PreserveManualMemo).
+  const handleClick = async () => {
     try {
       if (!session.session?.token) {
         toast.error(dict.oauth.selectAccount.noSession);
@@ -45,12 +46,7 @@ export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
     } catch (error) {
       toast.error(String(error));
     }
-  }, [
-    dict.oauth.selectAccount.failedToContinue,
-    dict.oauth.selectAccount.failedToSetActive,
-    dict.oauth.selectAccount.noSession,
-    session.session?.token,
-  ]);
+  };
 
   return (
     <Button

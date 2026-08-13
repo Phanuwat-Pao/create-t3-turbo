@@ -7,12 +7,13 @@ import { Input } from "@acme/ui/input";
 import { PasswordInput } from "@acme/ui/password-input";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
+import { useIsHydrated } from "~/hooks/use-hydrated";
 import type { Dictionary } from "~/i18n/get-dictionary";
 
 type SignInFormErrors = Partial<
@@ -33,7 +34,7 @@ export function SignInForm({
   dict,
 }: SignInFormProps) {
   const [loading, startTransition] = useTransition();
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useIsHydrated();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -44,10 +45,6 @@ export function SignInForm({
     password: z.string().min(1, dict.validation.passwordRequired),
     rememberMe: z.boolean(),
   });
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const validate = useCallback((): boolean => {
     const result = signInSchema.safeParse({ email, password, rememberMe });
