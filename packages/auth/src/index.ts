@@ -1,6 +1,7 @@
 import { db } from "@acme/db/client";
 import * as schema from "@acme/db/schema";
 import { expo } from "@better-auth/expo";
+import { i18n } from "@better-auth/i18n";
 import { oauthProvider } from "@better-auth/oauth-provider";
 import { passkey } from "@better-auth/passkey";
 import { scim } from "@better-auth/scim";
@@ -27,6 +28,10 @@ import {
   organization,
   twoFactor,
 } from "better-auth/plugins";
+
+import { translations } from "./translations";
+
+const SUPPORTED_LOCALES = new Set(["th", "en"]);
 
 export interface InitAuthOptions<
   TExtraPlugins extends BetterAuthPlugin[] = [],
@@ -203,6 +208,25 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       passkey(),
       sso(),
       scim(),
+      i18n({
+        // The web app's locale is path-based (/th, /en), so the Referer path
+        // is the source of truth there; Accept-Language covers Expo and
+        // direct API callers.
+        detection: ["callback", "header"],
+        getLocale: (ctx) => {
+          const referer = ctx.request?.headers.get("referer");
+          if (!referer) {
+            return null;
+          }
+          try {
+            const segment = new URL(referer).pathname.split("/")[1] ?? "";
+            return SUPPORTED_LOCALES.has(segment) ? segment : null;
+          } catch {
+            return null;
+          }
+        },
+        translations,
+      }),
       oauthProvider({
         allowDynamicClientRegistration: true,
         allowUnauthenticatedClientRegistration: true,

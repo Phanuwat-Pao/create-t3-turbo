@@ -18,6 +18,7 @@
   "dependencies": {
     "@acme/db": "workspace:*",
     "@better-auth/expo": "catalog:",
+    "@better-auth/i18n": "^1.6.27",
     "@better-auth/oauth-provider": "^1.6.27",
     "@better-auth/passkey": "^1.6.27",
     "@better-auth/scim": "^1.6.27",

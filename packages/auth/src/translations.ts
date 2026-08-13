@@ -1,0 +1,67 @@
+/**
+ * Thai translations for Better Auth server error messages, consumed by the
+ * Better Auth i18n plugin. English is the built-in default, so only
+ * non-English locales are listed. Keys are the canonical error codes from
+ * better-auth core and the twoFactor/organization plugins.
+ */
+export const translations = {
+  th: {
+    ACCOUNT_NOT_FOUND: "ไม่พบบัญชี",
+    ACCOUNT_TEMPORARILY_LOCKED:
+      "บัญชีถูกล็อกชั่วคราวจากการยืนยันที่ผิดพลาดหลายครั้ง กรุณาลองใหม่ภายหลัง",
+    BACKUP_CODES_NOT_ENABLED: "ยังไม่ได้เปิดใช้งานรหัสสำรอง",
+    CREDENTIAL_ACCOUNT_NOT_FOUND: "ไม่พบบัญชีที่ใช้รหัสผ่าน",
+    EMAIL_ALREADY_VERIFIED: "อีเมลได้รับการยืนยันแล้ว",
+    EMAIL_CAN_NOT_BE_UPDATED: "ไม่สามารถเปลี่ยนอีเมลได้",
+    EMAIL_NOT_VERIFIED: "อีเมลยังไม่ได้รับการยืนยัน",
+    FAILED_TO_CREATE_SESSION: "สร้างเซสชันไม่สำเร็จ",
+    FAILED_TO_CREATE_USER: "สร้างผู้ใช้ไม่สำเร็จ",
+    FAILED_TO_GET_SESSION: "ดึงข้อมูลเซสชันไม่สำเร็จ",
+    FAILED_TO_UNLINK_LAST_ACCOUNT: "ไม่สามารถยกเลิกการเชื่อมต่อบัญชีสุดท้ายได้",
+    FAILED_TO_UPDATE_USER: "อัปเดตข้อมูลผู้ใช้ไม่สำเร็จ",
+    INVALID_BACKUP_CODE: "รหัสสำรองไม่ถูกต้อง",
+    INVALID_CODE: "รหัสไม่ถูกต้อง",
+    INVALID_EMAIL: "อีเมลไม่ถูกต้อง",
+    INVALID_EMAIL_OR_PASSWORD: "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    INVALID_PASSWORD: "รหัสผ่านไม่ถูกต้อง",
+    INVALID_TOKEN: "โทเค็นไม่ถูกต้อง",
+    INVITATION_NOT_FOUND: "ไม่พบคำเชิญ",
+    MEMBER_NOT_FOUND: "ไม่พบสมาชิก",
+    MISSING_FIELD: "กรุณากรอกข้อมูลให้ครบถ้วน",
+    NO_ACTIVE_ORGANIZATION: "ไม่มีองค์กรที่ใช้งานอยู่",
+    ORGANIZATION_ALREADY_EXISTS: "มีองค์กรนี้อยู่แล้ว",
+    ORGANIZATION_NOT_FOUND: "ไม่พบองค์กร",
+    ORGANIZATION_SLUG_ALREADY_TAKEN: "slug ขององค์กรนี้ถูกใช้แล้ว",
+    OTP_HAS_EXPIRED: "รหัส OTP หมดอายุแล้ว",
+    OTP_NOT_ENABLED: "ยังไม่ได้เปิดใช้งาน OTP",
+    PASSWORD_ALREADY_SET: "ผู้ใช้ตั้งรหัสผ่านไว้แล้ว",
+    PASSWORD_TOO_LONG: "รหัสผ่านยาวเกินไป",
+    PASSWORD_TOO_SHORT: "รหัสผ่านสั้นเกินไป",
+    PROVIDER_NOT_FOUND: "ไม่พบผู้ให้บริการ",
+    ROLE_NOT_FOUND: "ไม่พบบทบาท",
+    SESSION_EXPIRED: "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่เพื่อดำเนินการนี้",
+    SESSION_NOT_FRESH: "เซสชันไม่ใหม่พอ กรุณาเข้าสู่ระบบอีกครั้ง",
+    SOCIAL_ACCOUNT_ALREADY_LINKED: "บัญชีโซเชียลนี้ถูกเชื่อมต่อแล้ว",
+    TOKEN_EXPIRED: "โทเค็นหมดอายุ",
+    TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE: "พยายามหลายครั้งเกินไป กรุณาขอรหัสใหม่",
+    TOTP_NOT_ENABLED: "ยังไม่ได้เปิดใช้งาน TOTP",
+    TWO_FACTOR_NOT_ENABLED: "ยังไม่ได้เปิดใช้งานการยืนยันตัวตนสองขั้นตอน",
+    USER_ALREADY_EXISTS: "มีผู้ใช้นี้อยู่แล้ว",
+    USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "มีผู้ใช้นี้อยู่แล้ว กรุณาใช้อีเมลอื่น",
+    USER_ALREADY_HAS_PASSWORD: "ผู้ใช้มีรหัสผ่านอยู่แล้ว กรุณากรอกรหัสผ่านเพื่อลบบัญชี",
+    USER_EMAIL_NOT_FOUND: "ไม่พบอีเมลผู้ใช้",
+    USER_IS_ALREADY_A_MEMBER_OF_THIS_ORGANIZATION: "ผู้ใช้เป็นสมาชิกขององค์กรนี้อยู่แล้ว",
+    USER_IS_ALREADY_INVITED_TO_THIS_ORGANIZATION: "ผู้ใช้ถูกเชิญเข้าองค์กรนี้แล้ว",
+    USER_IS_NOT_A_MEMBER_OF_THE_ORGANIZATION: "ผู้ใช้ไม่ได้เป็นสมาชิกขององค์กร",
+    USER_NOT_FOUND: "ไม่พบผู้ใช้",
+    VALIDATION_ERROR: "ข้อมูลไม่ถูกต้อง",
+    YOU_ARE_NOT_ALLOWED_TO_CANCEL_THIS_INVITATION: "คุณไม่มีสิทธิ์ยกเลิกคำเชิญนี้",
+    YOU_ARE_NOT_ALLOWED_TO_CREATE_A_NEW_ORGANIZATION: "คุณไม่มีสิทธิ์สร้างองค์กรใหม่",
+    YOU_ARE_NOT_ALLOWED_TO_DELETE_THIS_MEMBER: "คุณไม่มีสิทธิ์ลบสมาชิกนี้",
+    YOU_ARE_NOT_ALLOWED_TO_INVITE_USERS_TO_THIS_ORGANIZATION:
+      "คุณไม่มีสิทธิ์เชิญผู้ใช้เข้าองค์กรนี้",
+    YOU_ARE_NOT_THE_RECIPIENT_OF_THE_INVITATION: "คุณไม่ใช่ผู้รับคำเชิญนี้",
+    YOU_CANNOT_LEAVE_THE_ORGANIZATION_AS_THE_ONLY_OWNER:
+      "คุณไม่สามารถออกจากองค์กรได้เนื่องจากเป็นเจ้าของเพียงคนเดียว",
+  },
+};
