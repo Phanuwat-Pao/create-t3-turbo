@@ -1,28 +1,23 @@
 # create-t3-turbo
 
-> [!NOTE]
->
-> create-t3-turbo now includes the option to use Tanstack Start for the web app!
+A T3-style monorepo, kept aggressively current: a Next.js 16 web app and an
+Expo SDK 57 mobile app sharing one typed oRPC API, one Drizzle v1 Postgres
+schema, and one Better Auth setup — with dual-language (th/en) i18n across
+every surface.
 
 ## Installation
 
 > [!NOTE]
 >
-> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json#L4) before proceeding.
+> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json) before proceeding (Node ≥ 22, pnpm ≥ 11).
 
-There are two ways of initializing an app using the `create-t3-turbo` starter. You can either use this repository as a template:
-
-![use-as-template](https://github.com/t3-oss/create-t3-turbo/assets/51714798/bb6c2e5d-d8b6-416e-aeb3-b3e50e2ca994)
-
-or use Turbo's CLI to init your project (use PNPM as package manager):
+Use this repository as a template, or init via Turbo's CLI (use PNPM as the package manager):
 
 ```bash
 npx create-turbo@latest -e https://github.com/t3-oss/create-t3-turbo
 ```
 
 ## About
-
-Ever wondered how to migrate your T3 application into a monorepo? Stop right here! This is the perfect starter repo to get you running with the perfect stack!
 
 It uses [Turborepo](https://turborepo.com) and contains:
 
@@ -34,55 +29,70 @@ It uses [Turborepo](https://turborepo.com) and contains:
   └─ Recommended extensions and settings for VSCode users
 apps
   ├─ expo
-  │   ├─ Expo SDK 54
-  │   ├─ React Native 0.81 using React 19
+  │   ├─ Expo SDK 57 (React Native 0.86, React 19)
   │   ├─ Navigation using Expo Router
-  │   ├─ Tailwind CSS v4 using NativeWind v5
-  │   └─ Typesafe API calls using tRPC
+  │   ├─ Tailwind CSS v4 using uniwind
+  │   ├─ i18next with th/en resources
+  │   └─ Typesafe API calls using oRPC + Better Auth client (passkey, SSO, …)
   ├─ nextjs
-  │   ├─ Next.js 15
-  │   ├─ React 19
-  │   ├─ Tailwind CSS v4
-  │   └─ E2E Typesafe API Server & Client
-  └─ tanstack-start
-      ├─ Tanstack Start v1 (rc)
-      ├─ React 19
-      ├─ Tailwind CSS v4
-      └─ E2E Typesafe API Server & Client
+  │   ├─ Next.js 16 App Router (React 19 + React Compiler)
+  │   ├─ Tailwind CSS v4 + shadcn/ui
+  │   ├─ oRPC client with TanStack Query/Form
+  │   ├─ Path-based th/en i18n dictionaries ([lang] routes)
+  │   ├─ Full auth surface: sign-in/up (email, username, social, passkey),
+  │   │  2FA (TOTP + email OTP), device authorization, OAuth provider
+  │   │  consent/select-account/select-organization pages
+  │   ├─ Admin dashboard with self-hosted audit logs
+  │   └─ Presigned-S3 storage helpers (single + multipart uploads)
+  └─ e2e
+      └─ Playwright smoke tests against the real Next.js app
 packages
   ├─ api
-  │   └─ tRPC v11 router definition
+  │   ├─ oRPC v1 router (OpenAPI via @orpc/openapi + Scalar docs)
+  │   └─ S3 service for authenticated presigned uploads/downloads
   ├─ auth
-  │   └─ Authentication using better-auth.
+  │   ├─ Better Auth 1.6 with organization, twoFactor, passkey, admin,
+  │   │  multiSession, deviceAuthorization, username, sso (SAML), scim,
+  │   │  oauthProvider (act as an OAuth/OIDC provider), jwt, bearer,
+  │   │  oneTap, lastLoginMethod, oAuthProxy, expo
+  │   ├─ i18n plugin: server error messages localized th/en
+  │   └─ Self-hosted audit log plugin (events land in your own Postgres)
   ├─ db
-  │   └─ Typesafe db calls using Drizzle & Supabase
-  └─ ui
-      └─ Start of a UI package for the webapp using shadcn-ui
+  │   └─ Drizzle ORM v1 (relational queries v2) on PostgreSQL (node-postgres)
+  ├─ ui
+  │   └─ Shared shadcn/ui components (add more with `pnpm ui-add`)
+  └─ validators
+      └─ Shared Zod v4 schemas
 tooling
-  ├─ eslint
-  │   └─ shared, fine-grained, eslint presets
-  ├─ prettier
-  │   └─ shared prettier configuration
+  ├─ github
+  │   └─ CI setup action
   ├─ tailwind
   │   └─ shared tailwind theme and configuration
   └─ typescript
       └─ shared tsconfig you can extend from
 ```
 
+Repo-wide tooling: [Ultracite](https://ultracite.ai) (oxlint + oxfmt) for lint
+and formatting, `tsgo` (TypeScript native preview) for typechecking, Vitest for
+unit tests, shared dependency versions via pnpm catalogs in
+`pnpm-workspace.yaml`, and a lefthook pre-commit suite (format/lint, typecheck,
+workspace lint, build, and a critical `pnpm audit`) that every commit must pass.
+
 > In this template, we use `@acme` as a placeholder for package names. As a user, you might want to replace it with your own organization or project name. You can use find-and-replace to change all the instances of `@acme` to something like `@my-company` or `@project-name`.
 
 ## Quick Start
 
 > **Note**
-> The [db](./packages/db) package is preconfigured to use Supabase and is **edge-bound** with the [Vercel Postgres](https://github.com/vercel/storage/tree/main/packages/postgres) driver. If you're using something else, make the necessary modifications to the [schema](./packages/db/src/schema.ts) as well as the [client](./packages/db/src/index.ts) and the [drizzle config](./packages/db/drizzle.config.ts). If you want to switch to non-edge database driver, remove `export const runtime = "edge";` [from all pages and api routes](https://github.com/t3-oss/create-t3-turbo/issues/634#issuecomment-1730240214).
+> The [db](./packages/db) package is preconfigured for PostgreSQL via the
+> `node-postgres` driver and reads `POSTGRES_URL` from `.env` (a `:6543`
+> pooling port is swapped to `:5432` for Drizzle Kit). If you're using
+> something else, adjust the [schema](./packages/db/src/schema.ts), the
+> [client](./packages/db/src/client.ts), and the
+> [drizzle config](./packages/db/drizzle.config.ts).
 
 To get it running, follow the steps below:
 
 ### 1. Setup dependencies
-
-> [!NOTE]
->
-> While the repo does contain both a Next.js and Tanstack Start version of a web app, you can pick which one you like to use and delete the other folder before starting the setup.
 
 ```bash
 # Install dependencies
@@ -92,7 +102,8 @@ pnpm i
 # There is an `.env.example` in the root directory you can use for reference
 cp .env.example .env
 
-# Push the Drizzle schema to the database
+# Push the Drizzle schema to the database (opens turbo's TUI and asks
+# for confirmation before applying)
 pnpm db:push
 ```
 
@@ -117,11 +128,11 @@ The storage API is authenticated, generates keys under `users/<userId>/...`, and
 
 ### 2. Generate Better Auth Schema
 
-This project uses [Better Auth](https://www.better-auth.com) for authentication. The auth schema needs to be generated using the Better Auth CLI before you can use the authentication features.
+This project uses [Better Auth](https://www.better-auth.com) for authentication. The auth schema needs to be generated using the Better Auth CLI whenever the auth config changes.
 
 ```bash
 # Generate the Better Auth schema
-pnpm --filter @acme/auth generate
+pnpm auth:generate
 ```
 
 This command runs the Better Auth CLI with the following configuration:
@@ -129,13 +140,14 @@ This command runs the Better Auth CLI with the following configuration:
 - **Config file**: `packages/auth/script/auth-cli.ts` - A CLI-only configuration file (isolated from src to prevent imports)
 - **Output**: `packages/db/src/auth-schema.ts` - Generated Drizzle schema for authentication tables
 
-The generation process:
+> **Note**: The `auth-cli.ts` file is placed in the `script/` directory (instead of `src/`) to prevent accidental imports from other parts of the codebase. For runtime authentication, use the configuration from `packages/auth/src/index.ts`.
 
-1. Reads the Better Auth configuration from `packages/auth/script/auth-cli.ts`
-2. Generates the appropriate database schema based on your auth setup
-3. Outputs a Drizzle-compatible schema file to the `@acme/db` package
-
-> **Note**: The `auth-cli.ts` file is placed in the `script/` directory (instead of `src/`) to prevent accidental imports from other parts of the codebase. This file is exclusively for CLI schema generation and should **not** be used directly in your application. For runtime authentication, use the configuration from `packages/auth/src/index.ts`.
+> [!IMPORTANT]
+> Two post-generation fixups are maintained in this repo (see `AGENTS.md`):
+> the CLI's drizzle-v0 `relations()` blocks are stripped (relations live in
+> `packages/db/src/relations.ts` via `defineRelations`), and
+> `{ withTimezone: true }` is re-applied to every `timestamp(...)` column so
+> the database keeps `timestamptz`.
 
 For more information about the Better Auth CLI, see the [official documentation](https://www.better-auth.com/docs/concepts/cli#generate).
 
@@ -173,7 +185,7 @@ In order to get Better-Auth to work with Expo, you must either:
 
 Better-auth comes with an [auth proxy plugin](https://www.better-auth.com/docs/plugins/oauth-proxy). By deploying the Next.js app, you can get OAuth working in preview deployments and development for Expo apps.
 
-By using the proxy plugin, the Next.js apps will forward any auth requests to the proxy server, which will handle the OAuth flow and then redirect back to the Next.js app. This makes it easy to get OAuth working since you'll have a stable URL that is publicly accessible and doesn't change for every deployment and doesn't rely on what port the app is running on. So if port 3000 is taken and your Next.js app starts at port 3001 instead, your auth should still work without having to reconfigure the OAuth provider.
+By using the proxy plugin, the Next.js apps will forward any auth requests to the proxy server, which will handle the OAuth flow and then redirect back to the Next.js app. This makes it easy to get OAuth working since you'll have a stable URL that is publicly accessible and doesn't change for every deployment and doesn't rely on what port the app is running on.
 
 #### Add your local IP to your OAuth provider
 
@@ -195,15 +207,16 @@ To add a new package, simply run `pnpm turbo gen init` in the monorepo root. Thi
 
 The generator sets up the `package.json`, `tsconfig.json` and a `index.ts`, as well as configures all the necessary configurations for tooling around your package such as formatting, linting and typechecking. When the package is created, you're ready to go build out the package.
 
-### 6. Run the Playwright smoke test
-
-The repo includes a standalone Playwright workspace at `apps/e2e` that starts the Next.js app and exercises a public smoke path.
+### 6. Run the tests
 
 ```bash
-# Install the Chromium browser used by the e2e workspace
-pnpm e2e:install
+# Unit tests (Vitest) live in packages/validators, packages/api, apps/nextjs
+pnpm -F @acme/api test
+pnpm -F @acme/nextjs test
+pnpm -F @acme/validators test
 
-# Run the smoke suite against the real Next.js app
+# Install the Chromium browser used by the e2e workspace, then run it
+pnpm e2e:install
 pnpm e2e
 ```
 
@@ -211,17 +224,31 @@ See [`apps/e2e/README.md`](./apps/e2e/README.md) for the workspace-level setup a
 
 ## FAQ
 
-### Does the starter include Solito?
+### Where is tRPC?
 
-No. Solito will not be included in this repo. It is a great tool if you want to share code between your Next.js and Expo app. However, the main purpose of this repo is not the integration between Next.js and Expo — it's the code splitting of your T3 App into a monorepo. The Expo app is just a bonus example of how you can utilize the monorepo with multiple apps but can just as well be any app such as Vite, Electron, etc.
-
-Integrating Solito into this repo isn't hard, and there are a few [official templates](https://github.com/nandorojo/solito/tree/master/example-monorepos) by the creators of Solito that you can use as a reference.
+This template uses [oRPC](https://orpc.unnoq.com) instead: the same end-to-end
+typesafety, plus a generated OpenAPI spec (served with Scalar at `/api/docs`)
+and REST-style routes for free.
 
 ### Does this pattern leak backend code to my client applications?
 
 No, it does not. The `api` package should only be a production dependency in the Next.js application where it's served. The Expo app, and all other apps you may add in the future, should only add the `api` package as a dev dependency. This lets you have full typesafety in your client applications, while keeping your backend code safe.
 
-If you need to share runtime code between the client and server, such as input validation schemas, you can create a separate `shared` package for this and import it on both sides.
+If you need to share runtime code between the client and server, such as input validation schemas, use the `validators` package and import it on both sides.
+
+### Can this app act as an OAuth/OIDC provider?
+
+Yes. The `oauthProvider` plugin is fully wired: dynamic client registration,
+consent/select-account/select-organization pages, JWKS at `/api/auth/jwks`,
+and OAuth/OIDC discovery metadata under `/.well-known/`. SAML SSO (`sso`) and
+SCIM provisioning (`scim`) are also enabled for enterprise scenarios.
+
+### Where do audit logs go?
+
+Into your own Postgres. A small `auditLog()` plugin in `packages/auth` records
+auth events (sign-ins, password/2FA changes, organization activity, …) into
+the `audit_log` table, and the admin dashboard lists them — no third-party
+cloud involved.
 
 ## Deployment
 
@@ -230,7 +257,7 @@ If you need to share runtime code between the client and server, such as input v
 #### Prerequisites
 
 > **Note**
-> Please note that the Next.js application with tRPC must be deployed in order for the Expo app to communicate with the server in a production environment.
+> Please note that the Next.js application with oRPC must be deployed in order for the Expo app to communicate with the server in a production environment.
 
 #### Deploy to Vercel
 
@@ -238,7 +265,7 @@ Let's deploy the Next.js application to [Vercel](https://vercel.com). If you've 
 
 1. Create a new project on Vercel, select the `apps/nextjs` folder as the root directory. Vercel's zero-config system should handle all configurations for you.
 
-2. Add your `POSTGRES_URL` environment variable.
+2. Add your `POSTGRES_URL` and `AUTH_SECRET` environment variables (plus any optional S3/email variables you use).
 
 3. Done! Your app should successfully deploy. Assign your domain and use that instead of `localhost` for the `url` in the Expo app so that your Expo app can communicate with your backend when you are not in development.
 
@@ -250,9 +277,7 @@ The auth proxy comes as a better-auth plugin. This is required for the Next.js a
 
 Deploying your Expo application works slightly differently compared to Next.js on the web. Instead of "deploying" your app online, you need to submit production builds of your app to app stores, like [Apple App Store](https://www.apple.com/app-store) and [Google Play](https://play.google.com/store/apps). You can read the full [guide to distributing your app](https://docs.expo.dev/distribution/introduction), including best practices, in the Expo docs.
 
-1. Make sure to modify the `getBaseUrl` function to point to your backend's production URL:
-
-   <https://github.com/t3-oss/create-t3-turbo/blob/656965aff7db271e5e080242c4a3ce4dad5d25f8/apps/expo/src/utils/api.tsx#L20-L37>
+1. Make sure to modify the `getBaseUrl` function in `apps/expo/src/utils/base-url.ts` to point to your backend's production URL.
 
 2. Let's start by setting up [EAS Build](https://docs.expo.dev/build/introduction), which is short for Expo Application Services. The build service helps you create builds of your app, without requiring a full native development setup. The commands below are a summary of [Creating your first build](https://docs.expo.dev/build/setup).
 
