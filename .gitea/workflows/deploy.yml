@@ -9,6 +9,11 @@ on:
         type: choice
         options:
           - web
+      environment:
+        description: "Environment ปลายทาง (ตรงกับชื่อใน idp.yaml: dev, production, ...)"
+        required: true
+        type: string
+        default: dev
       tag:
         description: "Image tag (เช่น main-sha-abc1234) — ดูได้จาก registry หรือ ใน workflows ของ version ที่ต้องการ deploy"
         required: true
@@ -19,7 +24,8 @@ on:
 #   1. ไปหน้า Actions → เลือก "🚀 Deploy / Rollback"
 #   2. กด "Run workflow"
 #   3. เลือก service (web)
-#   4. ใส่ tag ที่ต้องการ deploy (เช่น main-sha-abc1234)
+#   4. เลือก environment (dev, production, ... ตาม idp.yaml)
+#   5. ใส่ tag ที่ต้องการ deploy (เช่น main-sha-abc1234)
 #
 # Rollback:
 #   ใส่ tag เก่าที่ต้องการย้อนกลับไป → MiniIDP จะ deploy tag นั้นแทน
@@ -39,6 +45,7 @@ jobs:
         run: |
           echo "📋 Deploy Request:"
           echo "   Service: ${{ inputs.service }}"
+          echo "   Env:     ${{ inputs.environment }}"
           echo "   Tag:     ${{ inputs.tag }}"
           echo "   By:      ${{ github.actor }}"
           echo "   Time:    $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
@@ -95,6 +102,7 @@ jobs:
           {
             "repo": "${{ github.event.repository.name }}",
             "service": "${{ inputs.service }}",
+            "environment": "${{ inputs.environment }}",
             "tag": "${{ inputs.tag }}",
             "image": "${IMAGE}"
           }

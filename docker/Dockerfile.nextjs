@@ -1,6 +1,9 @@
-ARG NODE_VERSION=24
+# Full image reference so CI can point the build at a registry proxy-cache
+# (avoids Docker Hub's anonymous pull rate limit); defaults to Docker Hub for
+# local builds.
+ARG NODE_IMAGE=node:24-alpine
 
-FROM node:${NODE_VERSION}-alpine AS alpine
+FROM ${NODE_IMAGE} AS alpine
 
 # This Dockerfile is copy-pasted into our main docs at /docs/handbook/deploying-with-docker.
 # Make sure you update both files!

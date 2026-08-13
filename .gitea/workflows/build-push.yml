@@ -45,9 +45,13 @@ jobs:
     timeout-minutes: 25
     needs: registry-login
     strategy:
+      fail-fast: false
       matrix:
-        service:
-          - web
+        # service = image / deploy name (must match idp.yaml)
+        # dockerfile = the Dockerfile that builds it (context is the repo root)
+        include:
+          - service: web
+            dockerfile: docker/Dockerfile.nextjs
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -71,28 +75,40 @@ jobs:
           echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_URL}" \
             -u "${REGISTRY_USERNAME}" --password-stdin
 
-      - name: Build image
+      - name: Setup Docker Buildx
         run: |
-          docker build \
-            -t "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" \
-            -f docker/Dockerfile.nextjs \
+          # Pull buildkit + base images through the Harbor proxy-cache to dodge
+          # Docker Hub's anonymous pull rate limit (429); gcr mirror as fallback.
+          cat > /tmp/buildkitd.toml <<'EOF'
+          [registry."docker.io"]
+            mirrors = ["mirror.gcr.io"]
+          EOF
+          docker buildx create --name cibuilder --use \
+            --driver-opt image=registry.telecorpthailand.com/dockerhub/moby/buildkit:buildx-stable-1 \
+            --config /tmp/buildkitd.toml
+          docker buildx inspect --bootstrap
+
+      - name: Build & push image
+        run: |
+          IMAGE="${{ steps.meta.outputs.image }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+
+          # `latest` only tracks main; other branches publish the SHA tag only.
+          EXTRA_TAG=""
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            EXTRA_TAG="-t ${IMAGE}:latest"
+          fi
+
+          docker buildx build \
+            --cache-from type=registry,ref=${IMAGE}:buildcache \
+            --cache-to   type=registry,ref=${IMAGE}:buildcache,mode=max \
+            --build-arg IMAGE_TAG="${TAG}" \
+            --build-arg NODE_IMAGE=registry.telecorpthailand.com/dockerhub/library/node:24-alpine \
+            -t "${IMAGE}:${TAG}" \
+            ${EXTRA_TAG} \
+            -f ${{ matrix.dockerfile }} \
+            --push \
             .
-
-      - name: Tag latest (main only)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker tag \
-            "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" \
-            "${{ steps.meta.outputs.image }}:latest"
-
-      - name: Push image
-        run: |
-          docker push "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
-
-      - name: Push latest (main only)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker push "${{ steps.meta.outputs.image }}:latest"
 
       - name: Summary
         run: |

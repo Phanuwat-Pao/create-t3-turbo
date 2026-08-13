@@ -3,14 +3,24 @@ name: CI
 on:
   push:
     branches:
+      # main stays disabled on purpose: enabling it makes every push to main
+      # build an image and notify MiniIDP (i.e. can deploy). Uncomment when
+      # this repo should ship from main.
       # - main
       - "release/*"
       - "develop"
       - "feature/*"
   pull_request:
 
+# scale-to-zero runners: a cold start per job is the main cost → cancel runs
+# that a newer push on the same ref has superseded, instead of waking runners
+# for a pipeline whose result is already stale.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # ─── Job 0: Wait for MiniIDP validation ───
+  # ─── Job 0: Wait for MiniIDP validation (runs alongside quality; gates build) ───
   validate:
     name: "⓪ Validate idp.yaml"
     runs-on: ubuntu-latest
@@ -55,11 +65,149 @@ jobs:
 
           echo "::warning::MiniIDP check timed out after $((MAX_ATTEMPTS * 2))s — proceeding anyway"
 
-  # ─── Job 1: Quality Gates ───
+  # ─── Job ⓪b: Affected services (turbo dependency graph) ───────────────────────
+  # Ask turbo which DEPLOYABLE apps are actually affected since the LAST
+  # SUCCESSFUL BUILD (the ci-built/<branch> marker; falls back to the push
+  # range, then build_all). This catches transitive workspace edges a
+  # hand-written path filter misses, and — more importantly here — stops a
+  # change that only touches apps/expo or apps/e2e from rebuilding the web
+  # image, since neither is ever containerised.
+  # FAIL-SAFE: any uncertainty (new branch, tooling/CI/root change, turbo
+  # error) → build_all=true → the old "rebuild everything" behaviour. We never
+  # silently skip an image that was needed.
+  affected:
+    name: "⓪ Affected services"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Deploy branches only (matches build-push): feature/PR pushes skip this
+    # job, and build-push (which needs it) skips with it.
+    if: >-
+      github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/develop' ||
+        startsWith(github.ref, 'refs/heads/release/')
+      )
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+    outputs:
+      build_all: ${{ steps.detect.outputs.build_all }}
+      services: ${{ steps.detect.outputs.services }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Install pnpm
+        # Version comes from the "packageManager" field in package.json
+        run: corepack enable
+
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "${RUNNER_TEMP}/pnpm-store"
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Detect affected deployable services
+        id: detect
+        env:
+          BEFORE: ${{ github.event.before }}
+          BRANCH: ${{ github.ref_name }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set +e -u  # fail-safe: never abort — fall back to build_all on any error
+          ZERO="0000000000000000000000000000000000000000"
+
+          emit_all() {
+            {
+              echo "build_all=true"
+              echo "services="
+            } >> "$GITHUB_OUTPUT"
+            echo "🟡 Building ALL services — $1" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          }
+
+          # Deployable services: image name -> workspace package + source dir.
+          # Only the Next.js app ships as a container; apps/expo (store builds)
+          # and apps/e2e (test harness) are deliberately excluded.
+          SERVICE="web"
+          PACKAGE="@acme/nextjs"
+          APP_DIR="apps/nextjs"
+
+          # Base = the LAST SUCCESSFULLY BUILT commit (ci-built/<branch>,
+          # advanced by mark-built after every green Build), NOT the push's own
+          # before..HEAD: concurrency cancels superseded runs, so a push-range
+          # diff silently loses every change the cancelled runs covered.
+          # Fallbacks: marker missing → push range; neither usable → build_all.
+          git fetch --quiet origin "refs/heads/ci-built/${BRANCH}" 2>/dev/null
+          MARKER=$(git rev-parse --verify -q FETCH_HEAD)
+          if [ -n "${MARKER}" ]; then
+            BASE="${MARKER}"
+            echo "base = ci-built/${BRANCH} (${BASE})"
+          else
+            BASE="${BEFORE}"
+            echo "base = push range (no ci-built/${BRANCH} marker yet)"
+          fi
+
+          if [ -z "${BASE}" ] || [ "${BASE}" = "${ZERO}" ] || ! git rev-parse "${BASE}" >/dev/null 2>&1; then
+            emit_all "no usable base SHA (new branch / force push)"
+          fi
+
+          CHANGED=$(git diff --name-only "${BASE}" "${HEAD_SHA}")
+          echo "::group::Changed files"; echo "${CHANGED}"; echo "::endgroup::"
+
+          # Global inputs turbo's task graph doesn't fully track → build all.
+          # This doubles as the manual full-rebuild lever: push a commit
+          # touching any root file, tooling/ or .gitea/ to force a fresh image.
+          echo "${CHANGED}" | grep -qE '^(tooling/|\.gitea/|[^/]+$)' \
+            && emit_all "tooling / CI / root file changed"
+
+          # 1) Dependency-graph affected (turbo): is the app's own source or any
+          #    transitive workspace dep in the range?
+          TURBO_JSON=$(TURBO_SCM_BASE="${BASE}" TURBO_SCM_HEAD="${HEAD_SHA}" \
+            pnpm turbo run build --affected --dry-run=json 2>/dev/null)
+          { [ $? -ne 0 ] || [ -z "${TURBO_JSON}" ]; } && emit_all "turbo affected failed"
+          AFFECTED_PKGS=$(echo "${TURBO_JSON}" | jq -r '.packages[]?' 2>/dev/null)
+
+          BUILD_WEB=""
+          echo "${AFFECTED_PKGS}" | grep -qx -- "${PACKAGE}" && BUILD_WEB="yes"
+
+          # 2) Files turbo doesn't treat as build inputs but the image depends
+          #    on: the app dir itself and the Dockerfile that builds it.
+          echo "${CHANGED}" | grep -qE "^(${APP_DIR}/|docker/)" && BUILD_WEB="yes"
+
+          if [ -z "${BUILD_WEB}" ]; then
+            { echo "build_all=false"; echo "services="; } >> "$GITHUB_OUTPUT"
+            echo "⚪ No deployable services affected — nothing to build" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          { echo "build_all=false"; echo "services=|${SERVICE}|"; } >> "$GITHUB_OUTPUT"
+          echo "🟢 Affected services: |${SERVICE}|" >> "$GITHUB_STEP_SUMMARY"
+
+  # ─── Job 1: Quality (starts immediately, parallel with validate + build) ───
+  # NON-GATING: lefthook already enforces quality on the dev machine
+  # (pre-commit: check:fix, typecheck, lint:ws, build, critical audit), so CI
+  # quality is a backstop rather than a gate — build-push does not wait on it.
   quality:
     name: "① Quality Gates"
     runs-on: ubuntu-latest
-    needs: validate
     timeout-minutes: 30
     env:
       # Non-interactive corepack so it can fetch the packageManager pnpm
@@ -91,6 +239,14 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: ${{ runner.os }}-pnpm-
 
+      # Cache turbo's task results → later runs can hit FULL TURBO
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-turbo-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -111,67 +267,53 @@ jobs:
         continue-on-error: true
 
   # ─── Job 2: Build & Push Docker images (push only) ───
+  # Waits only on validate (idp.yaml must pass before anything deployable is
+  # produced) and affected — not on quality, which runs in parallel as a
+  # non-gating backstop.
+  # ⚠️ STATIC matrix only — do not switch to a dynamic matrix built from job
+  # outputs (`strategy.matrix: ${{ fromJSON(needs.*.outputs.*) }}`): Gitea
+  # act_runner does not support it (gitea#25179, still open) → the matrix does
+  # not expand, service/path come out empty, and the build breaks.
   build-push:
     name: "② Build · ${{ matrix.service }}"
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    needs: quality
-    if: github.event_name == 'push'
+    needs: [validate, affected]
+    # Build images only on DEPLOY branches, and only for services the
+    # `affected` job flagged (build_all=true on any uncertainty → everything).
+    # feature/* and PRs still run Quality — they just don't fan out jobs to
+    # push images nobody deploys.
+    if: >-
+      github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/develop' ||
+        startsWith(github.ref, 'refs/heads/release/')
+      ) && (
+        needs.affected.outputs.build_all == 'true' ||
+        contains(needs.affected.outputs.services, format('|{0}|', matrix.service))
+      )
     strategy:
+      fail-fast: false
       matrix:
-        service:
-          - web
+        # service = image / deploy name (must match idp.yaml)
+        # dockerfile = the Dockerfile that builds it (context is the repo root)
+        include:
+          - service: web
+            dockerfile: docker/Dockerfile.nextjs
+    env:
+      REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      IDP_URL: ${{ secrets.IDP_URL }}
+      IDP_TOKEN: ${{ secrets.IDP_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-
-      - name: Detect changes
-        id: changes
-        run: |
-          echo "::group::Changed files"
-          if ! git rev-parse HEAD~1 >/dev/null 2>&1; then
-            echo "⚠️ Cannot find HEAD~1 (first commit or force push)"
-            echo "build=true" >> $GITHUB_OUTPUT
-            echo "ℹ️ First commit or force push → building all" >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
-
-          CHANGED=$(git diff --name-only HEAD~1 HEAD)
-          echo "${CHANGED}"
-          echo "::endgroup::"
-
-          # shared code, workflow, Dockerfile หรือไฟล์ root เปลี่ยน → build service
-          if echo "${CHANGED}" | grep -qE '^(packages/|\.gitea/|docker/Dockerfile.nextjs$|[^/]+$)'; then
-            echo "✅ Shared code or root files changed → building all services"
-            echo "build=true" >> $GITHUB_OUTPUT
-            echo "ℹ️ Shared code changed → building all" >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
-
-          # เช็คว่า Next.js app มีไฟล์เปลี่ยนไหม
-          if echo "${CHANGED}" | grep -q "^apps/nextjs/"; then
-            echo "✅ Changes detected in apps/nextjs/"
-            echo "build=true" >> $GITHUB_OUTPUT
-          else
-            echo "⏭️ No changes in apps/nextjs/ → skipping"
-            echo "build=false" >> $GITHUB_OUTPUT
-            echo "⏭️ No changes in **${{ matrix.service }}** → skipped" >> $GITHUB_STEP_SUMMARY
-          fi
 
       - name: Validate secrets
-        if: steps.changes.outputs.build == 'true'
-        env:
-          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-          IDP_URL: ${{ secrets.IDP_URL }}
-          IDP_TOKEN: ${{ secrets.IDP_TOKEN }}
         run: |
           echo "::group::Checking required secrets"
           MISSING=""
-          FOUND=""
 
           for SECRET_NAME in REGISTRY_URL REGISTRY_USERNAME REGISTRY_PASSWORD; do
             VAL=$(eval echo "\${$SECRET_NAME}")
@@ -179,7 +321,6 @@ jobs:
               MISSING="${MISSING} ${SECRET_NAME}"
               echo "❌ ${SECRET_NAME}: NOT SET"
             else
-              FOUND="${FOUND} ${SECRET_NAME}"
               echo "✅ ${SECRET_NAME}: set (${#VAL} chars)"
             fi
           done
@@ -203,11 +344,6 @@ jobs:
           echo "✅ All required secrets present"
 
       - name: Login to registry
-        if: steps.changes.outputs.build == 'true'
-        env:
-          REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
-          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
           echo "🔐 Logging in to ${REGISTRY_URL} as ${REGISTRY_USERNAME}..."
           echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_URL}" \
@@ -215,15 +351,14 @@ jobs:
           echo "✅ Login successful"
 
       - name: Set image meta
-        if: steps.changes.outputs.build == 'true'
         id: meta
         run: |
           SHA_SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
           BRANCH=$(echo "${{ github.ref_name }}" | sed 's/[^a-zA-Z0-9._-]/-/g')
           TAG="${BRANCH}-sha-${SHA_SHORT}"
-          IMAGE="${{ secrets.REGISTRY_URL }}/${{ github.event.repository.name }}/${{ matrix.service }}"
+          IMAGE="${REGISTRY_URL}/${{ github.event.repository.name }}/${{ matrix.service }}"
 
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}"     >> $GITHUB_OUTPUT
           echo "image=${IMAGE}" >> $GITHUB_OUTPUT
 
           echo "📋 Image Meta:"
@@ -234,119 +369,191 @@ jobs:
           echo "  Image:    ${IMAGE}"
           echo "  Full:     ${IMAGE}:${TAG}"
 
-      - name: Build image
-        if: steps.changes.outputs.build == 'true'
+      - name: Setup Docker Buildx
         run: |
-          FULL_TAG="${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
-          echo "🔨 Building ${FULL_TAG}"
-          echo "   Dockerfile: docker/Dockerfile.nextjs"
-          echo "   Context:    ."
+          # Pull the buildkit image + base images through the Harbor
+          # proxy-cache (registry.telecorpthailand.com/dockerhub → Docker Hub)
+          # to dodge Docker Hub's anonymous pull rate limit (429). The gcr
+          # mirror stays as a fallback for any other docker.io reference.
+          cat > /tmp/buildkitd.toml <<'EOF'
+          [registry."docker.io"]
+            mirrors = ["mirror.gcr.io"]
+          EOF
+          docker buildx create --name cibuilder --use \
+            --driver-opt image=registry.telecorpthailand.com/dockerhub/moby/buildkit:buildx-stable-1 \
+            --config /tmp/buildkitd.toml
+          docker buildx inspect --bootstrap
+          echo "✅ Buildx builder ready (buildkit + bases via Harbor proxy)"
+
+      - name: "🐳 Build & Push"
+        run: |
+          IMAGE="${{ steps.meta.outputs.image }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+
+          echo "🔨 Building ${IMAGE}:${TAG}"
+          echo "   Dockerfile: ${{ matrix.dockerfile }}"
+          echo "   Cache:      ${IMAGE}:buildcache"
           echo ""
-          docker build \
-            -t "${FULL_TAG}" \
-            -f docker/Dockerfile.nextjs \
+          docker buildx build \
+            --cache-from type=registry,ref=${IMAGE}:buildcache \
+            --cache-to   type=registry,ref=${IMAGE}:buildcache,mode=max \
+            --build-arg IMAGE_TAG="${TAG}" \
+            --build-arg NODE_IMAGE=registry.telecorpthailand.com/dockerhub/library/node:24-alpine \
+            -t "${IMAGE}:${TAG}" \
+            -t "${IMAGE}:latest" \
+            -f ${{ matrix.dockerfile }} \
+            --push \
             .
           echo ""
-          echo "✅ Build complete"
-          docker images "${FULL_TAG}" --format "   Size: {{.Size}}"
+          echo "✅ Build & push complete: ${IMAGE}:${TAG}"
 
-      - name: Tag latest
-        if: steps.changes.outputs.build == 'true'
-        run: |
-          echo "🏷️ Tagging ${{ steps.meta.outputs.image }}:latest"
-          docker tag \
-            "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" \
-            "${{ steps.meta.outputs.image }}:latest"
-
-      - name: Push image
-        if: steps.changes.outputs.build == 'true'
-        run: |
-          echo "📤 Pushing ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
-          docker push "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
-          echo "✅ Push complete"
-
-      - name: Push latest
-        if: steps.changes.outputs.build == 'true'
-        run: |
-          echo "📤 Pushing ${{ steps.meta.outputs.image }}:latest"
-          docker push "${{ steps.meta.outputs.image }}:latest"
-          echo "✅ Push complete"
-
-      - name: Summary
-        if: steps.changes.outputs.build == 'true'
-        run: |
           echo "## 🐳 ${{ matrix.service }} image pushed" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- \`${{ steps.meta.outputs.image }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${IMAGE}:${TAG}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- \`${IMAGE}:latest\`" >> $GITHUB_STEP_SUMMARY
 
-      - name: Notify MiniIDP
-        if: steps.changes.outputs.build == 'true'
-        env:
-          IDP_URL: ${{ secrets.IDP_URL }}
-          IDP_TOKEN: ${{ secrets.IDP_TOKEN }}
+      - name: "📡 Notify MiniIDP"
         run: |
           if [ -z "${IDP_URL}" ] || [ -z "${IDP_TOKEN}" ]; then
-            echo "⚠️ IDP_URL or IDP_TOKEN not set → skipping notify"
-            echo "   IDP_URL:   $([ -n "${IDP_URL}" ] && echo 'set' || echo '❌ NOT SET')"
-            echo "   IDP_TOKEN: $([ -n "${IDP_TOKEN}" ] && echo 'set' || echo '❌ NOT SET')"
+            echo "⚠️ IDP secrets not set → skipping notify"
             exit 0
           fi
 
-          ENDPOINT="${IDP_URL}/api/v1/image-update"
-          PAYLOAD=$(cat <<EOF
-          {
-            "repo": "${{ github.event.repository.name }}",
-            "service": "${{ matrix.service }}",
-            "branch": "${{ github.ref_name }}",
-            "tag": "${{ steps.meta.outputs.tag }}",
-            "image": "${{ steps.meta.outputs.image }}"
-          }
-          EOF
-          )
+          IMAGE="${{ steps.meta.outputs.image }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+          PAYLOAD="{\"repo\":\"${{ github.event.repository.name }}\",\"service\":\"${{ matrix.service }}\",\"branch\":\"${{ github.ref_name }}\",\"tag\":\"${TAG}\",\"image\":\"${IMAGE}\"}"
 
-          echo "📡 Notifying MiniIDP"
-          echo "   URL:     ${ENDPOINT}"
-          echo "   Payload: ${PAYLOAD}"
-          echo ""
+          echo "📡 Notifying MiniIDP for ${{ matrix.service }}"
 
-          HTTP_CODE=$(curl -s -o /tmp/idp_response.txt -w "%{http_code}" \
-            -X POST "${ENDPOINT}" \
-            -H "X-IDP-Token: ${IDP_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d "${PAYLOAD}" \
-            --connect-timeout 10 \
-            --max-time 30)
-
-          RESPONSE=$(cat /tmp/idp_response.txt 2>/dev/null || echo "(empty)")
-
-          echo "   Status:   ${HTTP_CODE}"
-          echo "   Response: ${RESPONSE}"
-
-          if [ "${HTTP_CODE}" -ge 200 ] && [ "${HTTP_CODE}" -lt 300 ]; then
-            echo "✅ MiniIDP notified successfully"
-          else
-            echo "::error::MiniIDP notify failed (HTTP ${HTTP_CODE}): ${RESPONSE}"
+          # /image-update re-renders manifests synchronously, so a busy MiniIDP
+          # can legitimately take >30s. Give it a generous per-attempt budget
+          # and retry with linear backoff rather than failing a build whose
+          # image is already safely in Harbor.
+          MAX_RETRIES=5
+          for ATTEMPT in $(seq 1 ${MAX_RETRIES}); do
+            HTTP_CODE=$(curl -s -o /tmp/idp_resp.txt -w "%{http_code}" \
+              -X POST "${IDP_URL}/api/v1/image-update" \
+              -H "X-IDP-Token: ${IDP_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "${PAYLOAD}" \
+              --connect-timeout 10 --max-time 90)
+            if [ "${HTTP_CODE}" -ge 200 ] && [ "${HTTP_CODE}" -lt 300 ]; then
+              echo "✅ MiniIDP notified (${{ matrix.service }}) — attempt ${ATTEMPT}"
+              break
+            fi
+            echo "⚠️ Attempt ${ATTEMPT}/${MAX_RETRIES} failed (HTTP ${HTTP_CODE})"
+            [ ${ATTEMPT} -lt ${MAX_RETRIES} ] && sleep $((ATTEMPT * 10))
+          done
+          if [ "${HTTP_CODE}" -lt 200 ] || [ "${HTTP_CODE}" -ge 300 ]; then
+            echo "::error::MiniIDP notify (${{ matrix.service }}) failed after ${MAX_RETRIES} attempts"
             exit 1
           fi
 
-      - name: Harbor retention (keep 3 per branch)
-        if: steps.changes.outputs.build == 'true'
-        continue-on-error: true
-        env:
-          HARBOR_USER: ${{ secrets.REGISTRY_USERNAME }}
-          HARBOR_PASS: ${{ secrets.REGISTRY_PASSWORD }}
+  # ─── Job 2b: Advance the last-built marker ───
+  # Runs only when every build-push leg succeeded (a failed or cancelled leg
+  # skips this job, so the marker stays behind and the next run's affected diff
+  # re-covers everything unbuilt). Pushing the ref needs the automatic actions
+  # token to have contents:write; if it doesn't, the push warns and `affected`
+  # simply keeps using the push-range fallback.
+  mark-built:
+    name: "②b All images built → advance ci-built/branch marker"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [affected, build-push]
+    if: >-
+      github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/develop' ||
+        startsWith(github.ref, 'refs/heads/release/')
+      )
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Advance ci-built/${{ github.ref_name }}
         run: |
-          API="https://${{ secrets.REGISTRY_URL }}/api/v2.0"
-          PAIRS=$(curl -fsS -u "${HARBOR_USER}:${HARBOR_PASS}" \
-            "${API}/projects/${{ github.event.repository.name }}/repositories/${{ matrix.service }}/artifacts?sort=-push_time&page_size=100" \
-            | jq -r '[.[] | (.tags // [])[]?.name | select(. != "latest" and . != null)] | .[] | "\(sub("-sha-[a-f0-9]{7,}$"; ""))|\(.)"')
-          [ -z "${PAIRS}" ] && exit 0
-          declare -A SEEN
-          while IFS='|' read -r BRANCH TAG; do
-            [ -z "${TAG}" ] && continue
-            CURRENT=$(( ${SEEN[${BRANCH}]:-0} + 1 ))
-            SEEN[${BRANCH}]=${CURRENT}
-            [ ${CURRENT} -le 3 ] && continue
-            curl -sS -o /dev/null -X DELETE -u "${HARBOR_USER}:${HARBOR_PASS}" \
-              "${API}/projects/${{ github.event.repository.name }}/repositories/${{ matrix.service }}/artifacts/${TAG}" || true
-          done <<< "${PAIRS}"
+          git push --force \
+            "${{ github.server_url }}/${{ github.repository }}.git" \
+            "HEAD:refs/heads/ci-built/${{ github.ref_name }}" \
+            && echo "ci-built/${{ github.ref_name }} -> ${{ github.sha }}" \
+            || echo "::warning::could not advance ci-built marker (token lacks push?) — affected falls back to the push range"
+
+  # ─── Job 3: Registry retention ───
+  retention:
+    name: "③ Retention"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: build-push
+    # Same deploy-branch gate as build-push (the producer of the new tags).
+    if: >-
+      github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/develop' ||
+        startsWith(github.ref, 'refs/heads/release/')
+      )
+    env:
+      REGISTRY_URL: ${{ secrets.REGISTRY_URL }}
+      REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+    steps:
+      - name: "🗑️ Harbor Retention (keep last 3)"
+        continue-on-error: true
+        run: |
+          PROJECT="${{ github.event.repository.name }}"
+          API="https://${REGISTRY_URL}/api/v2.0"
+
+          # Discover every repo in the Harbor project rather than hardcoding a
+          # list, so a service added to the matrix is cleaned automatically.
+          # Strip the "<project>/" prefix to the short name the artifacts API
+          # expects.
+          REPOS=$(curl -s -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
+            "${API}/projects/${PROJECT}/repositories?page_size=100" \
+            | jq -r '.[].name // empty' | sed "s#^${PROJECT}/##")
+
+          if [ -z "${REPOS}" ]; then
+            echo "⚠️ No repositories found (or Harbor unreachable) → nothing to clean"
+            exit 0
+          fi
+
+          for REPO in ${REPOS}; do
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "🗑️ Retention: ${REPO}"
+            echo ""
+
+            RESPONSE=$(curl -s -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
+              "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts?sort=-push_time&page_size=100")
+
+            if ! echo "${RESPONSE}" | jq empty 2>/dev/null; then
+              echo "⚠️ Cannot parse Harbor response → skipping ${REPO}"
+              continue
+            fi
+
+            TAGS=$(echo "${RESPONSE}" | jq -r '.[].tags[]?.name // empty' | grep -v '^latest$')
+
+            if [ -z "${TAGS}" ]; then
+              echo "ℹ️ No tags to clean for ${REPO}"
+              continue
+            fi
+
+            COUNT=0
+            DELETED=0
+            for TAG in ${TAGS}; do
+              COUNT=$((COUNT + 1))
+              if [ ${COUNT} -le 3 ]; then
+                echo "   ✅ KEEP  [${COUNT}] ${TAG}"
+              else
+                echo "   🗑️ DEL   [${COUNT}] ${TAG}"
+                DEL_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                  -X DELETE -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
+                  "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts/${TAG}")
+                if [ "${DEL_CODE}" -ge 200 ] && [ "${DEL_CODE}" -lt 300 ]; then
+                  DELETED=$((DELETED + 1))
+                else
+                  echo "   ⚠️ Failed (HTTP ${DEL_CODE})"
+                fi
+              fi
+            done
+            echo "✅ ${REPO}: kept 3, deleted ${DELETED}"
+            echo ""
+          done
