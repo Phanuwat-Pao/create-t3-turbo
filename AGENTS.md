@@ -35,7 +35,12 @@ version of this stack. Two standing policies follow from that:
    If a gate fails, fix the cause and commit again through the hooks.
 2. **Hand-editing generated auth schema.** `packages/db/src/auth-schema.ts`
    comes from `pnpm auth:generate` (Better Auth CLI). Change auth config in
-   `packages/auth/src/index.ts`, then regenerate.
+   `packages/auth/src/index.ts`, then regenerate. Two post-regen fixups this
+   repo maintains (re-apply them after every regen): strip the drizzle-v0
+   `relations()` blocks the CLI emits (relations live in `relations.ts` via
+   `defineRelations`), and add `{ withTimezone: true }` to every
+   `timestamp(...)` column — this repo's columns are `timestamptz`, while the
+   CLI emits plain `timestamp`.
 3. **Pushing schema at the wrong database.** `pnpm db:push` applies
    `packages/db/src/schema.ts` directly to `POSTGRES_URL` from `.env` (it
    swaps port 6543 → 5432 for the non-pooling connection). Know which
