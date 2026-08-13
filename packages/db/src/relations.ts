@@ -90,7 +90,6 @@ export const relations = defineRelations(schema, (r) => ({
   organization: {
     invitations: r.many.invitation(),
     members: r.many.member(),
-    scimProviders: r.many.scimProvider(),
     ssoProviders: r.many.ssoProvider(),
   },
   passkey: {
@@ -99,10 +98,47 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.user.id,
     }),
   },
-  scimProvider: {
-    organization: r.one.organization({
-      from: r.scimProvider.organizationId,
-      to: r.organization.id,
+  scimGroup: {
+    scimGroupMembers: r.many.scimGroupMember(),
+  },
+  scimGroupMember: {
+    scimGroup: r.one.scimGroup({
+      from: r.scimGroupMember.groupId,
+      to: r.scimGroup.id,
+    }),
+    scimUser: r.one.scimUser({
+      from: r.scimGroupMember.scimUserId,
+      to: r.scimUser.id,
+    }),
+  },
+  scimIdentityTombstone: {
+    user: r.one.user({
+      from: r.scimIdentityTombstone.userId,
+      to: r.user.id,
+    }),
+  },
+  scimProjectionGrant: {
+    scimUser: r.one.scimUser({
+      from: r.scimProjectionGrant.scimUserId,
+      to: r.scimUser.id,
+    }),
+    user: r.one.user({
+      from: r.scimProjectionGrant.userId,
+      to: r.user.id,
+    }),
+  },
+  scimSubject: {
+    user: r.one.user({
+      from: r.scimSubject.userId,
+      to: r.user.id,
+    }),
+  },
+  scimUser: {
+    scimGroupMembers: r.many.scimGroupMember(),
+    scimProjectionGrants: r.many.scimProjectionGrant(),
+    user: r.one.user({
+      from: r.scimUser.userId,
+      to: r.user.id,
     }),
   },
   session: {
@@ -139,6 +175,10 @@ export const relations = defineRelations(schema, (r) => ({
     oauthConsents: r.many.oauthConsent(),
     oauthRefreshTokens: r.many.oauthRefreshToken(),
     passkeys: r.many.passkey(),
+    scimIdentityTombstones: r.many.scimIdentityTombstone(),
+    scimProjectionGrants: r.many.scimProjectionGrant(),
+    scimSubjects: r.many.scimSubject(),
+    scimUsers: r.many.scimUser(),
     sessions: r.many.session(),
     ssoProviders: r.many.ssoProvider(),
     twoFactors: r.many.twoFactor(),

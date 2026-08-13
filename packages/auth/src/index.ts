@@ -104,6 +104,8 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     database: drizzleAdapter(db, {
       provider: "pg",
       schema,
+      // scim (and sso) require native transactions; node-postgres has them.
+      transaction: true,
     }),
     emailAndPassword: {
       enabled: true,
@@ -206,7 +208,15 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       expo(),
       passkey(),
       sso(),
-      scim(),
+      scim({
+        // Secure default: no provisioning connections and a deny-all token
+        // verifier. Deployments declare their IdP connections (or a managed
+        // connection catalog) here to enable SCIM access.
+        authentication: {
+          verifyBearerToken: () => null,
+        },
+        connections: [],
+      }),
       username(),
       auditLog(),
       i18n({

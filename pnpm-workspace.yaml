@@ -13,7 +13,7 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  "@better-auth/expo": ^1.6.27
+  "@better-auth/expo": ^1.7.0-beta.10
   "@orpc/client": ^1.15.0
   "@orpc/server": ^1.15.0
   "@orpc/tanstack-query": ^1.15.0
@@ -24,7 +24,7 @@ catalog:
   "@types/node": ^26.2.0
   "@typescript/native-preview": 7.0.0-dev.20260707.2
   "@vitejs/plugin-react": ^6.0.5
-  better-auth: ^1.6.27
+  better-auth: ^1.7.0-beta.10
   tailwindcss: ^4.3.3
   vite: ^8.2.1
   zod: ^4.4.3
@@ -74,28 +74,41 @@ minimumReleaseAgeExclude:
   - react-email@6.1.5
   - ultracite@7.10.3
 
+# image-size DoS advisories (dev-only, via metro): patched release 2.0.3 is not
+# published as of 2026-08-13 — drop these once it ships and can be overridden.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-w3rx-r6r6-pgpr
+    - GHSA-5p2g-fcmc-qvqq
+
 overrides:
   "@hono/node-server": ">=1.19.13"
   "@types/minimatch": 5.1.2
   # Patch within 0.8 (like upstream better-auth): samlify (SSO/SAML) breaks on
   # the 0.9 line, which removed the errorHandler DOMParser option.
   "@xmldom/xmldom@<0.8.13": ">=0.8.13 <0.9"
-  brace-expansion: ">=1.1.13 <2 || >=5.0.6"
+  brace-expansion: ">=1.1.13 <2 || >=5.0.9"
   defu: ">=6.1.5"
   effect: ">=3.20.0"
-  fast-uri: ">=3.1.2"
+  fast-uri: ">=3.1.5"
   flatted: ">=3.4.2"
   hono: ">=4.12.18"
   ip-address: ">=10.1.1"
+  # Patch within 4.x: v5 is a breaking rewrite its v4 consumers can't load.
+  "js-yaml@>=4.0.0 <4.3.1": ">=4.3.1 <5"
   lightningcss: 1.33.0
   lodash: ">=4.18.0"
+  # Patch within each consumer's major: nanoid 4+ is ESM-only.
+  "nanoid@<3.3.17": ">=3.3.17 <4"
+  "nanoid@>=4.0.0 <5.1.16": ">=5.1.16 <6"
   node-forge: ">=1.4.0"
   path-to-regexp: ">=8.4.0"
   picomatch: ">=2.3.2"
-  postcss: ">=8.5.10"
+  postcss: ">=8.5.23"
   qs: ">=6.15.2"
-  shell-quote: ">=1.8.4"
+  shell-quote: ">=1.8.5"
+  socket.io-parser: ">=4.2.7"
   unhead: ">=2.1.13"
   uuid: ">=11.1.1"
   vite: 8.2.1
-  ws: ">=8.20.1"
+  ws: ">=8.21.0"

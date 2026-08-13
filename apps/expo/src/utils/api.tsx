@@ -17,11 +17,11 @@ export const queryClient = new QueryClient({
 });
 
 const link = new RPCLink({
-  headers: () => {
+  headers: async () => {
     const headers: Record<string, string> = {
       "x-trpc-source": "expo-react",
     };
-    const cookies = authClient.getCookie();
+    const cookies = await authClient.getCookie();
     if (cookies) {
       headers.Cookie = cookies;
     }
