@@ -8,7 +8,7 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
         backgroundColor: "#1F104A",
         foregroundImage: "./assets/icon-light.png",
       },
-      package: "your.bundle.identifier",
+      package: "com.createt3turbo.app",
     },
     assetBundlePatterns: ["**/*"],
     // extra: {
@@ -23,14 +23,14 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
     },
     icon: "./assets/icon-light.png",
     ios: {
-      bundleIdentifier: "your.bundle.identifier",
+      bundleIdentifier: "com.createt3turbo.app",
       icon: {
         dark: "./assets/icon-dark.png",
         light: "./assets/icon-light.png",
       },
       supportsTablet: true,
     },
-    name: "expo",
+    name: "create-t3-turbo",
     orientation: "portrait",
 
     plugins: [
@@ -114,8 +114,12 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
       ],
       ["expo-asset"],
     ],
-    scheme: "expo",
-    slug: "expo",
+    // Deep-link scheme. Must stay in sync with the mobile origin trusted in
+    // packages/auth (a session cookie is redirected to it after OAuth), and
+    // must be unique to this app — a generic scheme can be claimed by any
+    // other app installed on the device.
+    scheme: "create-t3-turbo",
+    slug: "create-t3-turbo",
     updates: {
       fallbackToCacheTimeout: 0,
     },

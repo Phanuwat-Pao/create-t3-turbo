@@ -45,7 +45,15 @@ version of this stack. Two standing policies follow from that:
    `packages/db/src/schema.ts` directly to `POSTGRES_URL` from `.env` (it
    swaps port 6543 → 5432 for the non-pooling connection). Know which
    database `.env` points at before running it.
-4. **Fighting the toolchain by hand.** Ultracite (oxlint + oxfmt) is the
+4. **Desyncing the Expo deep-link scheme.** `scheme` in
+   `apps/expo/app.config.ts` and the mobile origin in `trustedOrigins`
+   (`packages/auth/src/index.ts`) must match: the session cookie is redirected
+   to that scheme after mobile OAuth. Keep it app-specific — the `expo()`
+   plugin already trusts the broad `exp://` scheme in development only, and a
+   generic scheme trusted in production could hand the session to a deep link
+   this app does not control. Renaming it also means updating the callback
+   URLs registered with each OAuth provider.
+5. **Fighting the toolchain by hand.** Ultracite (oxlint + oxfmt) is the
    source of truth for style and will rewrite files repo-wide during commit.
    Don't hand-format; run `pnpm check:fix`. When a rule is genuinely wrong
    for a site, use the narrowest suppression with a reason:

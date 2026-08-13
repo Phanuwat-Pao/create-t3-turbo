@@ -365,7 +365,12 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
           : undefined,
     },
     trustedOrigins: [
-      "expo://",
+      // The Expo app's own deep-link scheme (apps/expo/app.config.ts). Keep
+      // these in sync, and keep the scheme app-specific: the expo() plugin
+      // already trusts the broad `exp://` scheme in development only, and a
+      // generic scheme trusted in production could hand the session cookie to
+      // a deep link this app does not control.
+      "create-t3-turbo://",
       `https://*.${new URL(options.productionUrl).hostname}`,
       ...(options.trustedOrigins ?? []),
     ],
