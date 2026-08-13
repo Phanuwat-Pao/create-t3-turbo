@@ -11,6 +11,7 @@ import {
   oneTapClient,
   organizationClient,
   twoFactorClient,
+  usernameClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { toast } from "sonner";
@@ -49,5 +50,6 @@ export const authClient = createAuthClient({
     passkeyClient(),
     oauthProviderClient(),
     ssoClient(),
+    usernameClient(),
   ],
 });

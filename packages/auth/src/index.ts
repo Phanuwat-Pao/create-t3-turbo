@@ -27,6 +27,7 @@ import {
   openAPI,
   organization,
   twoFactor,
+  username,
 } from "better-auth/plugins";
 
 import { translations } from "./translations";
@@ -42,8 +43,6 @@ export interface InitAuthOptions<
 
   adminUserIds?: string[];
 
-  discordClientId?: string;
-  discordClientSecret?: string;
   facebookClientId?: string;
   facebookClientSecret?: string;
   githubClientId?: string;
@@ -91,7 +90,6 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
           "facebook",
           "github",
           "google",
-          "discord",
           "microsoft",
           "twitch",
           "twitter",
@@ -208,6 +206,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       passkey(),
       sso(),
       scim(),
+      username(),
       i18n({
         // The web app's locale is path-based (/th, /en), so the Referer path
         // is the source of truth there; Accept-Language covers Expo and
@@ -306,14 +305,6 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     secret: options.secret,
 
     socialProviders: {
-      discord:
-        options.discordClientId && options.discordClientSecret
-          ? {
-              clientId: options.discordClientId,
-              clientSecret: options.discordClientSecret,
-              redirectURI: `${options.productionUrl}/api/auth/callback/discord`,
-            }
-          : undefined,
       facebook:
         options.facebookClientId && options.facebookClientSecret
           ? {
