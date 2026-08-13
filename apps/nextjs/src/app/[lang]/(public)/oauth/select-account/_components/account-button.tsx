@@ -1,6 +1,6 @@
 "use client";
 
-import type { Session } from "@acme/auth";
+import type { DeviceSession } from "@acme/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import { toast } from "sonner";
@@ -10,7 +10,7 @@ import type { Dictionary } from "~/i18n/get-dictionary";
 import { getAvatarUrl } from "~/lib/avatar";
 
 interface SelectAccountBtnProps {
-  session: Partial<Session>;
+  session: DeviceSession;
   dict: Dictionary;
 }
 

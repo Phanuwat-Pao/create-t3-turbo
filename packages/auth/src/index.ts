@@ -3,13 +3,17 @@ import * as schema from "@acme/db/schema";
 import { expo } from "@better-auth/expo";
 import { oauthProvider } from "@better-auth/oauth-provider";
 import { passkey } from "@better-auth/passkey";
+import { scim } from "@better-auth/scim";
+import { sso } from "@better-auth/sso";
 import {
   type BetterAuthOptions,
   type BetterAuthPlugin,
+  APIError,
   betterAuth,
 } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import {
+  type Organization,
   admin,
   bearer,
   customSession,
@@ -197,16 +201,82 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       }),
       expo(),
       passkey(),
+      sso(),
+      scim(),
       oauthProvider({
+        allowDynamicClientRegistration: true,
+        allowUnauthenticatedClientRegistration: true,
         consentPage: "/oauth/consent",
-        loginPage: "/sign-in",
-      }),
-      customSession(async (session) => ({
-        ...session,
-        user: {
-          ...session.user,
+        customAccessTokenClaims({ referenceId, scopes }) {
+          if (referenceId && scopes.includes("read:organization")) {
+            return {
+              [`${options.baseUrl}/org`]: referenceId,
+            };
+          }
+          return {};
         },
-      })),
+        loginPage: "/sign-in",
+        postLogin: {
+          consentReferenceId({ session, scopes }) {
+            if (scopes.includes("read:organization")) {
+              const activeOrganizationId = (session?.activeOrganizationId ??
+                undefined) as string | undefined;
+              if (!activeOrganizationId) {
+                throw new APIError("BAD_REQUEST", {
+                  error: "set_organization",
+                  error_description: "must set organization for these scopes",
+                });
+              }
+              return activeOrganizationId;
+            }
+            return undefined;
+          },
+          page: "/oauth/select-organization",
+          async shouldRedirect({ session, scopes, headers }) {
+            const userOnlyScopes = new Set([
+              "openid",
+              "profile",
+              "email",
+              "offline_access",
+            ]);
+            if (scopes.every((sc) => userOnlyScopes.has(sc))) {
+              return false;
+            }
+            // Redirect unless the user's only organization is already active
+            try {
+              // oxlint-disable-next-line no-use-before-define -- helper is a hoisted function declaration that must close over the later-defined auth instance
+              const organizations = (await getAllUserOrganizations(
+                headers
+              )) as Organization[];
+              return (
+                organizations.length > 1 ||
+                !(
+                  organizations.length === 1 &&
+                  organizations.at(0)?.id === session.activeOrganizationId
+                )
+              );
+            } catch {
+              return true;
+            }
+          },
+        },
+        scopes: [
+          "openid",
+          "profile",
+          "email",
+          "offline_access",
+          "read:organization",
+        ],
+        selectAccount: {
+          page: "/oauth/select-account",
+          shouldRedirect: async ({ headers }) => {
+            // oxlint-disable-next-line no-use-before-define -- helper is a hoisted function declaration that must close over the later-defined auth instance
+            const allSessions = await getAllDeviceSessions(headers);
+            return allSessions.length >= 1;
+          },
+        },
+        validAudiences: [options.baseUrl, `${options.baseUrl}/api/mcp`],
+      }),
       ...(options.extraPlugins ?? []),
     ],
     secret: options.secret,
@@ -284,7 +354,43 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     ],
   } satisfies BetterAuthOptions;
 
-  const auth = betterAuth(authOptions);
+  const auth = betterAuth({
+    ...authOptions,
+    plugins: [
+      ...authOptions.plugins,
+      customSession(
+        async ({ user, session }) => ({
+          session,
+          user: {
+            ...user,
+          },
+        }),
+        authOptions,
+        { shouldMutateListDeviceSessionsEndpoint: true }
+      ),
+    ],
+  });
+
+  // These helpers are referenced from hooks inside authOptions, which makes
+  // their types circular with the `auth` instance. The explicit annotations
+  // (and the untyped view of `auth.api`) break that inference cycle; the
+  // endpoints exist at runtime via the multiSession/organization plugins.
+  type UntypedApi = Record<
+    "listDeviceSessions" | "listOrganizations",
+    (opts: { headers: Headers }) => Promise<unknown[]>
+  >;
+
+  async function getAllDeviceSessions(headers: Headers): Promise<unknown[]> {
+    return await (auth.api as unknown as UntypedApi).listDeviceSessions({
+      headers,
+    });
+  }
+
+  async function getAllUserOrganizations(headers: Headers): Promise<unknown[]> {
+    return await (auth.api as unknown as UntypedApi).listOrganizations({
+      headers,
+    });
+  }
 
   return auth;
 }

@@ -84,6 +84,8 @@ export const relations = defineRelations(schema, (r) => ({
   organization: {
     invitations: r.many.invitation(),
     members: r.many.member(),
+    scimProviders: r.many.scimProvider(),
+    ssoProviders: r.many.ssoProvider(),
   },
   passkey: {
     user: r.one.user({
@@ -91,11 +93,27 @@ export const relations = defineRelations(schema, (r) => ({
       to: r.user.id,
     }),
   },
+  scimProvider: {
+    organization: r.one.organization({
+      from: r.scimProvider.organizationId,
+      to: r.organization.id,
+    }),
+  },
   session: {
     oauthAccessTokens: r.many.oauthAccessToken(),
     oauthRefreshTokens: r.many.oauthRefreshToken(),
     user: r.one.user({
       from: r.session.userId,
+      to: r.user.id,
+    }),
+  },
+  ssoProvider: {
+    organization: r.one.organization({
+      from: r.ssoProvider.organizationId,
+      to: r.organization.id,
+    }),
+    user: r.one.user({
+      from: r.ssoProvider.userId,
       to: r.user.id,
     }),
   },
@@ -115,6 +133,7 @@ export const relations = defineRelations(schema, (r) => ({
     oauthRefreshTokens: r.many.oauthRefreshToken(),
     passkeys: r.many.passkey(),
     sessions: r.many.session(),
+    ssoProviders: r.many.ssoProvider(),
     twoFactors: r.many.twoFactor(),
   },
 }));

@@ -20,6 +20,7 @@
     "@acme/validators": "workspace:*",
     "@better-auth/oauth-provider": "^1.6.27",
     "@better-auth/passkey": "^1.6.27",
+    "@better-auth/sso": "^1.6.27",
     "@formatjs/intl-localematcher": "^0.8.13",
     "@modelcontextprotocol/sdk": "1.30.0",
     "@number-flow/react": "^0.6.2",

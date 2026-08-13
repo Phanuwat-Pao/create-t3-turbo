@@ -1,6 +1,7 @@
 import { expoClient } from "@better-auth/expo/client";
 import { oauthProviderClient } from "@better-auth/oauth-provider/client";
 import { passkeyClient } from "@better-auth/passkey/client";
+import { ssoClient } from "@better-auth/sso/client";
 import {
   adminClient,
   organizationClient,
@@ -12,7 +13,6 @@ import {
   usernameClient,
   phoneNumberClient,
   oneTimeTokenClient,
-  genericOAuthClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import Constants from "expo-constants";
@@ -51,6 +51,6 @@ export const authClient = createAuthClient({
     usernameClient(),
     phoneNumberClient(),
     oneTimeTokenClient(),
-    genericOAuthClient(),
+    ssoClient(),
   ],
 });

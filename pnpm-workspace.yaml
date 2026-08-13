@@ -77,7 +77,9 @@ minimumReleaseAgeExclude:
 overrides:
   "@hono/node-server": ">=1.19.13"
   "@types/minimatch": 5.1.2
-  "@xmldom/xmldom": ">=0.9.10"
+  # Patch within 0.8 (like upstream better-auth): samlify (SSO/SAML) breaks on
+  # the 0.9 line, which removed the errorHandler DOMParser option.
+  "@xmldom/xmldom@<0.8.13": ">=0.8.13 <0.9"
   brace-expansion: ">=1.1.13 <2 || >=5.0.6"
   defu: ">=6.1.5"
   effect: ">=3.20.0"

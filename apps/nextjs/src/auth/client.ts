@@ -1,5 +1,6 @@
 import { oauthProviderClient } from "@better-auth/oauth-provider/client";
 import { passkeyClient } from "@better-auth/passkey/client";
+import { ssoClient } from "@better-auth/sso/client";
 import {
   adminClient,
   customSessionClient,
@@ -47,5 +48,6 @@ export const authClient = createAuthClient({
     lastLoginMethodClient(),
     passkeyClient(),
     oauthProviderClient(),
+    ssoClient(),
   ],
 });

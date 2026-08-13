@@ -32,9 +32,9 @@ const handler = mcpHandler(
             }),
           },
           async ({ message }) => {
-            const authUrl =
-              process.env.BETTER_AUTH_URL || "https://demo.better-auth.com";
-            const org = jwt?.[`${authUrl}/org`];
+            // Claim key must match customAccessTokenClaims in packages/auth,
+            // which is keyed on the serving origin (baseUrl).
+            const org = jwt?.[`${baseUrl}/org`];
             return {
               content: [
                 {
