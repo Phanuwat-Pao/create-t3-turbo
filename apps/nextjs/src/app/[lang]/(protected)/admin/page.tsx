@@ -222,9 +222,8 @@ function AdminDashboard() {
         const message =
           error instanceof Error ? error.message : "Failed to create user";
         toast.error(message);
-      } finally {
-        setIsLoading(undefined);
       }
+      setIsLoading(undefined);
     },
     [newUser, queryClient]
   );
@@ -242,9 +241,8 @@ function AdminDashboard() {
         const message =
           error instanceof Error ? error.message : "Failed to delete user";
         toast.error(message);
-      } finally {
-        setIsLoading(undefined);
       }
+      setIsLoading(undefined);
     },
     [queryClient]
   );
@@ -258,9 +256,8 @@ function AdminDashboard() {
       const message =
         error instanceof Error ? error.message : "Failed to revoke sessions";
       toast.error(message);
-    } finally {
-      setIsLoading(undefined);
     }
+    setIsLoading(undefined);
   }, []);
 
   const handleImpersonateUser = useCallback(
@@ -274,9 +271,8 @@ function AdminDashboard() {
         const message =
           error instanceof Error ? error.message : "Failed to impersonate user";
         toast.error(message);
-      } finally {
-        setIsLoading(undefined);
       }
+      setIsLoading(undefined);
     },
     [router]
   );
@@ -320,11 +316,12 @@ function AdminDashboard() {
   const handleBanUser = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+      if (!banForm.expirationDate) {
+        toast.error("Expiration date is required");
+        return;
+      }
       setIsLoading(`ban-${banForm.userId}`);
       try {
-        if (!banForm.expirationDate) {
-          throw new Error("Expiration date is required");
-        }
         await authClient.admin.banUser({
           banExpiresIn: banForm.expirationDate.getTime() - Date.now(),
           banReason: banForm.reason,
@@ -339,9 +336,8 @@ function AdminDashboard() {
         const message =
           error instanceof Error ? error.message : "Failed to ban user";
         toast.error(message);
-      } finally {
-        setIsLoading(undefined);
       }
+      setIsLoading(undefined);
     },
     [banForm, queryClient]
   );

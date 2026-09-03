@@ -7,7 +7,7 @@ import { Input } from "@acme/ui/input";
 import { PasswordInput } from "@acme/ui/password-input";
 import { Loader2 } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
-import QRCode from "react-qr-code";
+import { QRCode } from "react-qr-code";
 import { toast } from "sonner";
 import * as z from "zod";
 

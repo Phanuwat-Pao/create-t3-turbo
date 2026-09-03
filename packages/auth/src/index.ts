@@ -295,6 +295,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
             }
           },
         },
+        resources: [options.baseUrl],
         scopes: [
           "openid",
           "profile",
@@ -310,7 +311,6 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
             return allSessions.length >= 1;
           },
         },
-        validAudiences: [options.baseUrl],
       }),
       ...(options.extraPlugins ?? []),
     ],

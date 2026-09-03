@@ -18,11 +18,11 @@
   "dependencies": {
     "@acme/db": "workspace:*",
     "@better-auth/expo": "catalog:",
-    "@better-auth/i18n": "^1.7.0-beta.10",
-    "@better-auth/oauth-provider": "^1.7.0-beta.10",
-    "@better-auth/passkey": "^1.7.0-beta.10",
-    "@better-auth/scim": "^1.7.0-beta.10",
-    "@better-auth/sso": "^1.7.0-beta.10",
+    "@better-auth/i18n": "^1.7.2",
+    "@better-auth/oauth-provider": "^1.7.2",
+    "@better-auth/passkey": "^1.7.2",
+    "@better-auth/scim": "^1.7.2",
+    "@better-auth/sso": "^1.7.2",
     "@t3-oss/env-core": "^0.13.11",
     "better-auth": "catalog:",
     "zod": "catalog:"

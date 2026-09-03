@@ -13,33 +13,33 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  "@better-auth/expo": ^1.7.0-beta.10
+  "@better-auth/expo": ^1.7.2
   "@orpc/client": ^1.15.0
   "@orpc/server": ^1.15.0
   "@orpc/tanstack-query": ^1.15.0
   "@tailwindcss/postcss": ^4.3.3
   "@tailwindcss/vite": ^4.3.3
   "@tanstack/react-form": ^1.33.5
-  "@tanstack/react-query": ^5.101.4
-  "@types/node": ^26.2.0
+  "@tanstack/react-query": ^5.102.8
+  "@types/node": ^26.4.1
   "@typescript/native-preview": 7.0.0-dev.20260707.2
-  "@vitejs/plugin-react": ^6.0.5
-  better-auth: ^1.7.0-beta.10
+  "@vitejs/plugin-react": ^6.1.1
+  better-auth: ^1.7.2
   tailwindcss: ^4.3.3
-  vite: ^8.2.1
-  zod: ^4.4.3
+  vite: ^8.2.2
+  zod: ^4.5.4
 
 catalogs:
   react19:
     "@types/react": ^19.2.18
-    "@types/react-dom": ^19.2.4
+    "@types/react-dom": ^19.2.5
     react: ^19.2.8
     react-dom: ^19.2.8
 
 linkWorkspacePackages: true
 
 minimumReleaseAgeExclude:
-  - "@aws-sdk/client-s3@3.1049.0 || 3.1109.0"
+  - "@aws-sdk/client-s3@3.1049.0 || 3.1109.0 || 3.1125.0"
   - "@aws-sdk/core@3.974.12"
   - "@aws-sdk/credential-provider-env@3.972.38"
   - "@aws-sdk/credential-provider-http@3.972.40"
@@ -53,7 +53,7 @@ minimumReleaseAgeExclude:
   - "@aws-sdk/middleware-flexible-checksums@3.974.20"
   - "@aws-sdk/middleware-sdk-s3@3.972.41"
   - "@aws-sdk/nested-clients@3.997.10"
-  - "@aws-sdk/s3-request-presigner@3.1049.0 || 3.1109.0"
+  - "@aws-sdk/s3-request-presigner@3.1049.0 || 3.1109.0 || 3.1125.0"
   - "@aws-sdk/token-providers@3.1049.0"
   - "@tanstack/query-core@5.100.11"
   - "@tanstack/query-devtools@5.100.11"
@@ -61,8 +61,9 @@ minimumReleaseAgeExclude:
   - "@tanstack/react-query@5.100.11"
   - "@types/node@25.9.0"
   - date-fns@4.2.1
-  - framer-motion@12.39.0
-  - motion-dom@12.39.0
+  - framer-motion@12.39.0 || 13.2.0
+  - lucide-react@1.40.0
+  - motion-dom@12.39.0 || 13.2.0
   - motion-utils@12.39.0
   - pg-cloudflare@1.4.0
   - pg-connection-string@2.13.0
@@ -73,6 +74,9 @@ minimumReleaseAgeExclude:
   - react-native-screens@4.25.1
   - react-email@6.1.5
   - ultracite@7.10.3
+  - "@nanostores/react@2.0.1"
+  - lucide-react-native@1.40.0
+  - nanostores@1.5.3
 
 # image-size DoS advisories (dev-only, via metro): patched release 2.0.3 is not
 # published as of 2026-08-13 — drop these once it ships and can be overridden.
@@ -80,17 +84,35 @@ auditConfig:
   ignoreGhsas:
     - GHSA-w3rx-r6r6-pgpr
     - GHSA-5p2g-fcmc-qvqq
+    # decode-uri-component ReDoS (moderate) via query-string@7, which
+    # expo-router 57 pins. The only patched release (0.5.0) is ESM-only and
+    # query-string@7 is CJS, so an override breaks it at runtime. Drop once
+    # expo-router moves off query-string@7.
+    - GHSA-vcc3-ghjq-m6fr
 
 overrides:
   "@hono/node-server": ">=1.19.13"
   "@types/minimatch": 5.1.2
   # Patch within 0.8 (like upstream better-auth): samlify (SSO/SAML) breaks on
   # the 0.9 line, which removed the errorHandler DOMParser option.
-  "@xmldom/xmldom@<0.8.13": ">=0.8.13 <0.9"
+  "@xmldom/xmldom@<0.8.15": ">=0.8.15 <0.9"
+  "@xmldom/xmldom@>=0.9.0 <0.9.12": ">=0.9.12 <0.10"
+  # Patch within 7.x: Babel 8 is a breaking major that metro/next can't load yet.
+  "@babel/core@<7.29.1": ">=7.29.1 <8"
+  # @vercel/otel pulls the OTel SDK family as auto-installed peers; keep the
+  # family in lockstep since each sdk-* pins @opentelemetry/core exactly.
+  "@opentelemetry/core": ">=2.11.0"
+  "@opentelemetry/resources": ">=2.11.0"
+  "@opentelemetry/sdk-logs": ">=0.222.0"
+  "@opentelemetry/sdk-metrics": ">=2.11.0"
+  "@opentelemetry/sdk-trace-base": ">=2.11.0"
   brace-expansion: ">=1.1.13 <2 || >=5.0.9"
+  browserslist: ">=4.28.7"
   defu: ">=6.1.5"
   effect: ">=3.20.0"
-  fast-uri: ">=3.1.5"
+  # Patch within 0.28: drizzle-kit still pins 0.25, which is not affected.
+  "esbuild@>=0.27.3 <0.28.1": ">=0.28.1"
+  fast-uri: ">=4.1.3"
   flatted: ">=3.4.2"
   hono: ">=4.12.18"
   ip-address: ">=10.1.1"
@@ -110,5 +132,5 @@ overrides:
   socket.io-parser: ">=4.2.7"
   unhead: ">=2.1.13"
   uuid: ">=11.1.1"
-  vite: 8.2.1
+  vite: 8.2.2
   ws: ">=8.21.0"

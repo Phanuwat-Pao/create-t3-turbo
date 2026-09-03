@@ -615,12 +615,12 @@ function SidebarMenuSkeleton({
   showIcon?: boolean;
 }) {
   // Random width between 50 to 90%.
-  // oxlint-disable react/react-compiler -- vendored shadcn skeleton intentionally randomizes width once per mount
+  // oxlint-disable react/purity -- vendored shadcn skeleton intentionally randomizes width once per mount
   const width = React.useMemo(
     () => `${Math.floor(Math.random() * 40) + 50}%`,
     []
   );
-  // oxlint-enable react/react-compiler
+  // oxlint-enable react/purity
 
   return (
     <div
