@@ -32,7 +32,7 @@ catalog:
 catalogs:
   react19:
     "@types/react": ^19.2.18
-    "@types/react-dom": ^19.2.5
+    "@types/react-dom": ^19.2.6
     react: ^19.2.8
     react-dom: ^19.2.8
 
@@ -77,6 +77,7 @@ minimumReleaseAgeExclude:
   - "@nanostores/react@2.0.1"
   - lucide-react-native@1.40.0
   - nanostores@1.5.3
+  - "@types/react-dom@19.2.6"
 
 # image-size DoS advisories (dev-only, via metro): patched release 2.0.3 is not
 # published as of 2026-08-13 — drop these once it ships and can be overridden.
@@ -92,7 +93,6 @@ auditConfig:
 
 overrides:
   "@hono/node-server": ">=1.19.13"
-  "@types/minimatch": 5.1.2
   # Patch within 0.8 (like upstream better-auth): samlify (SSO/SAML) breaks on
   # the 0.9 line, which removed the errorHandler DOMParser option.
   "@xmldom/xmldom@<0.8.15": ">=0.8.15 <0.9"
@@ -118,7 +118,9 @@ overrides:
   ip-address: ">=10.1.1"
   # Patch within 4.x: v5 is a breaking rewrite its v4 consumers can't load.
   "js-yaml@>=4.0.0 <4.3.1": ">=4.3.1 <5"
-  lightningcss: 1.33.0
+  # Floor, not pin: @tailwindcss/node and uniwind pin older exact versions,
+  # so a single override keeps one native binary in the tree.
+  lightningcss: ">=1.33.0"
   lodash: ">=4.18.0"
   # Patch within each consumer's major: nanoid 4+ is ESM-only.
   "nanoid@<3.3.17": ">=3.3.17 <4"
@@ -132,5 +134,5 @@ overrides:
   socket.io-parser: ">=4.2.7"
   unhead: ">=2.1.13"
   uuid: ">=11.1.1"
-  vite: 8.2.2
+  vite: ">=8.2.2"
   ws: ">=8.21.0"
