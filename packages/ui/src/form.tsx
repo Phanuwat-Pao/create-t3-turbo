@@ -6,19 +6,31 @@ import { Calendar } from "@acme/ui/calendar";
 import { Checkbox } from "@acme/ui/checkbox";
 import {
   Field,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldLabel,
 } from "@acme/ui/field";
 import { Input } from "@acme/ui/input";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@acme/ui/input-otp";
 import { PasswordInput } from "@acme/ui/password-input";
 import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
+import { RadioGroup } from "@acme/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectTrigger,
   SelectValue,
 } from "@acme/ui/select";
+import { Slider } from "@acme/ui/slider";
+import { Switch } from "@acme/ui/switch";
+import { Textarea } from "@acme/ui/textarea";
+import { ToggleGroup } from "@acme/ui/toggle-group";
 import {
   createFormHook,
   createFormHookContexts,
@@ -424,6 +436,387 @@ function FileField({
   );
 }
 
+interface TextareaFieldProps
+  extends
+    BaseFieldProps,
+    Omit<
+      React.ComponentProps<typeof Textarea>,
+      "id" | "name" | "onBlur" | "onChange" | "value"
+    > {}
+
+function TextareaField({
+  description,
+  id,
+  label,
+  ...props
+}: TextareaFieldProps) {
+  const field = useFieldContext<string>();
+  const inputId = id ?? field.name;
+  const errors = toFieldErrors(field.state.meta.errors);
+  const isInvalid = errors.length > 0;
+
+  const handleChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      field.handleChange(event.target.value);
+    },
+    [field]
+  );
+
+  return (
+    <Field data-invalid={isInvalid}>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+      {description && <FieldDescription>{description}</FieldDescription>}
+      <Textarea
+        aria-invalid={isInvalid}
+        id={inputId}
+        name={field.name}
+        onBlur={field.handleBlur}
+        onChange={handleChange}
+        value={field.state.value}
+        {...props}
+      />
+      {isInvalid && <FieldError errors={errors} />}
+    </Field>
+  );
+}
+
+interface SwitchFieldProps extends BaseFieldProps {
+  disabled?: boolean;
+  size?: React.ComponentProps<typeof Switch>["size"];
+}
+
+function SwitchField({
+  description,
+  disabled,
+  id,
+  label,
+  size,
+}: SwitchFieldProps) {
+  const field = useFieldContext<boolean>();
+  const inputId = id ?? field.name;
+  const errors = toFieldErrors(field.state.meta.errors);
+  const isInvalid = errors.length > 0;
+
+  const handleCheckedChange = React.useCallback(
+    (checked: boolean) => {
+      field.handleChange(checked);
+    },
+    [field]
+  );
+
+  return (
+    <Field data-invalid={isInvalid} orientation="horizontal">
+      <FieldContent>
+        <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+        {description && <FieldDescription>{description}</FieldDescription>}
+        {isInvalid && <FieldError errors={errors} />}
+      </FieldContent>
+      <Switch
+        aria-invalid={isInvalid}
+        checked={field.state.value}
+        disabled={disabled}
+        id={inputId}
+        name={field.name}
+        onBlur={field.handleBlur}
+        onCheckedChange={handleCheckedChange}
+        size={size}
+      />
+    </Field>
+  );
+}
+
+interface RadioGroupFieldProps extends BaseFieldProps {
+  /** `RadioGroupItem` elements, each paired with its own label. */
+  children: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+}
+
+function RadioGroupField({
+  children,
+  className,
+  description,
+  disabled,
+  id,
+  label,
+}: RadioGroupFieldProps) {
+  const field = useFieldContext<string>();
+  const inputId = id ?? field.name;
+  const errors = toFieldErrors(field.state.meta.errors);
+  const isInvalid = errors.length > 0;
+
+  const handleValueChange = React.useCallback(
+    (value: string) => {
+      field.handleChange(value);
+    },
+    [field]
+  );
+
+  return (
+    <Field data-invalid={isInvalid}>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+      {description && <FieldDescription>{description}</FieldDescription>}
+      <RadioGroup
+        aria-invalid={isInvalid}
+        className={className}
+        disabled={disabled}
+        id={inputId}
+        name={field.name}
+        onBlur={field.handleBlur}
+        onValueChange={handleValueChange}
+        value={field.state.value}
+      >
+        {children}
+      </RadioGroup>
+      {isInvalid && <FieldError errors={errors} />}
+    </Field>
+  );
+}
+
+interface SliderFieldProps extends BaseFieldProps {
+  className?: string;
+  disabled?: boolean;
+  max?: number;
+  min?: number;
+  step?: number;
+}
+
+/** Bound to a `number[]` value: one entry per thumb. */
+function SliderField({
+  className,
+  description,
+  disabled,
+  id,
+  label,
+  max,
+  min,
+  step,
+}: SliderFieldProps) {
+  const field = useFieldContext<number[]>();
+  const inputId = id ?? field.name;
+  const errors = toFieldErrors(field.state.meta.errors);
+  const isInvalid = errors.length > 0;
+
+  const handleValueChange = React.useCallback(
+    (value: number[]) => {
+      field.handleChange(value);
+    },
+    [field]
+  );
+
+  return (
+    <Field data-invalid={isInvalid}>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+      {description && <FieldDescription>{description}</FieldDescription>}
+      <Slider
+        aria-invalid={isInvalid}
+        className={className}
+        disabled={disabled}
+        id={inputId}
+        max={max}
+        min={min}
+        name={field.name}
+        onBlur={field.handleBlur}
+        onValueChange={handleValueChange}
+        step={step}
+        value={field.state.value}
+      />
+      {isInvalid && <FieldError errors={errors} />}
+    </Field>
+  );
+}
+
+interface OtpFieldProps extends BaseFieldProps {
+  autoComplete?: string;
+  disabled?: boolean;
+  /** Slot indices after which a separator is drawn, e.g. `[3]` for 3+3. */
+  groups?: number[];
+  maxLength?: number;
+  pattern?: string;
+}
+
+const NO_OTP_GROUPS: number[] = [];
+
+function OtpField({
+  autoComplete = "one-time-code",
+  description,
+  disabled,
+  groups = NO_OTP_GROUPS,
+  id,
+  label,
+  maxLength = 6,
+  pattern,
+}: OtpFieldProps) {
+  const field = useFieldContext<string>();
+  const inputId = id ?? field.name;
+  const errors = toFieldErrors(field.state.meta.errors);
+  const isInvalid = errors.length > 0;
+
+  const handleChange = React.useCallback(
+    (value: string) => {
+      field.handleChange(value);
+    },
+    [field]
+  );
+
+  const slotGroups = React.useMemo(() => {
+    const boundaries = [...groups, maxLength];
+    const result: number[][] = [];
+    let start = 0;
+    for (const end of boundaries) {
+      const slots: number[] = [];
+      for (let index = start; index < end; index += 1) {
+        slots.push(index);
+      }
+      result.push(slots);
+      start = end;
+    }
+    return result;
+  }, [groups, maxLength]);
+
+  return (
+    <Field data-invalid={isInvalid}>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+      {description && <FieldDescription>{description}</FieldDescription>}
+      <InputOTP
+        aria-invalid={isInvalid}
+        autoComplete={autoComplete}
+        disabled={disabled}
+        id={inputId}
+        maxLength={maxLength}
+        name={field.name}
+        onBlur={field.handleBlur}
+        onChange={handleChange}
+        pattern={pattern}
+        value={field.state.value}
+      >
+        {slotGroups.map((slots, groupIndex) => (
+          <React.Fragment key={slots[0] ?? groupIndex}>
+            {groupIndex > 0 && <InputOTPSeparator />}
+            <InputOTPGroup>
+              {slots.map((index) => (
+                <InputOTPSlot
+                  aria-invalid={isInvalid}
+                  index={index}
+                  key={index}
+                />
+              ))}
+            </InputOTPGroup>
+          </React.Fragment>
+        ))}
+      </InputOTP>
+      {isInvalid && <FieldError errors={errors} />}
+    </Field>
+  );
+}
+
+type ToggleGroupBaseProps = Pick<
+  React.ComponentProps<typeof ToggleGroup>,
+  "className" | "size" | "spacing" | "variant"
+>;
+
+interface ToggleGroupFieldProps extends BaseFieldProps, ToggleGroupBaseProps {
+  /** `ToggleGroupItem` elements. */
+  children: React.ReactNode;
+  disabled?: boolean;
+}
+
+/** Single-select toggle group bound to a `string` value. */
+function ToggleGroupField({
+  children,
+  className,
+  description,
+  disabled,
+  id,
+  label,
+  size,
+  spacing,
+  variant,
+}: ToggleGroupFieldProps) {
+  const field = useFieldContext<string>();
+  const inputId = id ?? field.name;
+  const errors = toFieldErrors(field.state.meta.errors);
+  const isInvalid = errors.length > 0;
+
+  const handleValueChange = React.useCallback(
+    (value: string) => {
+      field.handleChange(value);
+    },
+    [field]
+  );
+
+  return (
+    <Field data-invalid={isInvalid}>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+      {description && <FieldDescription>{description}</FieldDescription>}
+      <ToggleGroup
+        aria-invalid={isInvalid}
+        className={className}
+        disabled={disabled}
+        id={inputId}
+        onBlur={field.handleBlur}
+        onValueChange={handleValueChange}
+        size={size}
+        spacing={spacing}
+        type="single"
+        value={field.state.value}
+        variant={variant}
+      >
+        {children}
+      </ToggleGroup>
+      {isInvalid && <FieldError errors={errors} />}
+    </Field>
+  );
+}
+
+/** Multi-select toggle group bound to a `string[]` value. */
+function ToggleGroupMultiField({
+  children,
+  className,
+  description,
+  disabled,
+  id,
+  label,
+  size,
+  spacing,
+  variant,
+}: ToggleGroupFieldProps) {
+  const field = useFieldContext<string[]>();
+  const inputId = id ?? field.name;
+  const errors = toFieldErrors(field.state.meta.errors);
+  const isInvalid = errors.length > 0;
+
+  const handleValueChange = React.useCallback(
+    (value: string[]) => {
+      field.handleChange(value);
+    },
+    [field]
+  );
+
+  return (
+    <Field data-invalid={isInvalid}>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
+      {description && <FieldDescription>{description}</FieldDescription>}
+      <ToggleGroup
+        aria-invalid={isInvalid}
+        className={className}
+        disabled={disabled}
+        id={inputId}
+        onBlur={field.handleBlur}
+        onValueChange={handleValueChange}
+        size={size}
+        spacing={spacing}
+        type="multiple"
+        value={field.state.value}
+        variant={variant}
+      >
+        {children}
+      </ToggleGroup>
+      {isInvalid && <FieldError errors={errors} />}
+    </Field>
+  );
+}
+
 type FormProps = Omit<React.ComponentProps<"form">, "onSubmit">;
 
 /** A `<form>` wired to the surrounding `useAppForm` instance. */
@@ -491,9 +884,16 @@ const { useAppForm, withFieldGroup, withForm } = createFormHook({
     CheckboxField,
     DateField,
     FileField,
+    OtpField,
     PasswordField,
+    RadioGroupField,
     SelectField,
+    SliderField,
+    SwitchField,
     TextField,
+    TextareaField,
+    ToggleGroupField,
+    ToggleGroupMultiField,
   },
   fieldContext,
   formComponents: {
