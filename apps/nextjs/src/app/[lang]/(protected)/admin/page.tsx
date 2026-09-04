@@ -2,7 +2,6 @@
 
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
-import { Calendar } from "@acme/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import {
   Dialog,
@@ -11,16 +10,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
-import { Input } from "@acme/ui/input";
-import { Label } from "@acme/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@acme/ui/select";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
+import { SelectItem } from "@acme/ui/select";
 import {
   Table,
   TableBody,
@@ -30,21 +22,13 @@ import {
   TableRow,
 } from "@acme/ui/table";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  Loader2,
-  Plus,
-  RefreshCw,
-  Trash,
-  UserCircle,
-} from "lucide-react";
+import { Loader2, Plus, RefreshCw, Trash, UserCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
+import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import { cn } from "~/lib/utils";
 
 import { AuditLogCard } from "./_components/audit-log-card";
 
@@ -164,23 +148,25 @@ const UserRow = memo(
 );
 UserRow.displayName = "UserRow";
 
+const createUserSchema = z.object({
+  email: z.email("Please enter a valid email address."),
+  name: z.string().trim().min(1, "Name is required."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+  role: z.enum(["admin", "user"]),
+});
+
+const banUserSchema = z.object({
+  expirationDate: z.date({ error: "Expiration date is required." }),
+  reason: z.string().trim().min(1, "Reason is required."),
+});
+
 function AdminDashboard() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newUser, setNewUser] = useState({
-    email: "",
-    name: "",
-    password: "",
-    role: "user" as const,
-  });
   const [isLoading, setIsLoading] = useState<string | undefined>();
   const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
-  const [banForm, setBanForm] = useState({
-    expirationDate: undefined as Date | undefined,
-    reason: "",
-    userId: "",
-  });
+  const [banUserId, setBanUserId] = useState("");
 
   const { data: users, isLoading: isUsersLoading } = useQuery({
     queryFn: async () => {
@@ -201,32 +187,83 @@ function AdminDashboard() {
     queryKey: ["users"],
   });
 
-  const handleCreateUser = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsLoading("create");
+  const invalidateUsers = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+    [queryClient]
+  );
+
+  const createUserForm = useAppForm({
+    defaultValues: {
+      email: "",
+      name: "",
+      password: "",
+      role: "user" as "admin" | "user",
+    },
+    onSubmit: async ({ formApi, value }) => {
       try {
-        await authClient.admin.createUser({
-          email: newUser.email,
-          name: newUser.name,
-          password: newUser.password,
-          role: newUser.role,
+        const { error } = await authClient.admin.createUser({
+          email: value.email,
+          name: value.name,
+          password: value.password,
+          role: value.role,
         });
-        toast.success("User created successfully");
-        setNewUser({ email: "", name: "", password: "", role: "user" });
-        setIsDialogOpen(false);
-        queryClient.invalidateQueries({
-          queryKey: ["users"],
-        });
+        if (error) {
+          toast.error(error.message || "Failed to create user");
+          return;
+        }
       } catch (error: unknown) {
-        const message =
-          error instanceof Error ? error.message : "Failed to create user";
-        toast.error(message);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to create user"
+        );
+        return;
+      }
+      toast.success("User created successfully");
+      formApi.reset();
+      setIsDialogOpen(false);
+      invalidateUsers();
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: createUserSchema,
+    },
+  });
+
+  const banUserForm = useAppForm({
+    defaultValues: {
+      expirationDate: undefined as Date | undefined,
+      reason: "",
+    },
+    onSubmit: async ({ formApi, value }) => {
+      if (!value.expirationDate) {
+        return;
+      }
+      setIsLoading(`ban-${banUserId}`);
+      try {
+        const { error } = await authClient.admin.banUser({
+          banExpiresIn: value.expirationDate.getTime() - Date.now(),
+          banReason: value.reason,
+          userId: banUserId,
+        });
+        if (error) {
+          toast.error(error.message || "Failed to ban user");
+        } else {
+          toast.success("User banned successfully");
+          setIsBanDialogOpen(false);
+          formApi.reset();
+          invalidateUsers();
+        }
+      } catch (error: unknown) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to ban user"
+        );
       }
       setIsLoading(undefined);
     },
-    [newUser, queryClient]
-  );
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: banUserSchema,
+    },
+  });
 
   const handleDeleteUser = useCallback(
     async (id: string) => {
@@ -234,9 +271,7 @@ function AdminDashboard() {
       try {
         await authClient.admin.removeUser({ userId: id });
         toast.success("User deleted successfully");
-        queryClient.invalidateQueries({
-          queryKey: ["users"],
-        });
+        invalidateUsers();
       } catch (error: unknown) {
         const message =
           error instanceof Error ? error.message : "Failed to delete user";
@@ -244,7 +279,7 @@ function AdminDashboard() {
       }
       setIsLoading(undefined);
     },
-    [queryClient]
+    [invalidateUsers]
   );
 
   const handleRevokeSessions = useCallback(async (id: string) => {
@@ -279,104 +314,32 @@ function AdminDashboard() {
 
   const handleBanToggle = useCallback(
     async (user: User) => {
-      setBanForm({
-        expirationDate: undefined,
-        reason: "",
-        userId: user.id,
-      });
-      if (user.banned) {
-        setIsLoading(`ban-${user.id}`);
-        await authClient.admin.unbanUser(
-          {
-            userId: user.id,
-          },
-          {
-            onError(context: { error: { message?: string } }) {
-              toast.error(context.error.message || "Failed to unban user");
-              setIsLoading(undefined);
-            },
-            onSuccess() {
-              queryClient.invalidateQueries({
-                queryKey: ["users"],
-              });
-              toast.success("User unbanned successfully");
-            },
-          }
-        );
-        queryClient.invalidateQueries({
-          queryKey: ["users"],
-        });
-      } else {
+      if (!user.banned) {
+        setBanUserId(user.id);
+        banUserForm.reset();
         setIsBanDialogOpen(true);
-      }
-    },
-    [queryClient]
-  );
-
-  const handleBanUser = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!banForm.expirationDate) {
-        toast.error("Expiration date is required");
         return;
       }
-      setIsLoading(`ban-${banForm.userId}`);
-      try {
-        await authClient.admin.banUser({
-          banExpiresIn: banForm.expirationDate.getTime() - Date.now(),
-          banReason: banForm.reason,
-          userId: banForm.userId,
-        });
-        toast.success("User banned successfully");
-        setIsBanDialogOpen(false);
-        queryClient.invalidateQueries({
-          queryKey: ["users"],
-        });
-      } catch (error: unknown) {
-        const message =
-          error instanceof Error ? error.message : "Failed to ban user";
-        toast.error(message);
-      }
-      setIsLoading(undefined);
+      setIsLoading(`ban-${user.id}`);
+      await authClient.admin.unbanUser(
+        {
+          userId: user.id,
+        },
+        {
+          onError(context: { error: { message?: string } }) {
+            toast.error(context.error.message || "Failed to unban user");
+            setIsLoading(undefined);
+          },
+          onSuccess() {
+            invalidateUsers();
+            toast.success("User unbanned successfully");
+          },
+        }
+      );
+      invalidateUsers();
     },
-    [banForm, queryClient]
+    [banUserForm, invalidateUsers]
   );
-
-  const handleEmailChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNewUser((prev) => ({ ...prev, email: e.target.value }));
-    },
-    []
-  );
-
-  const handlePasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNewUser((prev) => ({ ...prev, password: e.target.value }));
-    },
-    []
-  );
-
-  const handleNameChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNewUser((prev) => ({ ...prev, name: e.target.value }));
-    },
-    []
-  );
-
-  const handleRoleChange = useCallback((value: "admin" | "user") => {
-    setNewUser((prev) => ({ ...prev, role: value as "user" }));
-  }, []);
-
-  const handleBanReasonChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setBanForm((prev) => ({ ...prev, reason: e.target.value }));
-    },
-    []
-  );
-
-  const handleBanDateSelect = useCallback((date: Date | undefined) => {
-    setBanForm((prev) => ({ ...prev, expirationDate: date }));
-  }, []);
 
   return (
     <div className="container mx-auto space-y-8 p-4">
@@ -394,63 +357,53 @@ function AdminDashboard() {
               <DialogHeader>
                 <DialogTitle>Create New User</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleCreateUser} className="space-y-4">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={newUser.email}
-                    onChange={handleEmailChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={newUser.password}
-                    onChange={handlePasswordChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    value={newUser.name}
-                    onChange={handleNameChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="role">Role</Label>
-                  <Select value={newUser.role} onValueChange={handleRoleChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="admin">Admin</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading === "create"}
-                >
-                  {isLoading === "create" ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating...
-                    </>
-                  ) : (
-                    "Create User"
-                  )}
-                </Button>
-              </form>
+              <createUserForm.AppForm>
+                <createUserForm.Form className="space-y-4">
+                  <FieldGroup>
+                    <createUserForm.AppField name="email">
+                      {(field) => (
+                        <field.TextField
+                          autoComplete="email"
+                          id="email"
+                          label="Email"
+                          type="email"
+                        />
+                      )}
+                    </createUserForm.AppField>
+                    <createUserForm.AppField name="password">
+                      {(field) => (
+                        <field.TextField
+                          autoComplete="new-password"
+                          id="password"
+                          label="Password"
+                          type="password"
+                        />
+                      )}
+                    </createUserForm.AppField>
+                    <createUserForm.AppField name="name">
+                      {(field) => <field.TextField id="name" label="Name" />}
+                    </createUserForm.AppField>
+                    <createUserForm.AppField name="role">
+                      {(field) => (
+                        <field.SelectField
+                          id="role"
+                          label="Role"
+                          placeholder="Select role"
+                        >
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="user">User</SelectItem>
+                        </field.SelectField>
+                      )}
+                    </createUserForm.AppField>
+                  </FieldGroup>
+                  <createUserForm.SubmitButton
+                    className="w-full"
+                    submittingLabel="Creating..."
+                  >
+                    Create User
+                  </createUserForm.SubmitButton>
+                </createUserForm.Form>
+              </createUserForm.AppForm>
             </DialogContent>
           </Dialog>
           <Dialog open={isBanDialogOpen} onOpenChange={setIsBanDialogOpen}>
@@ -458,61 +411,31 @@ function AdminDashboard() {
               <DialogHeader>
                 <DialogTitle>Ban User</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleBanUser} className="space-y-4">
-                <div>
-                  <Label htmlFor="reason">Reason</Label>
-                  <Input
-                    id="reason"
-                    value={banForm.reason}
-                    onChange={handleBanReasonChange}
-                    required
-                  />
-                </div>
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="expirationDate">Expiration Date</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        id="expirationDate"
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !banForm.expirationDate && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {banForm.expirationDate ? (
-                          format(banForm.expirationDate, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={banForm.expirationDate}
-                        onSelect={handleBanDateSelect}
-                        autoFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading === `ban-${banForm.userId}`}
-                >
-                  {isLoading === `ban-${banForm.userId}` ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Banning...
-                    </>
-                  ) : (
-                    "Ban User"
-                  )}
-                </Button>
-              </form>
+              <banUserForm.AppForm>
+                <banUserForm.Form className="space-y-4">
+                  <FieldGroup>
+                    <banUserForm.AppField name="reason">
+                      {(field) => (
+                        <field.TextField id="reason" label="Reason" />
+                      )}
+                    </banUserForm.AppField>
+                    <banUserForm.AppField name="expirationDate">
+                      {(field) => (
+                        <field.DateField
+                          id="expirationDate"
+                          label="Expiration Date"
+                        />
+                      )}
+                    </banUserForm.AppField>
+                  </FieldGroup>
+                  <banUserForm.SubmitButton
+                    className="w-full"
+                    submittingLabel="Banning..."
+                  >
+                    Ban User
+                  </banUserForm.SubmitButton>
+                </banUserForm.Form>
+              </banUserForm.AppForm>
             </DialogContent>
           </Dialog>
         </CardHeader>

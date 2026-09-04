@@ -1,19 +1,13 @@
 "use client";
 
-import { Button } from "@acme/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
-import { CheckCircle2, Loader2 } from "lucide-react";
-import { useCallback, useState, useTransition } from "react";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
+import { CheckCircle2 } from "lucide-react";
+import { useState } from "react";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import type { Dictionary } from "~/i18n/get-dictionary";
-
-interface TotpFormValues {
-  code: string;
-}
-type FormErrors = Partial<Record<keyof TotpFormValues, { message: string }>>;
 
 interface TwoFactorTotpFormProps {
   onSuccess?: () => void;
@@ -26,10 +20,7 @@ export function TwoFactorTotpForm({
   onError,
   dict,
 }: TwoFactorTotpFormProps) {
-  const [loading, startTransition] = useTransition();
   const [isVerified, setIsVerified] = useState(false);
-  const [code, setCode] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
 
   const totpSchema = z.object({
     code: z
@@ -38,50 +29,31 @@ export function TwoFactorTotpForm({
       .regex(/^\d+$/u, dict.auth.twoFactor.codeMustBeDigitsOnly),
   });
 
-  const validate = useCallback((): boolean => {
-    const result = totpSchema.safeParse({ code });
-    if (!result.success) {
-      const fieldErrors: FormErrors = {};
-      for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof TotpFormValues;
-        fieldErrors[field] = { message: issue.message };
-      }
-      setErrors(fieldErrors);
-      return false;
-    }
-    setErrors({});
-    return true;
-  }, [code, totpSchema]);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (!validate()) {
-        return;
-      }
-
-      startTransition(async () => {
+  const form = useAppForm({
+    defaultValues: {
+      code: "",
+    },
+    onSubmit: () => {
+      setIsVerified(true);
+      onSuccess?.();
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: totpSchema,
+      // Runs after the schema passes; a rejected code lands on the field so
+      // the user sees it inline and the next submit re-checks the server.
+      onSubmitAsync: async ({ value }) => {
         const res = await authClient.twoFactor.verifyTotp({
-          code,
+          code: value.code,
         });
         if (res.data?.token) {
-          setIsVerified(true);
-          onSuccess?.();
-        } else {
-          onError?.(dict.auth.twoFactor.invalidCode);
-          setErrors({ code: { message: dict.auth.twoFactor.invalidCode } });
+          return undefined;
         }
-      });
+        onError?.(dict.auth.twoFactor.invalidCode);
+        return { fields: { code: dict.auth.twoFactor.invalidCode } };
+      },
     },
-    [code, dict.auth.twoFactor.invalidCode, onError, onSuccess, validate]
-  );
-
-  const handleCodeChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setCode(e.target.value);
-    },
-    []
-  );
+  });
 
   if (isVerified) {
     return (
@@ -95,33 +67,27 @@ export function TwoFactorTotpForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
-      <FieldGroup>
-        <Field data-invalid={!!errors.code}>
-          <FieldLabel htmlFor="totp-code">
-            {dict.auth.twoFactor.codeLabel}
-          </FieldLabel>
-          <Input
-            id="totp-code"
-            type="text"
-            inputMode="numeric"
-            maxLength={6}
-            placeholder={dict.auth.twoFactor.codePlaceholder}
-            aria-invalid={!!errors.code}
-            autoComplete="one-time-code"
-            value={code}
-            onChange={handleCodeChange}
-          />
-          {errors.code && <FieldError errors={[errors.code]} />}
-        </Field>
-      </FieldGroup>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? (
-          <Loader2 size={16} className="animate-spin" />
-        ) : (
-          dict.auth.twoFactor.verifyButton
-        )}
-      </Button>
-    </form>
+    <form.AppForm>
+      <form.Form className="grid gap-4">
+        <FieldGroup>
+          <form.AppField name="code">
+            {(field) => (
+              <field.TextField
+                autoComplete="one-time-code"
+                id="totp-code"
+                inputMode="numeric"
+                label={dict.auth.twoFactor.codeLabel}
+                maxLength={6}
+                placeholder={dict.auth.twoFactor.codePlaceholder}
+                type="text"
+              />
+            )}
+          </form.AppField>
+        </FieldGroup>
+        <form.SubmitButton className="w-full">
+          {dict.auth.twoFactor.verifyButton}
+        </form.SubmitButton>
+      </form.Form>
+    </form.AppForm>
   );
 }

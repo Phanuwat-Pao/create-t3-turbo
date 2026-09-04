@@ -1,24 +1,12 @@
 "use client";
 
-import { Button } from "@acme/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
-import { Loader2, X } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useState } from "react";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
 import * as z from "zod";
 
 import { uploadFile } from "~/data/storage/upload-file";
 import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
-import { useImagePreview } from "~/hooks/use-image-preview";
 import type { Dictionary } from "~/i18n/get-dictionary";
-
-interface UpdateUserFormValues {
-  name: string;
-}
-type FormErrors = Partial<
-  Record<keyof UpdateUserFormValues, { message: string }>
->;
 
 interface UpdateUserFormProps {
   currentName?: string;
@@ -34,157 +22,92 @@ export function UpdateUserForm({
   dict,
 }: UpdateUserFormProps) {
   const updateUserMutation = useUpdateUserMutation();
-  const { image, imagePreview, handleImageChange, clearImage } =
-    useImagePreview();
-
-  const [name, setName] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
 
   const updateUserSchema = z.object({
-    name: z
-      .string()
-      .min(2, dict.validation.nameMinLength)
-      .max(50, dict.validation.nameMaxLength)
-      .optional()
-      .or(z.literal("")),
+    image: z.file().nullable(),
+    name: z.union([
+      z.literal(""),
+      z
+        .string()
+        .min(2, dict.validation.nameMinLength)
+        .max(50, dict.validation.nameMaxLength),
+    ]),
   });
 
-  const validate = useCallback((): boolean => {
-    const result = updateUserSchema.safeParse({ name });
-    if (!result.success) {
-      const fieldErrors: FormErrors = {};
-      for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof UpdateUserFormValues;
-        fieldErrors[field] = { message: issue.message };
-      }
-      setErrors(fieldErrors);
-      return false;
-    }
-    setErrors({});
-    return true;
-  }, [name, updateUserSchema]);
-
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!validate()) {
-        return;
-      }
-
+  const form = useAppForm({
+    defaultValues: {
+      image: null as File | null,
+      name: "",
+    },
+    onSubmit: async ({ formApi, value }) => {
       try {
         let imageKey: string | undefined;
-        if (image) {
-          const result = await uploadFile(image);
+        if (value.image) {
+          const result = await uploadFile(value.image);
           imageKey = result.key;
         }
-
-        updateUserMutation.mutate(
-          {
-            image: imageKey,
-            name: name || undefined,
-          },
-          {
-            onError: (error) => {
-              onError?.(error.message);
-            },
-            onSuccess: () => {
-              setName("");
-              clearImage();
-              onSuccess?.();
-            },
-          }
-        );
+        await updateUserMutation.mutateAsync({
+          image: imageKey,
+          name: value.name || undefined,
+        });
       } catch (error) {
         onError?.(
           error instanceof Error
             ? error.message
             : dict.validation.failedToProcessImage
         );
+        return;
       }
+      formApi.reset();
+      onSuccess?.();
     },
-    [
-      validate,
-      image,
-      updateUserMutation,
-      name,
-      onError,
-      clearImage,
-      onSuccess,
-      dict,
-    ]
-  );
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: updateUserSchema,
+    },
+  });
 
-  const handleNameChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setName(e.target.value);
-    },
-    []
+  const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
+  const isEmpty = useStore(
+    form.store,
+    (state) => !state.values.image && !state.values.name
   );
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FieldGroup>
-        <Field data-invalid={!!errors.name}>
-          <FieldLabel htmlFor="name">
-            {dict.dashboard.user.fullNameLabel}
-          </FieldLabel>
-          <Input
-            id="name"
-            type="text"
-            placeholder={currentName}
-            disabled={updateUserMutation.isPending}
-            value={name}
-            onChange={handleNameChange}
-          />
-          {errors.name && <FieldError errors={[errors.name]} />}
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="image">
-            {dict.dashboard.user.profileImageLabel}
-          </FieldLabel>
-          <div className="flex items-end gap-4">
-            {imagePreview && (
-              <div className="relative h-16 w-16 overflow-hidden rounded-sm">
-                <Image
-                  src={imagePreview}
-                  alt={dict.dashboard.user.profileImageAlt}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            )}
-            <div className="flex w-full items-center gap-2">
-              <Input
-                id="image"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                disabled={updateUserMutation.isPending}
-                className="text-muted-foreground w-full"
+    <form.AppForm>
+      <form.Form>
+        <FieldGroup>
+          <form.AppField name="name">
+            {(field) => (
+              <field.TextField
+                disabled={isSubmitting}
+                id="name"
+                label={dict.dashboard.user.fullNameLabel}
+                placeholder={currentName}
+                type="text"
               />
-              {imagePreview && (
-                <X
-                  className="cursor-pointer"
-                  onClick={clearImage}
-                  aria-label="Clear image"
-                />
-              )}
-            </div>
-          </div>
-        </Field>
+            )}
+          </form.AppField>
 
-        <Button
-          type="submit"
-          disabled={updateUserMutation.isPending || (!image && !name)}
-        >
-          {updateUserMutation.isPending ? (
-            <Loader2 size={15} className="animate-spin" />
-          ) : (
-            dict.dashboard.user.updateButton
-          )}
-        </Button>
-      </FieldGroup>
-    </form>
+          <form.AppField name="image">
+            {(field) => (
+              <field.FileField
+                accept="image/*"
+                className="text-muted-foreground"
+                clearLabel="Clear image"
+                disabled={isSubmitting}
+                id="image"
+                label={dict.dashboard.user.profileImageLabel}
+                previewAlt={dict.dashboard.user.profileImageAlt}
+              />
+            )}
+          </form.AppField>
+
+          <form.SubmitButton disabled={isEmpty}>
+            {dict.dashboard.user.updateButton}
+          </form.SubmitButton>
+        </FieldGroup>
+      </form.Form>
+    </form.AppForm>
   );
 }

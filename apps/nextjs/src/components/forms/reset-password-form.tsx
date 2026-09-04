@@ -1,23 +1,12 @@
 "use client";
 
-import { Button } from "@acme/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
-import { PasswordInput } from "@acme/ui/password-input";
-import { Loader2 } from "lucide-react";
-import { useCallback, useState, useTransition } from "react";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import type { Dictionary } from "~/i18n/get-dictionary";
-
-interface ResetPasswordFormValues {
-  confirmPassword: string;
-  password: string;
-}
-type FormErrors = Partial<
-  Record<keyof ResetPasswordFormValues, { message: string }>
->;
 
 interface ResetPasswordFormProps {
   token: string;
@@ -30,11 +19,6 @@ export function ResetPasswordForm({
   onSuccess,
   dict,
 }: ResetPasswordFormProps) {
-  const [loading, startTransition] = useTransition();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<FormErrors>({});
-
   const resetPasswordSchema = z
     .object({
       confirmPassword: z
@@ -47,102 +31,58 @@ export function ResetPasswordForm({
       path: ["confirmPassword"],
     });
 
-  const validate = useCallback((): boolean => {
-    const result = resetPasswordSchema.safeParse({ confirmPassword, password });
-    if (!result.success) {
-      const fieldErrors: FormErrors = {};
-      for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof ResetPasswordFormValues;
-        fieldErrors[field] = { message: issue.message };
-      }
-      setErrors(fieldErrors);
-      return false;
-    }
-    setErrors({});
-    return true;
-  }, [confirmPassword, password, resetPasswordSchema]);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!validate()) {
+  const form = useAppForm({
+    defaultValues: {
+      confirmPassword: "",
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      const res = await authClient.resetPassword({
+        newPassword: value.password,
+        token,
+      });
+      if (res.error) {
+        toast.error(res.error.message);
         return;
       }
-
-      startTransition(async () => {
-        const res = await authClient.resetPassword({
-          newPassword: password,
-          token,
-        });
-        if (res.error) {
-          toast.error(res.error.message);
-          return;
-        }
-        toast.success(dict.auth.resetPassword.successMessage);
-        onSuccess?.();
-      });
+      toast.success(dict.auth.resetPassword.successMessage);
+      onSuccess?.();
     },
-    [
-      dict.auth.resetPassword.successMessage,
-      onSuccess,
-      password,
-      token,
-      validate,
-    ]
-  );
-
-  const handlePasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
-    []
-  );
-
-  const handleConfirmPasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) =>
-      setConfirmPassword(e.target.value),
-    []
-  );
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: resetPasswordSchema,
+    },
+  });
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
-      <FieldGroup>
-        <Field data-invalid={!!errors.password}>
-          <FieldLabel htmlFor="reset-password">
-            {dict.auth.resetPassword.newPasswordLabel}
-          </FieldLabel>
-          <PasswordInput
-            id="reset-password"
-            placeholder={dict.auth.resetPassword.newPasswordPlaceholder}
-            aria-invalid={!!errors.password}
-            autoComplete="new-password"
-            value={password}
-            onChange={handlePasswordChange}
-          />
-          {errors.password && <FieldError errors={[errors.password]} />}
-        </Field>
-        <Field data-invalid={!!errors.confirmPassword}>
-          <FieldLabel htmlFor="reset-confirm-password">
-            {dict.auth.resetPassword.confirmPasswordLabel}
-          </FieldLabel>
-          <PasswordInput
-            id="reset-confirm-password"
-            placeholder={dict.auth.resetPassword.confirmPasswordPlaceholder}
-            aria-invalid={!!errors.confirmPassword}
-            autoComplete="new-password"
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-          />
-          {errors.confirmPassword && (
-            <FieldError errors={[errors.confirmPassword]} />
-          )}
-        </Field>
-      </FieldGroup>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? (
-          <Loader2 size={16} className="animate-spin" />
-        ) : (
-          dict.auth.resetPassword.resetButton
-        )}
-      </Button>
-    </form>
+    <form.AppForm>
+      <form.Form className="grid gap-4">
+        <FieldGroup>
+          <form.AppField name="password">
+            {(field) => (
+              <field.PasswordField
+                autoComplete="new-password"
+                id="reset-password"
+                label={dict.auth.resetPassword.newPasswordLabel}
+                placeholder={dict.auth.resetPassword.newPasswordPlaceholder}
+              />
+            )}
+          </form.AppField>
+          <form.AppField name="confirmPassword">
+            {(field) => (
+              <field.PasswordField
+                autoComplete="new-password"
+                id="reset-confirm-password"
+                label={dict.auth.resetPassword.confirmPasswordLabel}
+                placeholder={dict.auth.resetPassword.confirmPasswordPlaceholder}
+              />
+            )}
+          </form.AppField>
+        </FieldGroup>
+        <form.SubmitButton className="w-full">
+          {dict.auth.resetPassword.resetButton}
+        </form.SubmitButton>
+      </form.Form>
+    </form.AppForm>
   );
 }

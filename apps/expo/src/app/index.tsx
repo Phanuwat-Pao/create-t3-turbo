@@ -1,13 +1,14 @@
 import Ionicons from "@expo/vector-icons/AntDesign";
 import { router, Stack, useNavigationContainerRef } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Image, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as z from "zod";
 
 import { Button } from "~/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
+import { revalidateLogic, useAppForm } from "~/components/ui/form";
 import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
@@ -17,8 +18,6 @@ import logoImage from "../../images/logo.png";
 export default function Index() {
   const { data: isAuthenticated } = authClient.useSession();
   const navContainerRef = useNavigationContainerRef();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const { t } = useTranslation();
 
   const isNavReady = navContainerRef.isReady();
@@ -27,6 +26,35 @@ export default function Index() {
       router.push("/dashboard");
     }
   }, [isAuthenticated, isNavReady]);
+
+  const signInSchema = z.object({
+    email: z.email(t("validation.emailRequired")),
+    password: z.string().min(1, t("validation.passwordRequired")),
+  });
+
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      await authClient.signIn.email(
+        {
+          email: value.email,
+          password: value.password,
+        },
+        {
+          onError: (ctx) => {
+            Alert.alert(t("common.error"), ctx.error.message);
+          },
+        }
+      );
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: signInSchema,
+    },
+  });
 
   const handleGoogleSignIn = useCallback(() => {
     authClient.signIn.social({
@@ -45,20 +73,6 @@ export default function Index() {
   const handleForgetPassword = useCallback(() => {
     router.push("/forget-password");
   }, []);
-
-  const handleEmailSignIn = useCallback(() => {
-    authClient.signIn.email(
-      {
-        email,
-        password,
-      },
-      {
-        onError: (ctx) => {
-          Alert.alert(t("common.error"), ctx.error.message);
-        },
-      }
-    );
-  }, [email, password, t]);
 
   const handleCreateAccount = useCallback(() => {
     router.push("/sign-up");
@@ -102,43 +116,51 @@ export default function Index() {
             <Text>{t("auth.signIn.orContinueWith")}</Text>
             <Separator className="w-3/12 grow" />
           </View>
-          <View className="px-6">
-            <Input
-              placeholder={t("auth.signIn.emailPlaceholder")}
-              className="rounded-b-none border-b-0"
-              value={email}
-              onChangeText={setEmail}
-            />
-            <Input
-              placeholder={t("auth.signIn.passwordPlaceholder")}
-              className="rounded-t-none"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
-          </View>
-          <CardFooter>
-            <View className="w-full">
-              <Button
-                variant="link"
-                className="w-full"
-                onPress={handleForgetPassword}
-              >
-                <Text className="text-center underline">
-                  {t("auth.signIn.forgotPassword")}
-                </Text>
-              </Button>
-              <Button onPress={handleEmailSignIn}>
-                <Text>{t("common.continue")}</Text>
-              </Button>
-              <Text className="mt-2 text-center">
-                {t("auth.signIn.noAccount")}{" "}
-                <Text className="underline" onPress={handleCreateAccount}>
-                  {t("auth.signIn.createAccount")}
-                </Text>
-              </Text>
+          <form.AppForm>
+            <View className="gap-2 px-6">
+              <form.AppField name="email">
+                {(field) => (
+                  <field.TextField
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    placeholder={t("auth.signIn.emailPlaceholder")}
+                  />
+                )}
+              </form.AppField>
+              <form.AppField name="password">
+                {(field) => (
+                  <field.TextField
+                    autoComplete="current-password"
+                    placeholder={t("auth.signIn.passwordPlaceholder")}
+                    secureTextEntry
+                  />
+                )}
+              </form.AppField>
             </View>
-          </CardFooter>
+            <CardFooter>
+              <View className="w-full">
+                <Button
+                  variant="link"
+                  className="w-full"
+                  onPress={handleForgetPassword}
+                >
+                  <Text className="text-center underline">
+                    {t("auth.signIn.forgotPassword")}
+                  </Text>
+                </Button>
+                <form.SubmitButton>
+                  <Text>{t("common.continue")}</Text>
+                </form.SubmitButton>
+                <Text className="mt-2 text-center">
+                  {t("auth.signIn.noAccount")}{" "}
+                  <Text className="underline" onPress={handleCreateAccount}>
+                    {t("auth.signIn.createAccount")}
+                  </Text>
+                </Text>
+              </View>
+            </CardFooter>
+          </form.AppForm>
         </Card>
       </View>
     </SafeAreaView>

@@ -40,12 +40,19 @@
       "description": "Enter your email to reset your password",
       "emailPlaceholder": "Email",
       "sendEmail": "Send Email",
-      "backToSignIn": "Back to Sign In"
+      "backToSignIn": "Back to Sign In",
+      "emailSent": "If an account exists for that email, a reset link is on its way."
     }
   },
   "dashboard": {
     "userImageAlt": "user-image",
     "editUser": "Edit User",
     "signOut": "Sign Out"
+  },
+  "validation": {
+    "emailRequired": "Please enter a valid email address.",
+    "passwordRequired": "Password is required.",
+    "passwordMinLength": "Password must be at least 8 characters.",
+    "nameRequired": "Name is required."
   }
 }

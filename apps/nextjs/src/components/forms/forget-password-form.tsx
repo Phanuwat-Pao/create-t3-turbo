@@ -1,10 +1,7 @@
 "use client";
 
-import { Button } from "@acme/ui/button";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
-import { Loader2 } from "lucide-react";
-import { useCallback, useState, useTransition } from "react";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
@@ -23,84 +20,52 @@ export function ForgetPasswordForm({
   redirectTo = "/reset-password",
   dict,
 }: ForgetPasswordFormProps) {
-  const [loading, startTransition] = useTransition();
-  const [email, setEmail] = useState("");
-  const [errors, setErrors] = useState<
-    Partial<Record<"email", { message: string }>>
-  >({});
-
   const forgetPasswordSchema = z.object({
-    email: z.string().email(dict.validation.emailRequired),
+    email: z.email(dict.validation.emailRequired),
   });
 
-  const validate = useCallback((): boolean => {
-    const result = forgetPasswordSchema.safeParse({ email });
-    if (!result.success) {
-      const fieldErrors: typeof errors = {};
-      for (const issue of result.error.issues) {
-        const field = issue.path[0] as "email";
-        fieldErrors[field] = { message: issue.message };
-      }
-      setErrors(fieldErrors);
-      return false;
-    }
-    setErrors({});
-    return true;
-  }, [email, forgetPasswordSchema]);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!validate()) {
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        await authClient.requestPasswordReset({
+          email: value.email,
+          redirectTo,
+        });
+      } catch {
+        onError?.(dict.common.error);
         return;
       }
-
-      startTransition(async () => {
-        try {
-          await authClient.requestPasswordReset({
-            email,
-            redirectTo,
-          });
-          onSuccess?.();
-        } catch {
-          onError?.(dict.common.error);
-        }
-      });
+      onSuccess?.();
     },
-    [validate, email, redirectTo, onSuccess, onError, dict]
-  );
-
-  const handleEmailChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
-    []
-  );
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: forgetPasswordSchema,
+    },
+  });
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4">
-      <FieldGroup>
-        <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="forget-email">
-            {dict.auth.forgotPassword.emailLabel}
-          </FieldLabel>
-          <Input
-            id="forget-email"
-            type="email"
-            placeholder={dict.auth.forgotPassword.emailPlaceholder}
-            aria-invalid={!!errors.email}
-            autoComplete="email"
-            value={email}
-            onChange={handleEmailChange}
-          />
-          {errors.email && <FieldError errors={[errors.email]} />}
-        </Field>
-      </FieldGroup>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? (
-          <Loader2 size={16} className="animate-spin" />
-        ) : (
-          dict.auth.forgotPassword.sendResetLink
-        )}
-      </Button>
-    </form>
+    <form.AppForm>
+      <form.Form className="grid gap-4">
+        <FieldGroup>
+          <form.AppField name="email">
+            {(field) => (
+              <field.TextField
+                autoComplete="email"
+                id="forget-email"
+                label={dict.auth.forgotPassword.emailLabel}
+                placeholder={dict.auth.forgotPassword.emailPlaceholder}
+                type="email"
+              />
+            )}
+          </form.AppField>
+        </FieldGroup>
+        <form.SubmitButton className="w-full">
+          {dict.auth.forgotPassword.sendResetLink}
+        </form.SubmitButton>
+      </form.Form>
+    </form.AppForm>
   );
 }

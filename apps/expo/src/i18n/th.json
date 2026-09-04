@@ -40,12 +40,19 @@
       "description": "กรอกอีเมลเพื่อรีเซ็ตรหัสผ่าน",
       "emailPlaceholder": "อีเมล",
       "sendEmail": "ส่งอีเมล",
-      "backToSignIn": "กลับไปหน้าเข้าสู่ระบบ"
+      "backToSignIn": "กลับไปหน้าเข้าสู่ระบบ",
+      "emailSent": "หากมีบัญชีสำหรับอีเมลนี้ ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปให้แล้ว"
     }
   },
   "dashboard": {
     "userImageAlt": "รูปผู้ใช้",
     "editUser": "แก้ไขผู้ใช้",
     "signOut": "ออกจากระบบ"
+  },
+  "validation": {
+    "emailRequired": "กรุณากรอกที่อยู่อีเมลที่ถูกต้อง",
+    "passwordRequired": "ต้องกรอกรหัสผ่าน",
+    "passwordMinLength": "รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร",
+    "nameRequired": "ต้องกรอกชื่อ"
   }
 }

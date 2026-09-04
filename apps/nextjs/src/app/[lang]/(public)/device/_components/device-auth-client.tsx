@@ -1,13 +1,12 @@
 "use client";
 
 import { Alert, AlertDescription } from "@acme/ui/alert";
-import { Button } from "@acme/ui/button";
 import { Card } from "@acme/ui/card";
-import { Input } from "@acme/ui/input";
-import { Label } from "@acme/ui/label";
-import { Loader2 } from "lucide-react";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useTransition } from "react";
+import { useState } from "react";
+import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import type { Dictionary } from "~/i18n/get-dictionary";
@@ -19,45 +18,45 @@ interface DeviceAuthClientProps {
 export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
   const router = useRouter();
   const params = useSearchParams();
-  const user_code = params.get("user_code");
-  const [userCode, setUserCode] = useState<string>(user_code || "");
-  const [isPending, startTransition] = useTransition();
+  const initialUserCode = params.get("user_code") ?? "";
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
+  const deviceSchema = z.object({
+    userCode: z.string().trim().min(1, dict.device.invalidCode),
+  });
+
+  const form = useAppForm({
+    defaultValues: {
+      userCode: initialUserCode,
+    },
+    onSubmit: async ({ value }) => {
       setErrorMessage(null);
+      try {
+        const finalCode = value.userCode
+          .trim()
+          .replaceAll("-", "")
+          .toUpperCase();
+        // Get the device authorization status
+        const response = await authClient.device({
+          query: {
+            user_code: finalCode,
+          },
+        });
 
-      startTransition(async () => {
-        try {
-          const finalCode = userCode.trim().replaceAll("-", "").toUpperCase();
-          // Get the device authorization status
-          const response = await authClient.device({
-            query: {
-              user_code: finalCode,
-            },
-          });
-
-          if (response.data) {
-            router.push(`/device/approve?user_code=${finalCode}`);
-          }
-        } catch (error: unknown) {
-          const message =
-            error instanceof Error ? error.message : dict.device.invalidCode;
-          setErrorMessage(message);
+        if (response.data) {
+          router.push(`/device/approve?user_code=${finalCode}`);
         }
-      });
+      } catch (error: unknown) {
+        setErrorMessage(
+          error instanceof Error ? error.message : dict.device.invalidCode
+        );
+      }
     },
-    [dict.device.invalidCode, router, userCode]
-  );
-
-  const handleUserCodeChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setUserCode(e.target.value);
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: deviceSchema,
     },
-    []
-  );
+  });
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -70,39 +69,37 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="userCode">{dict.device.codeLabel}</Label>
-              <Input
-                id="userCode"
-                type="text"
-                placeholder={dict.device.codePlaceholder}
-                value={userCode}
-                onChange={handleUserCodeChange}
-                className="text-center font-mono text-lg uppercase"
-                maxLength={9}
-                disabled={isPending}
-                required
-              />
-            </div>
+          <form.AppForm>
+            <form.Form className="space-y-4">
+              <FieldGroup>
+                <form.AppField name="userCode">
+                  {(field) => (
+                    <field.TextField
+                      className="text-center font-mono text-lg uppercase"
+                      id="userCode"
+                      label={dict.device.codeLabel}
+                      maxLength={9}
+                      placeholder={dict.device.codePlaceholder}
+                      type="text"
+                    />
+                  )}
+                </form.AppField>
+              </FieldGroup>
 
-            {errorMessage && (
-              <Alert variant="destructive">
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {dict.device.verifying}
-                </>
-              ) : (
-                dict.device.continueButton
+              {errorMessage && (
+                <Alert variant="destructive">
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
               )}
-            </Button>
-          </form>
+
+              <form.SubmitButton
+                className="w-full"
+                submittingLabel={dict.device.verifying}
+              >
+                {dict.device.continueButton}
+              </form.SubmitButton>
+            </form.Form>
+          </form.AppForm>
         </div>
       </Card>
     </div>

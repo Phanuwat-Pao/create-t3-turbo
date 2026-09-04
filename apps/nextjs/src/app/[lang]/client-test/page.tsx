@@ -9,31 +9,38 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
-import { Input } from "@acme/ui/input";
-import { Label } from "@acme/ui/label";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { Loader2 } from "lucide-react";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback } from "react";
 import { toast } from "sonner";
+import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
 import { getAvatarUrl } from "~/lib/avatar";
 
+const signInSchema = z.object({
+  email: z.email("Please enter a valid email address."),
+  password: z.string().min(1, "Password is required."),
+});
+
 export default function Page() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, startTransition] = useTransition();
   const { data: session, isPending, error } = useSessionQuery();
   const signOutMutation = useSignOutMutation();
 
-  const handleLogin = useCallback(async () => {
-    startTransition(async () => {
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    onSubmit: async ({ formApi, value }) => {
       await authClient.signIn.email(
         {
           callbackURL: "/client-test",
-          email,
-          password,
+          email: value.email,
+          password: value.password,
         },
         {
           onError: (ctx: { error: { message: string } }) => {
@@ -41,23 +48,16 @@ export default function Page() {
           },
           onSuccess: () => {
             toast.success("Successfully logged in!");
-            setEmail("");
-            setPassword("");
+            formApi.reset();
           },
         }
       );
-    });
-  }, [email, password]);
-
-  const handleEmailChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
-    []
-  );
-
-  const handlePasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
-    []
-  );
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: signInSchema,
+    },
+  });
 
   const handleSignOut = useCallback(
     () => signOutMutation.mutate(),
@@ -79,42 +79,44 @@ export default function Page() {
               Enter your email and password to sign in
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  value={email}
-                  onChange={handleEmailChange}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={handlePasswordChange}
-                />
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full" onClick={handleLogin} disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 size={16} className="mr-2 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </CardFooter>
+          <form.AppForm>
+            <form.Form>
+              <CardContent>
+                <FieldGroup className="gap-4">
+                  <form.AppField name="email">
+                    {(field) => (
+                      <field.TextField
+                        autoComplete="email"
+                        id="email"
+                        label="Email"
+                        placeholder="m@example.com"
+                        type="email"
+                      />
+                    )}
+                  </form.AppField>
+                  <form.AppField name="password">
+                    {(field) => (
+                      <field.TextField
+                        autoComplete="current-password"
+                        id="password"
+                        label="Password"
+                        placeholder="••••••••"
+                        type="password"
+                      />
+                    )}
+                  </form.AppField>
+                </FieldGroup>
+              </CardContent>
+              <CardFooter>
+                <form.SubmitButton
+                  className="w-full"
+                  submittingLabel="Signing in..."
+                >
+                  Sign In
+                </form.SubmitButton>
+              </CardFooter>
+            </form.Form>
+          </form.AppForm>
         </Card>
 
         {/* Session Display */}

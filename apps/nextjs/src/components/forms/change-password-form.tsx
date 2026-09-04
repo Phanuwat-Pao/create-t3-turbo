@@ -1,25 +1,11 @@
 "use client";
 
-import { Button } from "@acme/ui/button";
-import { Checkbox } from "@acme/ui/checkbox";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
-import { PasswordInput } from "@acme/ui/password-input";
-import { Loader2 } from "lucide-react";
-import { useCallback, useState } from "react";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
 import * as z from "zod";
 
 import { useChangePasswordMutation } from "~/data/user/change-password-mutation";
 import type { Dictionary } from "~/i18n/get-dictionary";
-
-interface ChangePasswordFormValues {
-  confirmPassword: string;
-  currentPassword: string;
-  newPassword: string;
-  revokeOtherSessions: boolean;
-}
-type FormErrors = Partial<
-  Record<keyof ChangePasswordFormValues, { message: string }>
->;
 
 interface ChangePasswordFormProps {
   onSuccess?: () => void;
@@ -33,12 +19,6 @@ export function ChangePasswordForm({
   dict,
 }: ChangePasswordFormProps) {
   const changePasswordMutation = useChangePasswordMutation();
-
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [revokeOtherSessions, setRevokeOtherSessions] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
 
   const changePasswordSchema = z
     .object({
@@ -59,180 +39,96 @@ export function ChangePasswordForm({
       path: ["confirmPassword"],
     });
 
-  const validate = useCallback((): boolean => {
-    const result = changePasswordSchema.safeParse({
-      confirmPassword,
-      currentPassword,
-      newPassword,
-      revokeOtherSessions,
-    });
-    if (!result.success) {
-      const fieldErrors: FormErrors = {};
-      for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof ChangePasswordFormValues;
-        fieldErrors[field] = { message: issue.message };
-      }
-      setErrors(fieldErrors);
-      return false;
-    }
-    setErrors({});
-    return true;
-  }, [
-    confirmPassword,
-    currentPassword,
-    newPassword,
-    revokeOtherSessions,
-    changePasswordSchema,
-  ]);
-
-  const resetForm = useCallback(() => {
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setRevokeOtherSessions(false);
-    setErrors({});
-  }, []);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (!validate()) {
+  const form = useAppForm({
+    defaultValues: {
+      confirmPassword: "",
+      currentPassword: "",
+      newPassword: "",
+      revokeOtherSessions: false,
+    },
+    onSubmit: async ({ formApi, value }) => {
+      try {
+        await changePasswordMutation.mutateAsync({
+          currentPassword: value.currentPassword,
+          newPassword: value.newPassword,
+          revokeOtherSessions: value.revokeOtherSessions,
+        });
+      } catch (error) {
+        onError?.(error instanceof Error ? error.message : dict.common.error);
         return;
       }
-
-      changePasswordMutation.mutate(
-        {
-          currentPassword,
-          newPassword,
-          revokeOtherSessions,
-        },
-        {
-          onError: (error) => {
-            onError?.(error.message);
-          },
-          onSuccess: () => {
-            resetForm();
-            onSuccess?.();
-          },
-        }
-      );
+      formApi.reset();
+      onSuccess?.();
     },
-    [
-      changePasswordMutation,
-      currentPassword,
-      newPassword,
-      onError,
-      onSuccess,
-      resetForm,
-      revokeOtherSessions,
-      validate,
-    ]
-  );
-
-  const handleCurrentPasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setCurrentPassword(e.target.value);
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: changePasswordSchema,
     },
-    []
-  );
+  });
 
-  const handleNewPasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setNewPassword(e.target.value);
-    },
-    []
-  );
-
-  const handleConfirmPasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setConfirmPassword(e.target.value);
-    },
-    []
-  );
-
-  const handleRevokeSessionsChange = useCallback(
-    (checked: boolean | "indeterminate") => {
-      setRevokeOtherSessions(checked === true);
-    },
-    []
-  );
+  const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FieldGroup>
-        <Field data-invalid={!!errors.currentPassword}>
-          <FieldLabel htmlFor="current-password">
-            {dict.dashboard.changePassword.currentPasswordLabel}
-          </FieldLabel>
-          <PasswordInput
-            id="current-password"
-            autoComplete="current-password"
-            placeholder={
-              dict.dashboard.changePassword.currentPasswordPlaceholder
-            }
-            disabled={changePasswordMutation.isPending}
-            value={currentPassword}
-            onChange={handleCurrentPasswordChange}
-          />
-          {errors.currentPassword && (
-            <FieldError errors={[errors.currentPassword]} />
-          )}
-        </Field>
+    <form.AppForm>
+      <form.Form>
+        <FieldGroup>
+          <form.AppField name="currentPassword">
+            {(field) => (
+              <field.PasswordField
+                autoComplete="current-password"
+                disabled={isSubmitting}
+                id="current-password"
+                label={dict.dashboard.changePassword.currentPasswordLabel}
+                placeholder={
+                  dict.dashboard.changePassword.currentPasswordPlaceholder
+                }
+              />
+            )}
+          </form.AppField>
 
-        <Field data-invalid={!!errors.newPassword}>
-          <FieldLabel htmlFor="new-password">
-            {dict.dashboard.changePassword.newPasswordLabel}
-          </FieldLabel>
-          <PasswordInput
-            id="new-password"
-            autoComplete="new-password"
-            placeholder={dict.dashboard.changePassword.newPasswordPlaceholder}
-            disabled={changePasswordMutation.isPending}
-            value={newPassword}
-            onChange={handleNewPasswordChange}
-          />
-          {errors.newPassword && <FieldError errors={[errors.newPassword]} />}
-        </Field>
+          <form.AppField name="newPassword">
+            {(field) => (
+              <field.PasswordField
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                id="new-password"
+                label={dict.dashboard.changePassword.newPasswordLabel}
+                placeholder={
+                  dict.dashboard.changePassword.newPasswordPlaceholder
+                }
+              />
+            )}
+          </form.AppField>
 
-        <Field data-invalid={!!errors.confirmPassword}>
-          <FieldLabel htmlFor="confirm-password">
-            {dict.dashboard.changePassword.confirmPasswordLabel}
-          </FieldLabel>
-          <PasswordInput
-            id="confirm-password"
-            autoComplete="new-password"
-            placeholder={
-              dict.dashboard.changePassword.confirmPasswordPlaceholder
-            }
-            disabled={changePasswordMutation.isPending}
-            value={confirmPassword}
-            onChange={handleConfirmPasswordChange}
-          />
-          {errors.confirmPassword && (
-            <FieldError errors={[errors.confirmPassword]} />
-          )}
-        </Field>
+          <form.AppField name="confirmPassword">
+            {(field) => (
+              <field.PasswordField
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                id="confirm-password"
+                label={dict.dashboard.changePassword.confirmPasswordLabel}
+                placeholder={
+                  dict.dashboard.changePassword.confirmPasswordPlaceholder
+                }
+              />
+            )}
+          </form.AppField>
 
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="revoke-sessions"
-            checked={revokeOtherSessions}
-            onCheckedChange={handleRevokeSessionsChange}
-            disabled={changePasswordMutation.isPending}
-          />
-          <label htmlFor="revoke-sessions" className="text-sm">
-            {dict.dashboard.changePassword.revokeOtherSessions}
-          </label>
-        </div>
+          <form.AppField name="revokeOtherSessions">
+            {(field) => (
+              <field.CheckboxField
+                disabled={isSubmitting}
+                id="revoke-sessions"
+                label={dict.dashboard.changePassword.revokeOtherSessions}
+              />
+            )}
+          </form.AppField>
 
-        <Button type="submit" disabled={changePasswordMutation.isPending}>
-          {changePasswordMutation.isPending ? (
-            <Loader2 size={15} className="animate-spin" />
-          ) : (
-            dict.dashboard.changePassword.changeButton
-          )}
-        </Button>
-      </FieldGroup>
-    </form>
+          <form.SubmitButton>
+            {dict.dashboard.changePassword.changeButton}
+          </form.SubmitButton>
+        </FieldGroup>
+      </form.Form>
+    </form.AppForm>
   );
 }

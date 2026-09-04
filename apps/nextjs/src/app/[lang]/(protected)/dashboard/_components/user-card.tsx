@@ -20,8 +20,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
-import { Input } from "@acme/ui/input";
-import { Label } from "@acme/ui/label";
 import {
   Table,
   TableBody,
@@ -50,6 +48,7 @@ import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
 import { authClient } from "~/auth/client";
+import { AddPasskeyForm } from "~/components/forms/add-passkey-form";
 import { ChangePasswordForm } from "~/components/forms/change-password-form";
 import { TwoFactorDisableForm } from "~/components/forms/two-factor-disable-form";
 import { TwoFactorEnableForm } from "~/components/forms/two-factor-enable-form";
@@ -191,33 +190,8 @@ function ChangePassword({ dict }: { dict: Dictionary }) {
 
 function AddPasskey({ dict }: { dict: Dictionary }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [passkeyName, setPasskeyName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddPasskey = useCallback(async () => {
-    if (!passkeyName) {
-      toast.error(dict.dashboard.passkeys.nameRequired);
-      return;
-    }
-    setIsLoading(true);
-    const res = await authClient.passkey.addPasskey({
-      name: passkeyName,
-    });
-    if (res?.error) {
-      toast.error(String(res?.error.message));
-    } else {
-      setIsOpen(false);
-      toast.success(dict.dashboard.passkeys.addedSuccess);
-    }
-    setIsLoading(false);
-  }, [passkeyName, dict]);
-
-  const handleNameChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPasskeyName(e.target.value);
-    },
-    []
-  );
+  const handleSuccess = useCallback(() => setIsOpen(false), []);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -234,33 +208,11 @@ function AddPasskey({ dict }: { dict: Dictionary }) {
             {dict.dashboard.passkeys.addNewDescription}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-2">
-          <Label htmlFor="passkey-name">
-            {dict.dashboard.passkeys.nameLabel}
-          </Label>
-          <Input
-            id="passkey-name"
-            value={passkeyName}
-            onChange={handleNameChange}
-          />
-        </div>
-        <DialogFooter>
-          <Button
-            disabled={isLoading}
-            type="submit"
-            onClick={handleAddPasskey}
-            className="w-full"
-          >
-            {isLoading ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <>
-                <Fingerprint className="mr-2 h-4 w-4" />
-                {dict.dashboard.passkeys.createButton}
-              </>
-            )}
-          </Button>
-        </DialogFooter>
+        <AddPasskeyForm
+          dict={dict}
+          label={dict.dashboard.passkeys.nameLabel}
+          onSuccess={handleSuccess}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -302,28 +254,9 @@ PasskeyRow.displayName = "PasskeyRow";
 function ListPasskeys({ dict }: { dict: Dictionary }) {
   const { data } = authClient.useListPasskeys();
   const [isOpen, setIsOpen] = useState(false);
-  const [passkeyName, setPasskeyName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [deletingPasskeyId, setDeletingPasskeyId] = useState<string | null>(
     null
   );
-
-  const handleAddPasskey = useCallback(async () => {
-    if (!passkeyName) {
-      toast.error(dict.dashboard.passkeys.nameRequired);
-      return;
-    }
-    setIsLoading(true);
-    const res = await authClient.passkey.addPasskey({
-      name: passkeyName,
-    });
-    setIsLoading(false);
-    if (res?.error) {
-      toast.error(String(res?.error.message));
-    } else {
-      toast.success(dict.dashboard.passkeys.addedSuccess);
-    }
-  }, [passkeyName, dict]);
 
   const handleDeletePasskey = useCallback(
     async (passkeyId: string) => {
@@ -343,13 +276,6 @@ function ListPasskeys({ dict }: { dict: Dictionary }) {
       });
     },
     [dict]
-  );
-
-  const handleNameChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setPasskeyName(e.target.value);
-    },
-    []
   );
 
   const handleClose = useCallback(() => setIsOpen(false), []);
@@ -397,29 +323,11 @@ function ListPasskeys({ dict }: { dict: Dictionary }) {
           </p>
         )}
         {!data?.length && (
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="passkey-name" className="text-sm">
-                {dict.dashboard.passkeys.newPasskey}
-              </Label>
-              <Input
-                id="passkey-name"
-                value={passkeyName}
-                onChange={handleNameChange}
-                placeholder={dict.dashboard.passkeys.defaultName}
-              />
-            </div>
-            <Button type="submit" onClick={handleAddPasskey} className="w-full">
-              {isLoading ? (
-                <Loader2 size={15} className="animate-spin" />
-              ) : (
-                <>
-                  <Fingerprint className="mr-2 h-4 w-4" />
-                  {dict.dashboard.passkeys.createButton}
-                </>
-              )}
-            </Button>
-          </div>
+          <AddPasskeyForm
+            dict={dict}
+            label={dict.dashboard.passkeys.newPasskey}
+            placeholder={dict.dashboard.passkeys.defaultName}
+          />
         )}
         <DialogFooter>
           <Button onClick={handleClose}>{dict.common.close}</Button>

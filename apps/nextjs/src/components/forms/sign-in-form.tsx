@@ -1,13 +1,8 @@
 "use client";
 
-import { Button } from "@acme/ui/button";
-import { Checkbox } from "@acme/ui/checkbox";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
-import { PasswordInput } from "@acme/ui/password-input";
-import { Loader2 } from "lucide-react";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import Link from "next/link";
-import { useCallback, useState, useTransition } from "react";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -15,10 +10,6 @@ import { authClient } from "~/auth/client";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
 import { useIsHydrated } from "~/hooks/use-hydrated";
 import type { Dictionary } from "~/i18n/get-dictionary";
-
-type SignInFormErrors = Partial<
-  Record<"email" | "password" | "rememberMe", { message: string }>
->;
 
 interface SignInFormProps {
   onSuccess?: () => void;
@@ -33,152 +24,107 @@ export function SignInForm({
   showPasswordToggle = false,
   dict,
 }: SignInFormProps) {
-  const [loading, startTransition] = useTransition();
   const isMounted = useIsHydrated();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState<SignInFormErrors>({});
 
   const signInSchema = z.object({
-    email: z.string().email(dict.validation.emailRequired),
+    email: z.email(dict.validation.emailRequired),
     password: z.string().min(1, dict.validation.passwordRequired),
     rememberMe: z.boolean(),
   });
 
-  const validate = useCallback((): boolean => {
-    const result = signInSchema.safeParse({ email, password, rememberMe });
-    if (!result.success) {
-      const fieldErrors: SignInFormErrors = {};
-      for (const issue of result.error.issues) {
-        const field = issue.path[0] as keyof SignInFormErrors;
-        fieldErrors[field] = { message: issue.message };
-      }
-      setErrors(fieldErrors);
-      return false;
-    }
-    setErrors({});
-    return true;
-  }, [email, password, rememberMe, signInSchema]);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!validate()) {
-        return;
-      }
-
-      startTransition(async () => {
-        await authClient.signIn.email(
-          {
-            callbackURL,
-            email,
-            password,
-            rememberMe,
-          },
-          {
-            onError(context: { error: { message: string } }) {
-              toast.error(context.error.message);
-            },
-            onSuccess() {
-              toast.success(dict.auth.signIn.successMessage);
-              onSuccess?.();
-            },
-          }
-        );
-      });
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
     },
-    [validate, callbackURL, email, password, rememberMe, onSuccess, dict]
-  );
+    onSubmit: async ({ value }) => {
+      await authClient.signIn.email(
+        {
+          callbackURL,
+          email: value.email,
+          password: value.password,
+          rememberMe: value.rememberMe,
+        },
+        {
+          onError(context: { error: { message: string } }) {
+            toast.error(context.error.message);
+          },
+          onSuccess() {
+            toast.success(dict.auth.signIn.successMessage);
+            onSuccess?.();
+          },
+        }
+      );
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: signInSchema,
+    },
+  });
 
-  const handleEmailChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
-    []
-  );
-
-  const handlePasswordChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
-    []
-  );
-
-  const handleRememberMeChange = useCallback(
-    (checked: boolean | "indeterminate") => setRememberMe(checked === true),
-    []
+  const forgotPasswordLink = (
+    <Link
+      className="text-foreground ml-auto inline-block text-sm underline"
+      href="/forget-password"
+    >
+      {dict.auth.signIn.forgotPassword}
+    </Link>
   );
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-2">
-      <FieldGroup>
-        <Field data-invalid={!!errors.email}>
-          <FieldLabel htmlFor="sign-in-email">
-            {dict.auth.signIn.emailLabel}
-          </FieldLabel>
-          <Input
-            id="sign-in-email"
-            type="email"
-            placeholder={dict.auth.signIn.emailPlaceholder}
-            aria-invalid={!!errors.email}
-            autoComplete="email"
-            value={email}
-            onChange={handleEmailChange}
-          />
-          {errors.email && <FieldError errors={[errors.email]} />}
-        </Field>
-        <Field data-invalid={!!errors.password}>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="sign-in-password">
-              {dict.auth.signIn.passwordLabel}
-            </FieldLabel>
-            <Link
-              href="/forget-password"
-              className="text-foreground ml-auto inline-block text-sm underline"
-            >
-              {dict.auth.signIn.forgotPassword}
-            </Link>
-          </div>
-          {showPasswordToggle ? (
-            <PasswordInput
-              id="sign-in-password"
-              placeholder={dict.auth.signIn.passwordPlaceholder}
-              aria-invalid={!!errors.password}
-              autoComplete="current-password"
-              value={password}
-              onChange={handlePasswordChange}
-            />
-          ) : (
-            <Input
-              id="sign-in-password"
-              type="password"
-              placeholder={dict.auth.signIn.passwordPlaceholder}
-              aria-invalid={!!errors.password}
-              autoComplete="current-password"
-              value={password}
-              onChange={handlePasswordChange}
-            />
+    <form.AppForm>
+      <form.Form className="grid gap-2">
+        <FieldGroup>
+          <form.AppField name="email">
+            {(field) => (
+              <field.TextField
+                autoComplete="email"
+                id="sign-in-email"
+                label={dict.auth.signIn.emailLabel}
+                placeholder={dict.auth.signIn.emailPlaceholder}
+                type="email"
+              />
+            )}
+          </form.AppField>
+          <form.AppField name="password">
+            {(field) =>
+              showPasswordToggle ? (
+                <field.PasswordField
+                  autoComplete="current-password"
+                  id="sign-in-password"
+                  label={dict.auth.signIn.passwordLabel}
+                  labelSuffix={forgotPasswordLink}
+                  placeholder={dict.auth.signIn.passwordPlaceholder}
+                />
+              ) : (
+                <field.TextField
+                  autoComplete="current-password"
+                  id="sign-in-password"
+                  label={dict.auth.signIn.passwordLabel}
+                  labelSuffix={forgotPasswordLink}
+                  placeholder={dict.auth.signIn.passwordPlaceholder}
+                  type="password"
+                />
+              )
+            }
+          </form.AppField>
+          <form.AppField name="rememberMe">
+            {(field) => (
+              <field.CheckboxField
+                id="sign-in-remember"
+                label={dict.auth.signIn.rememberMe}
+              />
+            )}
+          </form.AppField>
+        </FieldGroup>
+        <form.SubmitButton className="relative w-full">
+          {dict.auth.signIn.loginButton}
+          {isMounted && authClient.isLastUsedLoginMethod("email") && (
+            <LastUsedIndicator />
           )}
-          {errors.password && <FieldError errors={[errors.password]} />}
-        </Field>
-        <Field orientation="horizontal">
-          <Checkbox
-            id="sign-in-remember"
-            checked={rememberMe}
-            onCheckedChange={handleRememberMeChange}
-          />
-          <FieldLabel htmlFor="sign-in-remember" className="font-normal">
-            {dict.auth.signIn.rememberMe}
-          </FieldLabel>
-        </Field>
-      </FieldGroup>
-      <Button type="submit" className="relative w-full" disabled={loading}>
-        {loading ? (
-          <Loader2 size={16} className="animate-spin" />
-        ) : (
-          dict.auth.signIn.loginButton
-        )}
-        {isMounted && authClient.isLastUsedLoginMethod("email") && (
-          <LastUsedIndicator />
-        )}
-      </Button>
-    </form>
+        </form.SubmitButton>
+      </form.Form>
+    </form.AppForm>
   );
 }

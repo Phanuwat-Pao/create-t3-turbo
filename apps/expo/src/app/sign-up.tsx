@@ -1,11 +1,11 @@
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Image, KeyboardAvoidingView, View } from "react-native";
+import * as z from "zod";
 
-import { Button } from "~/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
-import { Input } from "~/components/ui/input";
+import { revalidateLogic, useAppForm } from "~/components/ui/form";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
@@ -13,28 +13,42 @@ import logoImage from "../../images/logo.png";
 
 export default function SignUp() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const { t } = useTranslation();
 
-  const handleSignUp = useCallback(async () => {
-    await authClient.signUp.email(
-      {
-        email,
-        name,
-        password,
-      },
-      {
-        onError: (ctx) => {
-          Alert.alert(t("common.error"), ctx.error.message);
+  const signUpSchema = z.object({
+    email: z.email(t("validation.emailRequired")),
+    name: z.string().trim().min(1, t("validation.nameRequired")),
+    password: z.string().min(8, t("validation.passwordMinLength")),
+  });
+
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      name: "",
+      password: "",
+    },
+    onSubmit: async ({ value }) => {
+      await authClient.signUp.email(
+        {
+          email: value.email,
+          name: value.name,
+          password: value.password,
         },
-        onSuccess: () => {
-          router.push("/dashboard");
-        },
-      }
-    );
-  }, [email, name, password, router, t]);
+        {
+          onError: (ctx) => {
+            Alert.alert(t("common.error"), ctx.error.message);
+          },
+          onSuccess: () => {
+            router.push("/dashboard");
+          },
+        }
+      );
+    },
+    validationLogic: revalidateLogic(),
+    validators: {
+      onDynamic: signUpSchema,
+    },
+  });
 
   const handleSignIn = useCallback(() => {
     router.push("/");
@@ -52,48 +66,50 @@ export default function SignUp() {
         />
         <CardTitle>{t("auth.signUp.title")}</CardTitle>
       </CardHeader>
-      <View className="px-6">
-        <KeyboardAvoidingView>
-          <Input
-            placeholder={t("auth.signUp.namePlaceholder")}
-            className="rounded-b-none border-b-0"
-            value={name}
-            onChangeText={setName}
-          />
+      <form.AppForm>
+        <KeyboardAvoidingView className="gap-2 px-6">
+          <form.AppField name="name">
+            {(field) => (
+              <field.TextField
+                autoComplete="name"
+                placeholder={t("auth.signUp.namePlaceholder")}
+              />
+            )}
+          </form.AppField>
+          <form.AppField name="email">
+            {(field) => (
+              <field.TextField
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+                placeholder={t("auth.signUp.emailPlaceholder")}
+              />
+            )}
+          </form.AppField>
+          <form.AppField name="password">
+            {(field) => (
+              <field.TextField
+                autoComplete="new-password"
+                placeholder={t("auth.signUp.passwordPlaceholder")}
+                secureTextEntry
+              />
+            )}
+          </form.AppField>
         </KeyboardAvoidingView>
-        <KeyboardAvoidingView>
-          <Input
-            placeholder={t("auth.signUp.emailPlaceholder")}
-            className="rounded-b-none border-b-0"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-          />
-        </KeyboardAvoidingView>
-
-        <KeyboardAvoidingView>
-          <Input
-            placeholder={t("auth.signUp.passwordPlaceholder")}
-            secureTextEntry
-            className="rounded-t-none"
-            value={password}
-            onChangeText={setPassword}
-          />
-        </KeyboardAvoidingView>
-      </View>
-      <CardFooter>
-        <View className="mt-2 w-full">
-          <Button onPress={handleSignUp}>
-            <Text>{t("auth.signUp.signUpButton")}</Text>
-          </Button>
-          <Text className="mt-2 text-center">
-            {t("auth.signUp.hasAccount")}{" "}
-            <Text className="underline" onPress={handleSignIn}>
-              {t("auth.signUp.signIn")}
+        <CardFooter>
+          <View className="mt-2 w-full">
+            <form.SubmitButton>
+              <Text>{t("auth.signUp.signUpButton")}</Text>
+            </form.SubmitButton>
+            <Text className="mt-2 text-center">
+              {t("auth.signUp.hasAccount")}{" "}
+              <Text className="underline" onPress={handleSignIn}>
+                {t("auth.signUp.signIn")}
+              </Text>
             </Text>
-          </Text>
-        </View>
-      </CardFooter>
+          </View>
+        </CardFooter>
+      </form.AppForm>
     </Card>
   );
 }

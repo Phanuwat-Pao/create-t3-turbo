@@ -4,17 +4,10 @@ import type { RouterOutputs } from "@acme/api";
 import { CreatePostSchema } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
-import {
-  Field,
-  FieldContent,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@acme/ui/field";
-import { Input } from "@acme/ui/input";
+import { FieldGroup } from "@acme/ui/field";
+import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { toast } from "@acme/ui/toast";
 import { ORPCError } from "@orpc/client";
-import { useForm } from "@tanstack/react-form";
 import {
   useMutation,
   useQueryClient,
@@ -23,52 +16,6 @@ import {
 import { useCallback } from "react";
 
 import { orpc } from "~/rpc/react";
-
-function TextField(props: {
-  field: {
-    handleBlur: () => void;
-    handleChange: (value: string) => void;
-    name: string;
-    state: {
-      meta: {
-        errors: ({ message?: string } | undefined)[];
-        isTouched: boolean;
-        isValid: boolean;
-      };
-      value: string;
-    };
-  };
-  label: string;
-  placeholder: string;
-}) {
-  const { field, label, placeholder } = props;
-  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
-
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      field.handleChange(e.target.value);
-    },
-    [field]
-  );
-
-  return (
-    <Field data-invalid={isInvalid}>
-      <FieldContent>
-        <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
-      </FieldContent>
-      <Input
-        aria-invalid={isInvalid}
-        id={field.name}
-        name={field.name}
-        onBlur={field.handleBlur}
-        onChange={handleChange}
-        placeholder={placeholder}
-        value={field.state.value}
-      />
-      {isInvalid && <FieldError errors={field.state.meta.errors} />}
-    </Field>
-  );
-}
 
 export function CreatePostForm() {
   const queryClient = useQueryClient();
@@ -90,48 +37,43 @@ export function CreatePostForm() {
     })
   );
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       content: "",
       title: "",
     },
-    onSubmit: async (data) => {
+    onSubmit: async ({ formApi, value }) => {
       try {
-        await createPost.mutateAsync(data.value);
-        form.reset();
+        await createPost.mutateAsync(value);
+        formApi.reset();
       } catch {
         // Error feedback is handled by the mutation's onError toast.
       }
     },
+    validationLogic: revalidateLogic(),
     validators: {
-      onSubmit: CreatePostSchema,
+      onDynamic: CreatePostSchema,
     },
   });
 
-  const handleSubmit = useCallback(
-    (event: React.FormEvent) => {
-      event.preventDefault();
-      form.handleSubmit();
-    },
-    [form]
-  );
-
   return (
-    <form className="w-full max-w-2xl" onSubmit={handleSubmit}>
-      <FieldGroup>
-        <form.Field name="title">
-          {(field) => (
-            <TextField field={field} label="Bug Title" placeholder="Title" />
-          )}
-        </form.Field>
-        <form.Field name="content">
-          {(field) => (
-            <TextField field={field} label="Content" placeholder="Content" />
-          )}
-        </form.Field>
-      </FieldGroup>
-      <Button type="submit">Create</Button>
-    </form>
+    <form.AppForm>
+      <form.Form className="w-full max-w-2xl">
+        <FieldGroup>
+          <form.AppField name="title">
+            {(field) => (
+              <field.TextField label="Bug Title" placeholder="Title" />
+            )}
+          </form.AppField>
+          <form.AppField name="content">
+            {(field) => (
+              <field.TextField label="Content" placeholder="Content" />
+            )}
+          </form.AppField>
+        </FieldGroup>
+        <form.SubmitButton>Create</form.SubmitButton>
+      </form.Form>
+    </form.AppForm>
   );
 }
 
