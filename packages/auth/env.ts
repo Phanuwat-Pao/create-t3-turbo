@@ -24,6 +24,8 @@ export function authEnv() {
       NODE_ENV: z.enum(["development", "production"]).optional(),
     },
     skipValidation:
-      !!process.env.CI || process.env.npm_lifecycle_event === "lint",
+      process.env.SKIP_ENV_VALIDATION === "true" ||
+      !!process.env.CI ||
+      process.env.npm_lifecycle_event === "lint",
   });
 }
