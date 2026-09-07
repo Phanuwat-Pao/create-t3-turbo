@@ -94,12 +94,12 @@ jobs:
       services: ${{ steps.detect.outputs.services }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-setup-node@v4
         with:
           node-version-file: ".nvmrc"
 
@@ -115,7 +115,7 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm store
-        uses: actions/cache@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
@@ -214,10 +214,10 @@ jobs:
       COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-setup-node@v4
         with:
           node-version-file: ".nvmrc"
 
@@ -233,7 +233,7 @@ jobs:
         run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Cache pnpm store
-        uses: actions/cache@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
@@ -241,7 +241,7 @@ jobs:
 
       # Cache turbo's task results → later runs can hit FULL TURBO
       - name: Cache turbo
-        uses: actions/cache@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-cache@v4
         with:
           path: .turbo
           key: ${{ runner.os }}-turbo-${{ github.sha }}
@@ -306,16 +306,18 @@ jobs:
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
       IDP_URL: ${{ secrets.IDP_URL }}
       IDP_TOKEN: ${{ secrets.IDP_TOKEN }}
+      # Read access to the telecorp/actions-* mirrors that `uses:` resolves.
+      TELECORP_PUBLIC_TOKEN: ${{ secrets.TELECORP_PUBLIC_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-checkout@v4
 
       - name: Validate secrets
         run: |
           echo "::group::Checking required secrets"
           MISSING=""
 
-          for SECRET_NAME in REGISTRY_URL REGISTRY_USERNAME REGISTRY_PASSWORD; do
+          for SECRET_NAME in TELECORP_PUBLIC_TOKEN REGISTRY_URL REGISTRY_USERNAME REGISTRY_PASSWORD; do
             VAL=$(eval echo "\${$SECRET_NAME}")
             if [ -z "${VAL}" ]; then
               MISSING="${MISSING} ${SECRET_NAME}"
@@ -467,7 +469,7 @@ jobs:
       )
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: https://oauth2:${{ secrets.TELECORP_PUBLIC_TOKEN }}@gitea.telecorpthailand.com/telecorp/actions-checkout@v4
         with:
           fetch-depth: 1
 
