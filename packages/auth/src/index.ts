@@ -312,7 +312,6 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
           },
         },
       }),
-      ...(options.extraPlugins ?? []),
     ],
     secret: options.secret,
 
@@ -400,6 +399,11 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
         authOptions,
         { shouldMutateListDeviceSessionsEndpoint: true }
       ),
+      // Framework cookie integrations (nextCookies, expo) arrive through
+      // extraPlugins and must be last: Better Auth warns on every request when
+      // a plugin with `hooks.after` (customSession has one) sits behind them,
+      // because cookies set by that hook never reach the framework store.
+      ...(options.extraPlugins ?? []),
     ],
   });
 
