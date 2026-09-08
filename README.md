@@ -311,7 +311,16 @@ Deploying your Expo application works slightly differently compared to Next.js o
 
 5. Before you can get your app in the hands of your users, you'll have to provide additional information to the app stores. This includes screenshots, app information, privacy policies, etc. _While still in preview_, [EAS Metadata](https://docs.expo.dev/eas/metadata) can help you with most of this information.
 
-6. Once everything is approved, your users can finally enjoy your app. Let's say you spotted a small typo; you'll have to create a new build, submit it to the stores, and wait for approval before you can resolve this issue. In these cases, you can use EAS Update to quickly send a small bugfix to your users without going through this long process. Let's start by setting up EAS Update.
+6. JavaScript-only changes can ship without a store release through [EAS Update](https://docs.expo.dev/eas-update/introduction). The app is already configured: `apps/expo/app.config.ts` sets `runtimeVersion` to the `fingerprint` policy and points `updates.url` at the EAS project, every `eas.json` build profile carries an update `channel`, and the root layout applies a downloaded update as soon as it lands. Publish to the channel that matches the build you want to reach:
+
+   ```bash
+   cd apps/expo
+   eas update --environment production --channel production --message "Describe the change"
+   ```
+
+   The template publishes under the `telecorp` EAS account. When you fork it, run `eas init` in `apps/expo` against your own account, then set `EAS_PROJECT_ID` in `.env` and in each EAS environment (`eas env:set --scope project --environment production --name EAS_PROJECT_ID --value <id>`, repeated for `preview` and `development`). A change to native code, a config plugin, or a bundled asset produces a new fingerprint, so those need a fresh `eas build` before updates reach the new binary.
+
+7. Once everything is approved, your users can finally enjoy your app. Let's say you spotted a small typo; you'll have to create a new build, submit it to the stores, and wait for approval before you can resolve this issue. In these cases, you can use EAS Update to quickly send a small bugfix to your users without going through this long process. Let's start by setting up EAS Update.
 
    The steps below summarize the [Getting started with EAS Update](https://docs.expo.dev/eas-update/getting-started/#configure-your-project) guide.
 
@@ -324,9 +333,9 @@ Deploying your Expo application works slightly differently compared to Next.js o
    eas update:configure
    ```
 
-7. Before we can send out updates to your app, you have to create a new build and submit it to the app stores. For every change that includes native APIs, you have to rebuild the app and submit the update to the app stores. See steps 2 and 3.
+8. Before we can send out updates to your app, you have to create a new build and submit it to the app stores. For every change that includes native APIs, you have to rebuild the app and submit the update to the app stores. See steps 2 and 3.
 
-8. Now that everything is ready for updates, let's create a new update for `production` builds. With the `--auto` flag, EAS Update uses your current git branch name and commit message for this update. See [How EAS Update works](https://docs.expo.dev/eas-update/how-eas-update-works/#publishing-an-update) for more information.
+9. Now that everything is ready for updates, let's create a new update for `production` builds. With the `--auto` flag, EAS Update uses your current git branch name and commit message for this update. See [How EAS Update works](https://docs.expo.dev/eas-update/how-eas-update-works/#publishing-an-update) for more information.
 
    ```bash
    cd apps/expo
@@ -335,7 +344,7 @@ Deploying your Expo application works slightly differently compared to Next.js o
 
    > Your OTA (Over The Air) updates must always follow the app store's rules. You can't change your app's primary functionality without getting app store approval. But this is a fast way to update your app for minor changes and bug fixes.
 
-9. Done! Now that you have created your production build, submitted it to the stores, and installed EAS Update, you are ready for anything!
+10. Done! Now that you have created your production build, submitted it to the stores, and installed EAS Update, you are ready for anything!
 
 ## References
 

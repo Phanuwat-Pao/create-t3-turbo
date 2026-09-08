@@ -1,5 +1,12 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
 
+// EAS project (@telecorp/create-t3-turbo) that builds and OTA updates publish
+// under. Forks override it with EAS_PROJECT_ID (also set in each EAS
+// environment via `eas env:set`) after running `eas init` against their
+// own account; set it to an empty string to disable updates entirely.
+const easProjectId =
+  process.env.EAS_PROJECT_ID ?? "353d8212-0cc4-4fe4-abc1-3f24c2ec36ac";
+
 function defineConfig({ config }: ConfigContext): ExpoConfig {
   return {
     ...config,
@@ -11,11 +18,6 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
       package: "com.createt3turbo.app",
     },
     assetBundlePatterns: ["**/*"],
-    // extra: {
-    //   eas: {
-    //     projectId: "your-eas-project-id",
-    //   },
-    // },
     experiments: {
       reactCompiler: true,
       tsconfigPaths: true,
@@ -32,6 +34,10 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
     },
     name: "create-t3-turbo",
     orientation: "portrait",
+    // The EAS account that owns the project. Pinned so `eas build` and
+    // `eas update` publish here no matter which account the CLI is logged
+    // in as; the CLI otherwise defaults to the personal account.
+    owner: "telecorp",
 
     plugins: [
       "expo-router",
@@ -120,11 +126,26 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
     // other app installed on the device.
     scheme: "create-t3-turbo",
     slug: "create-t3-turbo",
-    updates: {
-      fallbackToCacheTimeout: 0,
-    },
     userInterfaceStyle: "automatic",
     version: "0.1.0",
+    ...(easProjectId
+      ? {
+          extra: { eas: { projectId: easProjectId } },
+          // Native fingerprint as the runtime version: an OTA update reaches
+          // every installed build whose native code matches, and a change to
+          // a native module, plugin or asset yields a new fingerprint so the
+          // update cannot land on an incompatible binary.
+          runtimeVersion: { policy: "fingerprint" },
+          updates: {
+            fallbackToCacheTimeout: 0,
+            url: `https://u.expo.dev/${easProjectId}`,
+          },
+        }
+      : {
+          updates: {
+            fallbackToCacheTimeout: 0,
+          },
+        }),
   };
 }
 

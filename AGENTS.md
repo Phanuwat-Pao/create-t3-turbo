@@ -87,7 +87,9 @@ most common defect. Before calling work done, walk this list:
   Compiler, Tailwind CSS 4, oRPC client + TanStack Query/Form, Better Auth
   client, presigned-S3 storage helpers.
 - `apps/expo` — Expo SDK 57 (expo-router, React Native 0.86, uniwind) under
-  `src/`.
+  `src/`. Ships OTA updates through EAS Update: the `fingerprint` runtime
+  policy, update URL and `owner` live in `app.config.ts`, channels in
+  `eas.json`, and `src/hooks/use-ota-updates.ts` applies a downloaded update.
 - `apps/e2e` — Playwright end-to-end tests.
 - `packages/api` — oRPC router, context, and the S3 service
   (`src/s3.ts`; AWS interaction stays isolated here).

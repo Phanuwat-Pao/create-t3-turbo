@@ -17,6 +17,7 @@
     "@better-auth/oauth-provider": "^1.7.2",
     "@better-auth/passkey": "^1.7.2",
     "@better-auth/sso": "^1.7.2",
+    "@expo/metro": "~56.0.2",
     "@expo/vector-icons": "^15.1.1",
     "@legendapp/list": "^3.3.10",
     "@nanostores/react": "^2.0.1",
@@ -32,16 +33,18 @@
     "better-auth": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "expo": "~57.0.19",
+    "expo": "~57.0.20",
+    "expo-asset": "~57.0.16",
     "expo-audio": "^57.0.4",
     "expo-constants": "~57.0.17",
     "expo-dev-client": "~57.0.18",
-    "expo-image-picker": "^57.0.15",
+    "expo-font": "~57.0.3",
+    "expo-image-picker": "^57.0.16",
     "expo-linear-gradient": "~57.0.1",
     "expo-linking": "~57.0.9",
     "expo-localization": "~57.0.1",
-    "expo-notifications": "^57.0.16",
-    "expo-router": "~57.0.18",
+    "expo-notifications": "^57.0.17",
+    "expo-router": "~57.0.19",
     "expo-secure-store": "~57.0.3",
     "expo-splash-screen": "~57.0.8",
     "expo-sqlite": "~57.0.2",
@@ -75,5 +78,13 @@
     "@types/react": "catalog:react19",
     "@typescript/native-preview": "catalog:",
     "tailwindcss": "catalog:"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "react",
+        "react-dom"
+      ]
+    }
   }
 }

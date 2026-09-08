@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
 
+import { useOtaUpdates } from "~/hooks/use-ota-updates";
 import { queryClient } from "~/utils/api";
 
 import "~/styles.css";
@@ -11,6 +12,7 @@ import "~/styles.css";
 // It wraps your pages with the providers they need
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  useOtaUpdates();
   return (
     <QueryClientProvider client={queryClient}>
       {/*
