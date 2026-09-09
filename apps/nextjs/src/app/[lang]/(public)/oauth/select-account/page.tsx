@@ -11,6 +11,7 @@ import { AnotherAccountBtn } from "./_components/another-account-button";
 
 export const metadata: Metadata = {
   description: "Select account to authorize this application",
+  robots: { follow: false, index: false },
   title: "Select Account",
 };
 

@@ -22,6 +22,7 @@ import { ConsentBtns } from "./_components/consent-buttons";
 
 export const metadata: Metadata = {
   description: "Grant access to your account",
+  robots: { follow: false, index: false },
   title: "Authorize Application",
 };
 

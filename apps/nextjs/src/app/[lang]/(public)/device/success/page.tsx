@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
+
 import { getDictionary } from "~/i18n/get-dictionary";
 import type { Locale } from "~/i18n/i18n-config";
+import { NOINDEX } from "~/lib/metadata";
 
 import { DeviceSuccessClient } from "./_components/device-success-client";
+
+export const metadata: Metadata = { robots: NOINDEX };
 
 interface PageProps {
   params: Promise<{ lang: Locale }>;

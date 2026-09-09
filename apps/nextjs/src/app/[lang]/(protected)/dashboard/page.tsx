@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -6,9 +7,12 @@ import AccountSwitcher from "~/components/account-switch";
 import type { SessionData } from "~/data/user/session-query";
 import { getDictionary } from "~/i18n/get-dictionary";
 import type { Locale } from "~/i18n/i18n-config";
+import { NOINDEX } from "~/lib/metadata";
 
 import OrganizationCard from "./_components/organization-card";
 import UserCard from "./_components/user-card";
+
+export const metadata: Metadata = { robots: NOINDEX };
 
 interface PageProps {
   params: Promise<{ lang: Locale }>;

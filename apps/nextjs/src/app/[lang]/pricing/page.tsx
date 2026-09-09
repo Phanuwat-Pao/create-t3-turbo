@@ -1,4 +1,29 @@
+import type { Metadata } from "next";
+
 import { Pricing } from "~/components/pricing";
+import { getDictionary } from "~/i18n/get-dictionary";
+import type { Locale } from "~/i18n/i18n-config";
+import { pageMetadata } from "~/lib/metadata";
+import { getSiteUrl } from "~/lib/site-url";
+
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+  return pageMetadata({
+    description: dict.seo.pricing.description,
+    dict,
+    locale: lang,
+    path: "/pricing",
+    siteUrl: await getSiteUrl(),
+    title: dict.seo.pricing.title,
+  });
+}
 
 const demoPlans = [
   {

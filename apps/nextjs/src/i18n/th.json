@@ -13,6 +13,28 @@
     "email": "อีเมล",
     "password": "รหัสผ่าน"
   },
+  "seo": {
+    "siteName": "create-t3-turbo",
+    "defaultTitle": "create-t3-turbo",
+    "titleTemplate": "%s | create-t3-turbo",
+    "description": "เทมเพลตพร้อมใช้งานสำหรับแอป Next.js และ Expo พร้อม Better Auth, oRPC, Drizzle และ Tailwind บน T3 stack",
+    "home": {
+      "title": "หน้าแรก",
+      "description": "ระบบยืนยันตัวตน องค์กร Passkey และการเข้าสู่ระบบสองขั้นตอนบน T3 stack พร้อมนำไปต่อยอด"
+    },
+    "pricing": {
+      "title": "ราคา",
+      "description": "แพ็กเกจที่เรียบง่ายและโปร่งใสสำหรับผู้ใช้ทั่วไปและทีมที่กำลังเติบโต"
+    },
+    "signIn": {
+      "title": "เข้าสู่ระบบ",
+      "description": "เข้าสู่ระบบด้วยอีเมล Passkey หรือบัญชีโซเชียล"
+    },
+    "forgotPassword": {
+      "title": "ลืมรหัสผ่าน",
+      "description": "ขอลิงก์สำหรับรีเซ็ตรหัสผ่านของคุณ"
+    }
+  },
   "landing": {
     "title": "BETTER-AUTH.",
     "description": "สาธิตอย่างเป็นทางการเพื่อแสดง",

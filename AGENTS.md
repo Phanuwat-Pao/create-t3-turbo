@@ -80,6 +80,14 @@ most common defect. Before calling work done, walk this list:
 - **Env.** New environment variables go through the t3-env definitions
   (`apps/nextjs/src/env.ts`, `packages/auth/env.ts`) and `turbo.json`'s
   `globalEnv` when tasks depend on them.
+- **SEO.** A new public page needs `generateMetadata` built with
+  `pageMetadata` from `~/lib/metadata`, its path added to `PUBLIC_PATHS` so
+  the sitemap and hreflang alternates pick it up, and `seo.*` strings in
+  both dictionaries. Anything behind a session or mid-flow (auth steps,
+  OAuth consent, device codes) exports `robots: NOINDEX` instead; a
+  `"use client"` page cannot export metadata, so give its folder a layout
+  that does. Never hard-code a domain: `getSiteUrl()` reads the request's
+  forwarded host so www and bare hosts each get self-consistent URLs.
 
 ## Where code lives
 

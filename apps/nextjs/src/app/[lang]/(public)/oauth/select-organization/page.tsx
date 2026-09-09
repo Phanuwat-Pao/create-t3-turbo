@@ -13,6 +13,7 @@ import { SelectOrganizationBtn } from "./_components/org-buttons";
 
 export const metadata: Metadata = {
   description: "Specify which organization to authorize to this application",
+  robots: { follow: false, index: false },
   title: "Select Organization",
 };
 

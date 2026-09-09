@@ -13,6 +13,28 @@
     "email": "Email",
     "password": "Password"
   },
+  "seo": {
+    "siteName": "create-t3-turbo",
+    "defaultTitle": "create-t3-turbo",
+    "titleTemplate": "%s | create-t3-turbo",
+    "description": "A production-ready starter for Next.js and Expo apps with Better Auth, oRPC, Drizzle and Tailwind, built on the T3 stack.",
+    "home": {
+      "title": "Home",
+      "description": "Authentication, organizations, passkeys and two-factor sign-in on the T3 stack, ready to fork."
+    },
+    "pricing": {
+      "title": "Pricing",
+      "description": "Simple, transparent plans for individuals and growing teams."
+    },
+    "signIn": {
+      "title": "Sign in",
+      "description": "Sign in to your account with email, a passkey or a social provider."
+    },
+    "forgotPassword": {
+      "title": "Forgot password",
+      "description": "Request a link to reset your password."
+    }
+  },
   "landing": {
     "title": "BETTER-AUTH.",
     "description": "Official demo to showcase",

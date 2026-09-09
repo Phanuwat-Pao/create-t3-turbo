@@ -1,10 +1,33 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 
 import { auth } from "~/auth/server";
 import EntryButton from "~/components/entry-button";
+import { JsonLd } from "~/components/json-ld";
 import { getDictionary } from "~/i18n/get-dictionary";
-import { i18n } from "~/i18n/i18n-config";
+import { i18n, type Locale } from "~/i18n/i18n-config";
+import { localizedPath, pageMetadata } from "~/lib/metadata";
+import { getSiteUrl } from "~/lib/site-url";
+
+interface PageProps {
+  params: Promise<{ lang: Locale }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+  return pageMetadata({
+    description: dict.seo.home.description,
+    dict,
+    locale: lang,
+    path: "/",
+    siteUrl: await getSiteUrl(),
+    title: dict.seo.home.title,
+  });
+}
 
 const features = [
   {
@@ -61,14 +84,27 @@ const features = [
   },
 ] as const;
 
-export default async function HomePage() {
+export default async function HomePage({ params }: PageProps) {
+  const { lang } = await params;
+  const requestHeaders = await headers();
   const session = await auth.api.getSession({
-    headers: await headers(),
+    headers: requestHeaders,
   });
-  const dict = await getDictionary(i18n.defaultLocale);
+  const dict = await getDictionary(lang);
+  const siteUrl = await getSiteUrl();
 
   return (
     <main className="container h-screen py-16">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          description: dict.seo.description,
+          inLanguage: i18n.locales,
+          name: dict.seo.siteName,
+          url: new URL(localizedPath(lang, "/"), siteUrl).href,
+        }}
+      />
       <div className="flex flex-col items-center justify-center gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
