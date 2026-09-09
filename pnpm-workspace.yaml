@@ -92,6 +92,8 @@ auditConfig:
     - GHSA-vcc3-ghjq-m6fr
 
 overrides:
+  # Patch within 4.0: @scalar/agent-chat's ai-sdk deps pin 4.0.5 exactly.
+  "@ai-sdk/provider-utils@>=4.0.0-beta.10 <4.0.33": ">=4.0.33 <5"
   "@hono/node-server": ">=1.19.13"
   # Patch within 0.8 (like upstream better-auth): samlify (SSO/SAML) breaks on
   # the 0.9 line, which removed the errorHandler DOMParser option.
@@ -117,7 +119,7 @@ overrides:
   hono: ">=4.12.18"
   ip-address: ">=10.1.1"
   # Patch within 4.x: v5 is a breaking rewrite its v4 consumers can't load.
-  "js-yaml@>=4.0.0 <4.3.1": ">=4.3.1 <5"
+  "js-yaml@>=4.0.0 <4.3.2": ">=4.3.2 <5"
   # Floor, not pin: @tailwindcss/node and uniwind pin older exact versions,
   # so a single override keeps one native binary in the tree.
   lightningcss: ">=1.33.0"
