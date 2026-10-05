@@ -118,7 +118,7 @@ Keep new code in each workspace's `src/` and group files by feature.
 - `pnpm i` — install (runs sherif via postinstall).
 - `pnpm dev` — all dev tasks in watch mode; `pnpm dev:next` — web app only.
 - `pnpm build` — build all workspaces.
-- `pnpm typecheck` — `tsgo --noEmit` (TypeScript native preview) everywhere.
+- `pnpm typecheck` — `tsc --noEmit` (TypeScript 7, the native compiler) everywhere.
 - `pnpm check` / `pnpm check:fix` — Ultracite lint+format verify / auto-fix.
 - `pnpm -F <workspace> test` — Vitest for `@acme/api`, `@acme/nextjs`,
   `@acme/validators` (globals enabled via each `vitest.config.ts`).

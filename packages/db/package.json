@@ -19,12 +19,12 @@
   },
   "scripts": {
     "ncu": "ncu -u",
-    "build": "tsgo",
+    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsgo",
+    "dev": "tsc",
     "push": "pnpm with-env drizzle-kit push",
     "studio": "pnpm with-env drizzle-kit studio",
-    "typecheck": "tsgo --noEmit",
+    "typecheck": "tsc --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
@@ -36,7 +36,7 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@types/pg": "^8.23.1",
-    "@typescript/native-preview": "catalog:",
-    "drizzle-kit": "1.0.0-rc.4"
+    "drizzle-kit": "1.0.0-rc.4",
+    "typescript": "catalog:"
   }
 }

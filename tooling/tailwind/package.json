@@ -10,7 +10,7 @@
   "scripts": {
     "ncu": "ncu -u",
     "clean": "git clean -xdf .cache .turbo node_modules",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@tailwindcss/postcss": "catalog:",
@@ -20,6 +20,6 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "@typescript/native-preview": "catalog:"
+    "typescript": "catalog:"
   }
 }

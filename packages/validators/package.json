@@ -11,11 +11,11 @@
   },
   "scripts": {
     "ncu": "ncu -u",
-    "build": "tsgo",
+    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsgo",
+    "dev": "tsc",
     "test": "vitest run",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "catalog:"
@@ -23,7 +23,7 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "@typescript/native-preview": "catalog:",
+    "typescript": "catalog:",
     "vitest": "^5.0.3"
   }
 }

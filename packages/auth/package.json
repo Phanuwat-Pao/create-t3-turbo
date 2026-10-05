@@ -13,7 +13,7 @@
     "ncu": "ncu -u",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "generate": "dotenv -e ../../.env -- pnpx @better-auth/cli generate --config script/auth-cli.ts --output ../db/src/auth-schema.ts",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@acme/db": "workspace:*",
@@ -29,6 +29,6 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "@typescript/native-preview": "catalog:"
+    "typescript": "catalog:"
   }
 }

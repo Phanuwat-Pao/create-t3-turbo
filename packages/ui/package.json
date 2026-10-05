@@ -11,7 +11,7 @@
   "scripts": {
     "ncu": "ncu -u",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "typecheck": "tsgo --noEmit",
+    "typecheck": "tsc --noEmit",
     "ui-add": "pnpm dlx shadcn@latest add && ultracite fix"
   },
   "dependencies": {
@@ -63,8 +63,8 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@types/react": "catalog:react19",
-    "@typescript/native-preview": "catalog:",
     "react": "catalog:react19",
+    "typescript": "catalog:",
     "zod": "catalog:"
   },
   "peerDependencies": {

@@ -15,11 +15,11 @@
   },
   "scripts": {
     "ncu": "ncu -u",
-    "build": "tsgo",
+    "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
-    "dev": "tsgo",
+    "dev": "tsc",
     "test": "vitest run",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@acme/auth": "workspace:*",
@@ -35,7 +35,7 @@
     "@acme/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/pg": "^8.23.1",
-    "@typescript/native-preview": "catalog:",
+    "typescript": "catalog:",
     "vitest": "^5.0.3"
   }
 }

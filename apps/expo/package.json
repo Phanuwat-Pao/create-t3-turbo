@@ -10,7 +10,7 @@
     "dev:ios": "expo start --ios",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "typecheck": "tsgo --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
@@ -76,8 +76,8 @@
     "@acme/tsconfig": "workspace:*",
     "@orpc/server": "catalog:",
     "@types/react": "catalog:react19",
-    "@typescript/native-preview": "catalog:",
-    "tailwindcss": "catalog:"
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
   },
   "expo": {
     "install": {

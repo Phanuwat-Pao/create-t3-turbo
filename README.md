@@ -73,7 +73,7 @@ tooling
 ```
 
 Repo-wide tooling: [Ultracite](https://ultracite.ai) (oxlint + oxfmt) for lint
-and formatting, `tsgo` (TypeScript native preview) for typechecking, Vitest for
+and formatting, TypeScript 7 (the native `tsc`) for typechecking, Vitest for
 unit tests, shared dependency versions via pnpm catalogs in
 `pnpm-workspace.yaml`, and a lefthook pre-commit suite (format/lint, typecheck,
 workspace lint, build, and a critical `pnpm audit`) that every commit must pass.

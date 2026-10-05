@@ -30,13 +30,13 @@
   },
   "devDependencies": {
     "@turbo/gen": "^2.11.7",
-    "@typescript/native-preview": "catalog:",
     "dotenv-cli": "^11.0.0",
     "lefthook": "^2.1.17",
     "npm-check-updates": "^23.1.0",
     "oxfmt": "^0.71.0",
     "oxlint": "^1.86.0",
     "turbo": "^2.11.7",
+    "typescript": "catalog:",
     "ultracite": "7.12.3"
   },
   "engines": {
