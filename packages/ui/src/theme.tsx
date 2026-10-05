@@ -60,11 +60,13 @@ const updateThemeClass = (themeMode: ThemeMode) => {
   }
 };
 
+const handleSystemThemeChange = () => updateThemeClass("auto");
+
 const setupPreferredListener = () => {
   const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-  const handler = () => updateThemeClass("auto");
-  mediaQuery.addEventListener("change", handler);
-  return () => mediaQuery.removeEventListener("change", handler);
+  mediaQuery.addEventListener("change", handleSystemThemeChange);
+  return () =>
+    mediaQuery.removeEventListener("change", handleSystemThemeChange);
 };
 
 const getNextTheme = (current: ThemeMode): ThemeMode => {
@@ -78,6 +80,7 @@ const getNextTheme = (current: ThemeMode): ThemeMode => {
 
 export const themeDetectorScript = (function themeDetectorScript() {
   function themeFn() {
+    // oxlint-disable-next-line unicorn/consistent-function-scoping -- themeFn is serialized with toString() into an inline script, so every helper must live inside it
     const isValidTheme = (theme: string): theme is ThemeMode => {
       const validThemes = ["light", "dark", "auto"] as const;
       return validThemes.includes(theme as ThemeMode);

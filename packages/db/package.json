@@ -30,7 +30,7 @@
   "dependencies": {
     "drizzle-orm": "1.0.0-rc.4",
     "nanoid": "^6.0.1",
-    "pg": "^8.23.0",
+    "pg": "^8.23.1",
     "zod": "catalog:"
   },
   "devDependencies": {

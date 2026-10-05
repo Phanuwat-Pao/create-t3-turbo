@@ -29,15 +29,15 @@
     "ios": "expo run:ios"
   },
   "devDependencies": {
-    "@turbo/gen": "^2.10.12",
+    "@turbo/gen": "^2.11.7",
     "@typescript/native-preview": "catalog:",
     "dotenv-cli": "^11.0.0",
-    "lefthook": "^2.1.12",
+    "lefthook": "^2.1.17",
     "npm-check-updates": "^23.1.0",
-    "oxfmt": "^0.66.0",
-    "oxlint": "^1.81.0",
-    "turbo": "^2.10.12",
-    "ultracite": "7.10.7"
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0",
+    "turbo": "^2.11.7",
+    "ultracite": "7.12.3"
   },
   "engines": {
     "node": ">=22.12.0",

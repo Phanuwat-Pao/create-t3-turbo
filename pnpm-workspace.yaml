@@ -13,28 +13,28 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  "@better-auth/expo": ^1.7.2
-  "@orpc/client": ^1.15.0
-  "@orpc/server": ^1.15.0
-  "@orpc/tanstack-query": ^1.15.0
+  "@better-auth/expo": ^1.7.7
+  "@orpc/client": ^1.15.4
+  "@orpc/server": ^1.15.4
+  "@orpc/tanstack-query": ^1.15.4
   "@tailwindcss/postcss": ^4.3.3
   "@tailwindcss/vite": ^4.3.3
   "@tanstack/react-form": ^1.33.5
-  "@tanstack/react-query": ^5.102.8
-  "@types/node": ^26.4.1
+  "@tanstack/react-query": ^5.104.1
+  "@types/node": ^26.6.4
   "@typescript/native-preview": 7.0.0-dev.20260707.2
   "@vitejs/plugin-react": ^6.1.1
-  better-auth: ^1.7.2
+  better-auth: ^1.7.7
   tailwindcss: ^4.3.3
   vite: ^8.2.2
-  zod: ^4.5.4
+  zod: ^4.6.5
 
 catalogs:
   react19:
-    "@types/react": ^19.2.18
-    "@types/react-dom": ^19.2.6
-    react: ^19.2.8
-    react-dom: ^19.2.8
+    "@types/react": ^19.3.0
+    "@types/react-dom": ^19.3.0
+    react: ^19.3.0
+    react-dom: ^19.3.0
 
 linkWorkspacePackages: true
 
@@ -73,11 +73,25 @@ minimumReleaseAgeExclude:
   - react-native-safe-area-context@5.8.0
   - react-native-screens@4.25.1
   - react-email@6.1.5
-  - ultracite@7.10.3
+  - ultracite@7.10.3 || 7.12.3
   - "@nanostores/react@2.0.1"
   - lucide-react-native@1.40.0
   - nanostores@1.5.3
   - "@types/react-dom@19.2.6"
+  - nodemailer@10.0.15
+  - lefthook-darwin-arm64@2.1.17
+  - lefthook-darwin-x64@2.1.17
+  - lefthook-freebsd-arm64@2.1.17
+  - lefthook-freebsd-x64@2.1.17
+  - lefthook-linux-arm64@2.1.17
+  - lefthook-linux-x64@2.1.17
+  - lefthook-openbsd-arm64@2.1.17
+  - lefthook-openbsd-x64@2.1.17
+  - lefthook-windows-arm64@2.1.17
+  - lefthook-windows-x64@2.1.17
+  - lefthook@2.1.17
+  - uniwind@1.12.2
+  - postcss@8.5.29
 
 # image-size DoS advisories (dev-only, via metro): patched release 2.0.3 is not
 # published as of 2026-08-13 — drop these once it ships and can be overridden.
@@ -130,8 +144,18 @@ overrides:
   node-forge: ">=1.4.0"
   path-to-regexp: ">=8.4.0"
   picomatch: ">=2.3.2"
-  postcss: ">=8.5.23"
+  postcss: ">=8.5.29"
   qs: ">=6.15.2"
+  # Expo SDK 57 pins the React Native family (see expo/bundledNativeModules.json).
+  # Auto-installed peers in the non-Expo workspaces (drizzle-orm -> expo-sqlite,
+  # better-auth -> expo-router) would otherwise drift to the newest release and
+  # put a second copy of each in the tree.
+  react-native: "~0.86.3"
+  react-native-gesture-handler: "~2.32.0"
+  react-native-reanimated: "~4.5.1"
+  react-native-safe-area-context: "~5.7.0"
+  react-native-screens: "~4.26.2"
+  react-native-worklets: "~0.10.1"
   shell-quote: ">=1.8.5"
   socket.io-parser: ">=4.2.7"
   unhead: ">=2.1.13"
