@@ -499,63 +499,98 @@ jobs:
       REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
     steps:
-      - name: "🗑️ Harbor Retention (keep last 3)"
+      - name: "🗑️ Harbor Retention (keep last 3 per branch, drop untagged)"
         continue-on-error: true
         run: |
-          PROJECT="${{ github.event.repository.name }}"
+          PROJECT="${HARBOR_PROJECT:-${{ github.event.repository.name }}}"
+          KEEP="${HARBOR_KEEP:-3}"
           API="https://${REGISTRY_URL}/api/v2.0"
 
-          # Discover every repo in the Harbor project rather than hardcoding a
-          # list, so a service added to the matrix is cleaned automatically.
-          # Strip the "<project>/" prefix to the short name the artifacts API
-          # expects.
-          REPOS=$(curl -s -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
-            "${API}/projects/${PROJECT}/repositories?page_size=100" \
-            | jq -r '.[].name // empty' | sed "s#^${PROJECT}/##")
-
-          if [ -z "${REPOS}" ]; then
-            echo "⚠️ No repositories found (or Harbor unreachable) → nothing to clean"
+          if [ -z "${REGISTRY_URL}" ] || [ -z "${REGISTRY_USERNAME}" ] || [ -z "${REGISTRY_PASSWORD}" ]; then
+            echo "::warning::REGISTRY_URL / REGISTRY_USERNAME / REGISTRY_PASSWORD not set → skipping retention"
             exit 0
           fi
 
+          hget() { curl -sf -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" "$1"; }
+
+          # All repositories of the project (paginated).
+          REPOS=""
+          PAGE=1
+          while :; do
+            CHUNK=$(hget "${API}/projects/${PROJECT}/repositories?page_size=100&page=${PAGE}") || break
+            NAMES=$(echo "${CHUNK}" | jq -r '.[].name // empty' | sed "s#^${PROJECT}/##")
+            [ -z "${NAMES}" ] && break
+            REPOS="${REPOS} ${NAMES}"
+            [ "$(echo "${CHUNK}" | jq 'length')" -lt 100 ] && break
+            PAGE=$((PAGE + 1))
+          done
+          if [ -z "${REPOS}" ]; then
+            echo "⚠️ No repositories found in project '${PROJECT}' (or Harbor unreachable) → nothing to clean"
+            exit 0
+          fi
+
+          TOTAL_DEL=0
           for REPO in ${REPOS}; do
+            ENC=$(printf '%s' "${REPO}" | jq -sRr @uri)
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "🗑️ Retention: ${REPO}"
-            echo ""
+            echo "🗑️ Retention: ${PROJECT}/${REPO} (keep ${KEEP} per stream)"
 
-            RESPONSE=$(curl -s -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
-              "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts?sort=-push_time&page_size=100")
-
-            if ! echo "${RESPONSE}" | jq empty 2>/dev/null; then
-              echo "⚠️ Cannot parse Harbor response → skipping ${REPO}"
+            # All artifacts, newest first, across pages.
+            ARTS="[]"
+            PAGE=1
+            while :; do
+              CHUNK=$(hget "${API}/projects/${PROJECT}/repositories/${ENC}/artifacts?sort=-push_time&page_size=100&page=${PAGE}&with_tag=true") || { ARTS=""; break; }
+              echo "${CHUNK}" | jq -e 'type=="array"' >/dev/null 2>&1 || { ARTS=""; break; }
+              ARTS=$(jq -n --argjson a "${ARTS}" --argjson b "${CHUNK}" '$a + $b')
+              [ "$(echo "${CHUNK}" | jq 'length')" -lt 100 ] && break
+              PAGE=$((PAGE + 1))
+            done
+            if [ -z "${ARTS}" ]; then
+              echo "   ⚠️ Cannot read artifacts → skipping ${REPO}"
               continue
             fi
 
-            TAGS=$(echo "${RESPONSE}" | jq -r '.[].tags[]?.name // empty' | grep -v '^latest$')
+            # Decide. A stream is the tag with its build suffix stripped:
+            #   develop-sha-abc1234 → develop · 413-abc1234 → "" · bee-pro-48-abc1234 → bee-pro
+            #   uat1.11 → uat1 · 0.1.0-main.38 → 0.1.0-main
+            PLAN=$(echo "${ARTS}" | jq -c --argjson keep "${KEEP}" '
+              def floating: test("latest") or . == "buildcache";
+              def stream:
+                  sub("-sha-[0-9a-f]{7,40}$"; "")
+                | sub("^[0-9]+-[0-9a-f]{7,40}$"; "")
+                | sub("-[0-9]+-[0-9a-f]{7,40}$"; "")
+                | sub("[.-][0-9]+$"; "");
+              [ .[] | { digest, tags: [ (.tags // [])[].name ] } ] as $all
+              | ($all | map(select(.tags | length == 0) | .digest)) as $untagged
+              | ($all | map(select(.tags | length > 0))
+                      | map({ digest, tags,
+                              streams: ([ .tags[] | select(floating | not) | stream ] | unique) })
+                      | map(if (.streams | length) == 0 then .streams = ["(floating)"] else . end)) as $tagged
+              | ([ $tagged[] | .digest as $d | .streams[] | { s: ., d: $d } ]
+                  | group_by(.s) | map(.[0:$keep][] | .d) | unique) as $keep_digests
+              | { keep:   [ $tagged[] | select(.digest as $d | $keep_digests | index($d)) | { digest, tags } ],
+                  delete: [ $tagged[] | select(.digest as $d | $keep_digests | index($d) | not) | { digest, tags } ],
+                  untagged: $untagged }')
 
-            if [ -z "${TAGS}" ]; then
-              echo "ℹ️ No tags to clean for ${REPO}"
-              continue
-            fi
+            echo "${PLAN}" | jq -r '.keep[]   | "   ✅ KEEP  \(.tags | join(","))"'
+            echo "${PLAN}" | jq -r '.delete[] | "   🗑️ DEL   \(.tags | join(","))"'
+            N_UNT=$(echo "${PLAN}" | jq '.untagged | length')
+            [ "${N_UNT}" -gt 0 ] && echo "   🗑️ DEL   ${N_UNT} untagged artifact(s)"
 
-            COUNT=0
             DELETED=0
-            for TAG in ${TAGS}; do
-              COUNT=$((COUNT + 1))
-              if [ ${COUNT} -le 3 ]; then
-                echo "   ✅ KEEP  [${COUNT}] ${TAG}"
+            for DIGEST in $(echo "${PLAN}" | jq -r '.delete[].digest, .untagged[]'); do
+              if [ -n "${DRY_RUN}" ]; then DELETED=$((DELETED + 1)); continue; fi
+              CODE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+                -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
+                "${API}/projects/${PROJECT}/repositories/${ENC}/artifacts/${DIGEST}")
+              if [ "${CODE}" -ge 200 ] && [ "${CODE}" -lt 300 ]; then
+                DELETED=$((DELETED + 1))
               else
-                echo "   🗑️ DEL   [${COUNT}] ${TAG}"
-                DEL_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-                  -X DELETE -u "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD}" \
-                  "${API}/projects/${PROJECT}/repositories/${REPO}/artifacts/${TAG}")
-                if [ "${DEL_CODE}" -ge 200 ] && [ "${DEL_CODE}" -lt 300 ]; then
-                  DELETED=$((DELETED + 1))
-                else
-                  echo "   ⚠️ Failed (HTTP ${DEL_CODE})"
-                fi
+                echo "   ⚠️ Failed to delete ${DIGEST:0:19} (HTTP ${CODE})"
               fi
             done
-            echo "✅ ${REPO}: kept 3, deleted ${DELETED}"
-            echo ""
+            TOTAL_DEL=$((TOTAL_DEL + DELETED))
+            echo "✅ ${REPO}: kept $(echo "${PLAN}" | jq '.keep | length'), deleted ${DELETED}${DRY_RUN:+ (dry run)}"
           done
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🏁 ${PROJECT}: ${TOTAL_DEL} artifact(s) deleted${DRY_RUN:+ (dry run)}"
