@@ -4,25 +4,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
 import type { Organization } from "better-auth/plugins";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { getOrgLogoUrl } from "~/lib/avatar";
 
 interface SelectOrganizationBtnProps {
   organization: Partial<Organization>;
-  dict: Dictionary;
 }
 
 export function SelectOrganizationBtn({
   organization,
-  dict,
 }: SelectOrganizationBtnProps) {
+  const { t } = useTranslation();
   const handleClick = useCallback(async () => {
     try {
       if (!organization.id) {
-        toast.error(dict.oauth.selectOrganization.noOrganization);
+        toast.error(t("oauth.selectOrganization.noOrganization"));
         return;
       }
       const { data: active, error: activeError } =
@@ -32,7 +31,7 @@ export function SelectOrganizationBtn({
       if (activeError || !active) {
         toast.error(
           activeError?.message ??
-            dict.oauth.selectOrganization.failedToSetActive
+            t("oauth.selectOrganization.failedToSetActive")
         );
         return;
       }
@@ -41,7 +40,7 @@ export function SelectOrganizationBtn({
       });
       if (error || !data?.redirect || !data.url) {
         toast.error(
-          error?.message ?? dict.oauth.selectOrganization.failedToContinue
+          error?.message ?? t("oauth.selectOrganization.failedToContinue")
         );
         return;
       }
@@ -49,12 +48,7 @@ export function SelectOrganizationBtn({
     } catch (error) {
       toast.error(String(error));
     }
-  }, [
-    dict.oauth.selectOrganization.failedToContinue,
-    dict.oauth.selectOrganization.failedToSetActive,
-    dict.oauth.selectOrganization.noOrganization,
-    organization.id,
-  ]);
+  }, [organization.id, t]);
 
   return (
     <Button

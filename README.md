@@ -38,7 +38,7 @@ apps
   │   ├─ Next.js 16 App Router (React 19 + React Compiler)
   │   ├─ Tailwind CSS v4 + shadcn/ui
   │   ├─ oRPC client with TanStack Query/Form
-  │   ├─ Path-based th/en i18n dictionaries ([lang] routes)
+  │   ├─ next-i18next with th/en resources ([lang] routes)
   │   ├─ Full auth surface: sign-in/up (email, username, social, passkey),
   │   │  2FA (TOTP + email OTP), device authorization, OAuth provider
   │   │  consent/select-account/select-organization pages

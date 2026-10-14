@@ -6,16 +6,13 @@ import { Card } from "@acme/ui/card";
 import { Check, Loader2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState, useTransition } from "react";
+import { useTranslation } from "react-i18next";
 
 import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
-interface DeviceApproveClientProps {
-  dict: Dictionary;
-}
-
-export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
+export function DeviceApproveClient() {
+  const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
   const userCode = searchParams.get("user_code");
@@ -39,10 +36,10 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
         router.push("/device/success");
       } catch (error: unknown) {
         const errorObj = error as { error?: { message?: string } };
-        setErrorMessage(errorObj.error?.message ?? dict.device.failedToApprove);
+        setErrorMessage(errorObj.error?.message ?? t("device.failedToApprove"));
       }
     });
-  }, [dict.device.failedToApprove, router, userCode]);
+  }, [t, router, userCode]);
 
   const handleDeny = useCallback(() => {
     if (!userCode) {
@@ -59,10 +56,10 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
         router.push("/device/denied");
       } catch (error: unknown) {
         const errorObj = error as { error?: { message?: string } };
-        setErrorMessage(errorObj.error?.message ?? dict.device.failedToDeny);
+        setErrorMessage(errorObj.error?.message ?? t("device.failedToDeny"));
       }
     });
-  }, [dict.device.failedToDeny, router, userCode]);
+  }, [t, router, userCode]);
 
   if (!session) {
     return null;
@@ -73,20 +70,20 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
       <Card className="w-full max-w-md p-6">
         <div className="space-y-4">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">{dict.device.approveTitle}</h1>
+            <h1 className="text-2xl font-bold">{t("device.approveTitle")}</h1>
             <p className="text-muted-foreground mt-2">
-              {dict.device.approveDescription}
+              {t("device.approveDescription")}
             </p>
           </div>
 
           <div className="space-y-4">
             <div className="bg-muted rounded-lg p-4">
-              <p className="text-sm font-medium">{dict.device.codeLabel}</p>
+              <p className="text-sm font-medium">{t("device.codeLabel")}</p>
               <p className="font-mono text-lg">{userCode}</p>
             </div>
 
             <div className="bg-muted rounded-lg p-4">
-              <p className="text-sm font-medium">{dict.device.signedInAs}</p>
+              <p className="text-sm font-medium">{t("device.signedInAs")}</p>
               <p>{session.user.email}</p>
             </div>
 
@@ -108,7 +105,7 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
                 ) : (
                   <>
                     <X className="mr-2 h-4 w-4" />
-                    {dict.device.denyButton}
+                    {t("device.denyButton")}
                   </>
                 )}
               </Button>
@@ -122,7 +119,7 @@ export function DeviceApproveClient({ dict }: DeviceApproveClientProps) {
                 ) : (
                   <>
                     <Check className="mr-2 h-4 w-4" />
-                    {dict.device.approveButton}
+                    {t("device.approveButton")}
                   </>
                 )}
               </Button>

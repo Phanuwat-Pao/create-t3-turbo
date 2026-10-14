@@ -4,16 +4,13 @@ import { Button } from "@acme/ui/button";
 import { CardFooter } from "@acme/ui/card";
 import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
-interface ConsentBtnsProps {
-  dict: Dictionary;
-}
-
-export function ConsentBtns({ dict }: ConsentBtnsProps) {
+export function ConsentBtns() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
   const handleAuthorize = useCallback(async () => {
@@ -26,8 +23,8 @@ export function ConsentBtns({ dict }: ConsentBtnsProps) {
       window.location.href = res.data?.url;
       return;
     }
-    toast.error(dict.oauth.consent.authorizeFailed);
-  }, [dict.oauth.consent.authorizeFailed]);
+    toast.error(t("oauth.consent.authorizeFailed"));
+  }, [t]);
 
   const handleCancel = useCallback(async () => {
     const res = await authClient.oauth2.consent({
@@ -37,8 +34,8 @@ export function ConsentBtns({ dict }: ConsentBtnsProps) {
       window.location.href = res.data?.url;
       return;
     }
-    toast.error(dict.oauth.consent.cancelFailed);
-  }, [dict.oauth.consent.cancelFailed]);
+    toast.error(t("oauth.consent.cancelFailed"));
+  }, [t]);
 
   return (
     <CardFooter className="flex items-center gap-2">
@@ -46,11 +43,11 @@ export function ConsentBtns({ dict }: ConsentBtnsProps) {
         {loading ? (
           <Loader2 size={15} className="animate-spin" />
         ) : (
-          dict.oauth.consent.authorizeButton
+          t("oauth.consent.authorizeButton")
         )}
       </Button>
       <Button variant="outline" onClick={handleCancel}>
-        {dict.oauth.consent.cancelButton}
+        {t("oauth.consent.cancelButton")}
       </Button>
     </CardFooter>
   );

@@ -2,40 +2,39 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { useChangePasswordMutation } from "~/data/user/change-password-mutation";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface ChangePasswordFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
-  dict: Dictionary;
 }
 
 export function ChangePasswordForm({
   onSuccess,
   onError,
-  dict,
 }: ChangePasswordFormProps) {
+  const { t } = useTranslation();
   const changePasswordMutation = useChangePasswordMutation();
 
   const changePasswordSchema = z
     .object({
       confirmPassword: z
         .string()
-        .min(1, dict.validation.confirmPasswordRequired),
+        .min(1, t("validation.confirmPasswordRequired")),
       currentPassword: z
         .string()
-        .min(1, dict.validation.currentPasswordRequired),
+        .min(1, t("validation.currentPasswordRequired")),
       newPassword: z
         .string()
-        .min(8, dict.validation.passwordMinLength)
-        .max(128, dict.validation.passwordMaxLength),
+        .min(8, t("validation.passwordMinLength"))
+        .max(128, t("validation.passwordMaxLength")),
       revokeOtherSessions: z.boolean(),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
-      message: dict.validation.passwordsDoNotMatch,
+      message: t("validation.passwordsDoNotMatch"),
       path: ["confirmPassword"],
     });
 
@@ -54,7 +53,7 @@ export function ChangePasswordForm({
           revokeOtherSessions: value.revokeOtherSessions,
         });
       } catch (error) {
-        onError?.(error instanceof Error ? error.message : dict.common.error);
+        onError?.(error instanceof Error ? error.message : t("common.error"));
         return;
       }
       formApi.reset();
@@ -78,10 +77,10 @@ export function ChangePasswordForm({
                 autoComplete="current-password"
                 disabled={isSubmitting}
                 id="current-password"
-                label={dict.dashboard.changePassword.currentPasswordLabel}
-                placeholder={
-                  dict.dashboard.changePassword.currentPasswordPlaceholder
-                }
+                label={t("dashboard.changePassword.currentPasswordLabel")}
+                placeholder={t(
+                  "dashboard.changePassword.currentPasswordPlaceholder"
+                )}
               />
             )}
           </form.AppField>
@@ -92,10 +91,10 @@ export function ChangePasswordForm({
                 autoComplete="new-password"
                 disabled={isSubmitting}
                 id="new-password"
-                label={dict.dashboard.changePassword.newPasswordLabel}
-                placeholder={
-                  dict.dashboard.changePassword.newPasswordPlaceholder
-                }
+                label={t("dashboard.changePassword.newPasswordLabel")}
+                placeholder={t(
+                  "dashboard.changePassword.newPasswordPlaceholder"
+                )}
               />
             )}
           </form.AppField>
@@ -106,10 +105,10 @@ export function ChangePasswordForm({
                 autoComplete="new-password"
                 disabled={isSubmitting}
                 id="confirm-password"
-                label={dict.dashboard.changePassword.confirmPasswordLabel}
-                placeholder={
-                  dict.dashboard.changePassword.confirmPasswordPlaceholder
-                }
+                label={t("dashboard.changePassword.confirmPasswordLabel")}
+                placeholder={t(
+                  "dashboard.changePassword.confirmPasswordPlaceholder"
+                )}
               />
             )}
           </form.AppField>
@@ -119,13 +118,13 @@ export function ChangePasswordForm({
               <field.CheckboxField
                 disabled={isSubmitting}
                 id="revoke-sessions"
-                label={dict.dashboard.changePassword.revokeOtherSessions}
+                label={t("dashboard.changePassword.revokeOtherSessions")}
               />
             )}
           </form.AppField>
 
           <form.SubmitButton>
-            {dict.dashboard.changePassword.changeButton}
+            {t("dashboard.changePassword.changeButton")}
           </form.SubmitButton>
         </FieldGroup>
       </form.Form>

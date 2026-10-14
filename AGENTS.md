@@ -74,16 +74,21 @@ most common defect. Before calling work done, walk this list:
 - **Auth surface.** Auth changes ripple: `packages/auth` config →
   `pnpm auth:generate` → `packages/db/src/auth-schema.ts` →
   `packages/db/src/relations.ts` → both app clients.
-- **i18n.** The web app is dictionary-based (`[lang]` routes); the Expo app
-  uses i18next with `en`/`th` resources. User-visible strings need entries in
-  both places they appear.
+- **i18n.** Both apps use i18next with one `translation` namespace and
+  `en`/`th` resources. The web app's live in `apps/nextjs/src/i18n/*.json`
+  behind next-i18next (`[lang]` routes): Server Components and
+  `generateMetadata` call `getT()` from `~/i18n/server`, Client Components
+  call `useTranslation()` from react-i18next. Keep `en.json` and `th.json`
+  key-for-key; the web client only receives the current language, and a
+  test enforces the parity. User-visible strings need entries in both apps
+  where they appear.
 - **Env.** New environment variables go through the t3-env definitions
   (`apps/nextjs/src/env.ts`, `packages/auth/env.ts`) and `turbo.json`'s
   `globalEnv` when tasks depend on them.
 - **SEO.** A new public page needs `generateMetadata` built with
   `pageMetadata` from `~/lib/metadata`, its path added to `PUBLIC_PATHS` so
   the sitemap and hreflang alternates pick it up, and `seo.*` strings in
-  both dictionaries. Anything behind a session or mid-flow (auth steps,
+  both locale files. Anything behind a session or mid-flow (auth steps,
   OAuth consent, device codes) exports `robots: NOINDEX` instead; a
   `"use client"` page cannot export metadata, so give its folder a layout
   that does. Never hard-code a domain: `getSiteUrl()` reads the request's

@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 
-import { getDictionary } from "~/i18n/get-dictionary";
-import { i18n, type Locale } from "~/i18n/i18n-config";
+import { getT } from "~/i18n/server";
 
 export const alt = "create-t3-turbo";
 export const contentType = "image/png";
@@ -18,10 +17,8 @@ interface ImageProps {
  */
 export default async function OpenGraphImage({ params }: ImageProps) {
   const { lang } = await params;
-  const locale = (i18n.locales as readonly string[]).includes(lang)
-    ? (lang as Locale)
-    : i18n.defaultLocale;
-  const dict = await getDictionary(locale);
+  // Metadata image routes cannot read root params, so pass the language.
+  const { t } = await getT("translation", { lng: lang });
 
   return new ImageResponse(
     <div
@@ -39,7 +36,7 @@ export default async function OpenGraphImage({ params }: ImageProps) {
       }}
     >
       <div style={{ display: "flex", fontSize: 88, fontWeight: 800 }}>
-        {dict.seo.siteName}
+        {t("seo.siteName")}
       </div>
       <div
         style={{
@@ -51,7 +48,7 @@ export default async function OpenGraphImage({ params }: ImageProps) {
           textAlign: "center",
         }}
       >
-        {dict.seo.description}
+        {t("seo.description")}
       </div>
     </div>,
     size

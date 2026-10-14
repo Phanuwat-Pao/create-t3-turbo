@@ -2,25 +2,24 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { uploadFile } from "~/data/storage/upload-file";
 import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface UpdateUserFormProps {
   currentName?: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
-  dict: Dictionary;
 }
 
 export function UpdateUserForm({
   currentName,
   onSuccess,
   onError,
-  dict,
 }: UpdateUserFormProps) {
+  const { t } = useTranslation();
   const updateUserMutation = useUpdateUserMutation();
 
   const updateUserSchema = z.object({
@@ -29,8 +28,8 @@ export function UpdateUserForm({
       z.literal(""),
       z
         .string()
-        .min(2, dict.validation.nameMinLength)
-        .max(50, dict.validation.nameMaxLength),
+        .min(2, t("validation.nameMinLength"))
+        .max(50, t("validation.nameMaxLength")),
     ]),
   });
 
@@ -54,7 +53,7 @@ export function UpdateUserForm({
         onError?.(
           error instanceof Error
             ? error.message
-            : dict.validation.failedToProcessImage
+            : t("validation.failedToProcessImage")
         );
         return;
       }
@@ -82,7 +81,7 @@ export function UpdateUserForm({
               <field.TextField
                 disabled={isSubmitting}
                 id="name"
-                label={dict.dashboard.user.fullNameLabel}
+                label={t("dashboard.user.fullNameLabel")}
                 placeholder={currentName}
                 type="text"
               />
@@ -97,14 +96,14 @@ export function UpdateUserForm({
                 clearLabel="Clear image"
                 disabled={isSubmitting}
                 id="image"
-                label={dict.dashboard.user.profileImageLabel}
-                previewAlt={dict.dashboard.user.profileImageAlt}
+                label={t("dashboard.user.profileImageLabel")}
+                previewAlt={t("dashboard.user.profileImageAlt")}
               />
             )}
           </form.AppField>
 
           <form.SubmitButton disabled={isEmpty}>
-            {dict.dashboard.user.updateButton}
+            {t("dashboard.user.updateButton")}
           </form.SubmitButton>
         </FieldGroup>
       </form.Form>

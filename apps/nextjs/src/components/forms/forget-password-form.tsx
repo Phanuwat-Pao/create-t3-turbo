@@ -2,26 +2,25 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface ForgetPasswordFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
   redirectTo?: string;
-  dict: Dictionary;
 }
 
 export function ForgetPasswordForm({
   onSuccess,
   onError,
   redirectTo = "/reset-password",
-  dict,
 }: ForgetPasswordFormProps) {
+  const { t } = useTranslation();
   const forgetPasswordSchema = z.object({
-    email: z.email(dict.validation.emailRequired),
+    email: z.email(t("validation.emailRequired")),
   });
 
   const form = useAppForm({
@@ -35,7 +34,7 @@ export function ForgetPasswordForm({
           redirectTo,
         });
       } catch {
-        onError?.(dict.common.error);
+        onError?.(t("common.error"));
         return;
       }
       onSuccess?.();
@@ -55,15 +54,15 @@ export function ForgetPasswordForm({
               <field.TextField
                 autoComplete="email"
                 id="forget-email"
-                label={dict.auth.forgotPassword.emailLabel}
-                placeholder={dict.auth.forgotPassword.emailPlaceholder}
+                label={t("auth.forgotPassword.emailLabel")}
+                placeholder={t("auth.forgotPassword.emailPlaceholder")}
                 type="email"
               />
             )}
           </form.AppField>
         </FieldGroup>
         <form.SubmitButton className="w-full">
-          {dict.auth.forgotPassword.sendResetLink}
+          {t("auth.forgotPassword.sendResetLink")}
         </form.SubmitButton>
       </form.Form>
     </form.AppForm>

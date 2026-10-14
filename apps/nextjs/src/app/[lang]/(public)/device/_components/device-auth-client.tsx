@@ -6,23 +6,20 @@ import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
-interface DeviceAuthClientProps {
-  dict: Dictionary;
-}
-
-export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
+export function DeviceAuthClient() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
   const initialUserCode = params.get("user_code") ?? "";
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const deviceSchema = z.object({
-    userCode: z.string().trim().min(1, dict.device.invalidCode),
+    userCode: z.string().trim().min(1, t("device.invalidCode")),
   });
 
   const form = useAppForm({
@@ -48,7 +45,7 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
         }
       } catch (error: unknown) {
         setErrorMessage(
-          error instanceof Error ? error.message : dict.device.invalidCode
+          error instanceof Error ? error.message : t("device.invalidCode")
         );
       }
     },
@@ -63,9 +60,9 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
       <Card className="w-full max-w-md p-6">
         <div className="space-y-4">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">{dict.device.title}</h1>
+            <h1 className="text-2xl font-bold">{t("device.title")}</h1>
             <p className="text-muted-foreground mt-2">
-              {dict.device.description}
+              {t("device.description")}
             </p>
           </div>
 
@@ -77,9 +74,9 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
                     <field.TextField
                       className="text-center font-mono text-lg uppercase"
                       id="userCode"
-                      label={dict.device.codeLabel}
+                      label={t("device.codeLabel")}
                       maxLength={9}
-                      placeholder={dict.device.codePlaceholder}
+                      placeholder={t("device.codePlaceholder")}
                       type="text"
                     />
                   )}
@@ -94,9 +91,9 @@ export function DeviceAuthClient({ dict }: DeviceAuthClientProps) {
 
               <form.SubmitButton
                 className="w-full"
-                submittingLabel={dict.device.verifying}
+                submittingLabel={t("device.verifying")}
               >
-                {dict.device.continueButton}
+                {t("device.continueButton")}
               </form.SubmitButton>
             </form.Form>
           </form.AppForm>

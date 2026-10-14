@@ -1,14 +1,14 @@
 import type { MetadataRoute } from "next";
 
-import { getDictionary } from "~/i18n/get-dictionary";
 import { i18n } from "~/i18n/i18n-config";
+import { getT } from "~/i18n/server";
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
-  const dict = await getDictionary(i18n.defaultLocale);
+  const { t } = await getT("translation", { lng: i18n.defaultLocale });
 
   return {
     background_color: "#09090b",
-    description: dict.seo.description,
+    description: t("seo.description"),
     display: "standalone",
     icons: [
       {
@@ -22,8 +22,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
         type: "image/png",
       },
     ],
-    name: dict.seo.siteName,
-    short_name: dict.seo.siteName,
+    name: t("seo.siteName"),
+    short_name: t("seo.siteName"),
     start_url: `/${i18n.defaultLocale}`,
     theme_color: "#09090b",
   };

@@ -4,14 +4,10 @@ import { Button } from "@acme/ui/button";
 import { Card } from "@acme/ui/card";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
-
-interface DeviceSuccessClientProps {
-  dict: Dictionary;
-}
-
-export function DeviceSuccessClient({ dict }: DeviceSuccessClientProps) {
+export function DeviceSuccessClient() {
+  const { t } = useTranslation();
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md p-6">
@@ -21,18 +17,18 @@ export function DeviceSuccessClient({ dict }: DeviceSuccessClientProps) {
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold">{dict.device.successTitle}</h1>
+            <h1 className="text-2xl font-bold">{t("device.successTitle")}</h1>
             <p className="text-muted-foreground mt-2">
-              {dict.device.successDescription}
+              {t("device.successDescription")}
             </p>
           </div>
 
           <p className="text-muted-foreground text-sm">
-            {dict.device.successNote}
+            {t("device.successNote")}
           </p>
 
           <Button asChild className="w-full">
-            <Link href="/">{dict.device.returnHome}</Link>
+            <Link href="/">{t("device.returnHome")}</Link>
           </Button>
         </div>
       </Card>

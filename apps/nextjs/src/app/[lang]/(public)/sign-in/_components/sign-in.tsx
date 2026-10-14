@@ -13,21 +13,18 @@ import { Key } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
 import { SignInForm } from "~/components/forms/sign-in-form";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
 import { useIsHydrated } from "~/hooks/use-hydrated";
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { getCallbackURL } from "~/lib/shared";
 import { cn } from "~/lib/utils";
 
-interface SignInProps {
-  dict: Dictionary;
-}
-
-export default function SignIn({ dict }: SignInProps) {
+export default function SignIn() {
+  const { t } = useTranslation();
   const isMounted = useIsHydrated();
   const router = useRouter();
   const params = useSearchParams();
@@ -68,33 +65,29 @@ export default function SignIn({ dict }: SignInProps) {
     await authClient.signIn.passkey({
       fetchOptions: {
         onError(context: { error: { message: string } }) {
-          toast.error(`${dict.common.error}: ${context.error.message}`);
+          toast.error(`${t("common.error")}: ${context.error.message}`);
         },
         onSuccess() {
-          toast.success(dict.auth.signIn.successMessage);
+          toast.success(t("auth.signIn.successMessage"));
           router.push(getCallbackURL(params));
         },
       },
     });
-  }, [router, params, dict]);
+  }, [router, params, t]);
 
   return (
     <Card className="max-h-[90vh] w-full overflow-y-auto rounded-none">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">
-          {dict.auth.signIn.title}
+          {t("auth.signIn.title")}
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          {dict.auth.signIn.description}
+          {t("auth.signIn.description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <SignInForm
-            onSuccess={handleSuccess}
-            callbackURL="/dashboard"
-            dict={dict}
-          />
+          <SignInForm onSuccess={handleSuccess} callbackURL="/dashboard" />
 
           {/* OAuth Buttons - 2 per row */}
           <div className="grid grid-cols-2 gap-2">
@@ -102,7 +95,7 @@ export default function SignIn({ dict }: SignInProps) {
               variant="outline"
               className={cn("relative flex gap-2")}
               onClick={handleGoogleSignIn}
-              aria-label={dict.auth.signIn.ariaGoogle}
+              aria-label={t("auth.signIn.ariaGoogle")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -128,7 +121,7 @@ export default function SignIn({ dict }: SignInProps) {
                 />
               </svg>
               <span className="hidden sm:inline">
-                {dict.auth.signIn.withGoogle}
+                {t("auth.signIn.withGoogle")}
               </span>
               {isMounted && authClient.isLastUsedLoginMethod("google") && (
                 <LastUsedIndicator />
@@ -138,7 +131,7 @@ export default function SignIn({ dict }: SignInProps) {
               variant="outline"
               className={cn("relative flex items-center gap-2")}
               onClick={handleGitHubSignIn}
-              aria-label={dict.auth.signIn.ariaGitHub}
+              aria-label={t("auth.signIn.ariaGitHub")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +145,7 @@ export default function SignIn({ dict }: SignInProps) {
                 />
               </svg>
               <span className="hidden sm:inline">
-                {dict.auth.signIn.withGitHub}
+                {t("auth.signIn.withGitHub")}
               </span>
               {isMounted && authClient.isLastUsedLoginMethod("github") && (
                 <LastUsedIndicator />
@@ -162,7 +155,7 @@ export default function SignIn({ dict }: SignInProps) {
               variant="outline"
               className={cn("relative flex items-center gap-2")}
               onClick={handleMicrosoftSignIn}
-              aria-label={dict.auth.signIn.ariaMicrosoft}
+              aria-label={t("auth.signIn.ariaMicrosoft")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +169,7 @@ export default function SignIn({ dict }: SignInProps) {
                 />
               </svg>
               <span className="hidden sm:inline">
-                {dict.auth.signIn.withMicrosoft}
+                {t("auth.signIn.withMicrosoft")}
               </span>
               {isMounted && authClient.isLastUsedLoginMethod("microsoft") && (
                 <LastUsedIndicator />
@@ -186,7 +179,7 @@ export default function SignIn({ dict }: SignInProps) {
               variant="outline"
               className={cn("relative flex gap-2")}
               onClick={handleVercelSignIn}
-              aria-label={dict.auth.signIn.ariaVercel}
+              aria-label={t("auth.signIn.ariaVercel")}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -198,7 +191,7 @@ export default function SignIn({ dict }: SignInProps) {
                 <path d="m128 0l128 221.705H0z" />
               </svg>
               <span className="hidden sm:inline">
-                {dict.auth.signIn.withVercel}
+                {t("auth.signIn.withVercel")}
               </span>
               {isMounted && authClient.isLastUsedLoginMethod("vercel") && (
                 <LastUsedIndicator />
@@ -213,7 +206,7 @@ export default function SignIn({ dict }: SignInProps) {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background text-muted-foreground px-2">
-                {dict.auth.signIn.orContinueWith}
+                {t("auth.signIn.orContinueWith")}
               </span>
             </div>
           </div>
@@ -225,7 +218,7 @@ export default function SignIn({ dict }: SignInProps) {
             onClick={handlePasskeySignIn}
           >
             <Key size={16} />
-            <span>{dict.auth.signIn.withPasskey}</span>
+            <span>{t("auth.signIn.withPasskey")}</span>
             {isMounted && authClient.isLastUsedLoginMethod("passkey") && (
               <LastUsedIndicator />
             )}
@@ -235,7 +228,7 @@ export default function SignIn({ dict }: SignInProps) {
       <CardFooter>
         <div className="flex w-full justify-center border-t pt-4">
           <p className="text-center text-xs text-neutral-500">
-            {dict.auth.signIn.builtWith}{" "}
+            {t("auth.signIn.builtWith")}{" "}
             <Link
               href="https://better-auth.com"
               className="underline"

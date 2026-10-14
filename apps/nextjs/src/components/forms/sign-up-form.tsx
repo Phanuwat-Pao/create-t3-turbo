@@ -2,37 +2,36 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import { uploadFile } from "~/data/storage/upload-file";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface SignUpFormProps {
   onSuccess?: () => void;
   callbackURL?: string;
-  dict: Dictionary;
 }
 
 export function SignUpForm({
   onSuccess,
   callbackURL = "/dashboard",
-  dict,
 }: SignUpFormProps) {
+  const { t } = useTranslation();
   const signUpSchema = z
     .object({
-      email: z.email(dict.validation.emailRequired),
-      firstName: z.string().min(1, dict.validation.firstNameRequired),
+      email: z.email(t("validation.emailRequired")),
+      firstName: z.string().min(1, t("validation.firstNameRequired")),
       image: z.file().nullable(),
-      lastName: z.string().min(1, dict.validation.lastNameRequired),
-      password: z.string().min(8, dict.validation.passwordMinLength),
+      lastName: z.string().min(1, t("validation.lastNameRequired")),
+      password: z.string().min(8, t("validation.passwordMinLength")),
       passwordConfirmation: z
         .string()
-        .min(1, dict.validation.confirmPasswordRequired),
+        .min(1, t("validation.confirmPasswordRequired")),
     })
     .refine((data) => data.password === data.passwordConfirmation, {
-      message: dict.validation.passwordsDoNotMatch,
+      message: t("validation.passwordsDoNotMatch"),
       path: ["passwordConfirmation"],
     });
 
@@ -62,7 +61,7 @@ export function SignUpForm({
                 // Sign-up succeeded but avatar upload failed. Non-blocking.
               }
             }
-            toast.success(dict.auth.signUp.successMessage);
+            toast.success(t("auth.signUp.successMessage"));
             onSuccess?.();
           },
         },
@@ -87,8 +86,8 @@ export function SignUpForm({
                 <field.TextField
                   autoComplete="given-name"
                   id="sign-up-first-name"
-                  label={dict.auth.signUp.firstNameLabel}
-                  placeholder={dict.auth.signUp.firstNamePlaceholder}
+                  label={t("auth.signUp.firstNameLabel")}
+                  placeholder={t("auth.signUp.firstNamePlaceholder")}
                 />
               )}
             </form.AppField>
@@ -97,8 +96,8 @@ export function SignUpForm({
                 <field.TextField
                   autoComplete="family-name"
                   id="sign-up-last-name"
-                  label={dict.auth.signUp.lastNameLabel}
-                  placeholder={dict.auth.signUp.lastNamePlaceholder}
+                  label={t("auth.signUp.lastNameLabel")}
+                  placeholder={t("auth.signUp.lastNamePlaceholder")}
                 />
               )}
             </form.AppField>
@@ -108,8 +107,8 @@ export function SignUpForm({
               <field.TextField
                 autoComplete="email"
                 id="sign-up-email"
-                label={dict.auth.signUp.emailLabel}
-                placeholder={dict.auth.signUp.emailPlaceholder}
+                label={t("auth.signUp.emailLabel")}
+                placeholder={t("auth.signUp.emailPlaceholder")}
                 type="email"
               />
             )}
@@ -120,8 +119,8 @@ export function SignUpForm({
                 <field.TextField
                   autoComplete="new-password"
                   id="sign-up-password"
-                  label={dict.auth.signUp.passwordLabel}
-                  placeholder={dict.auth.signUp.passwordPlaceholder}
+                  label={t("auth.signUp.passwordLabel")}
+                  placeholder={t("auth.signUp.passwordPlaceholder")}
                   type="password"
                 />
               )}
@@ -131,8 +130,8 @@ export function SignUpForm({
                 <field.TextField
                   autoComplete="new-password"
                   id="sign-up-password-confirmation"
-                  label={dict.auth.signUp.confirmPasswordLabel}
-                  placeholder={dict.auth.signUp.confirmPasswordPlaceholder}
+                  label={t("auth.signUp.confirmPasswordLabel")}
+                  placeholder={t("auth.signUp.confirmPasswordPlaceholder")}
                   type="password"
                 />
               )}
@@ -143,14 +142,14 @@ export function SignUpForm({
               <field.FileField
                 accept="image/*"
                 id="sign-up-image"
-                label={dict.auth.signUp.profileImageLabel}
-                previewAlt={dict.auth.signUp.profileImageAlt}
+                label={t("auth.signUp.profileImageLabel")}
+                previewAlt={t("auth.signUp.profileImageAlt")}
               />
             )}
           </form.AppField>
         </FieldGroup>
         <form.SubmitButton className="w-full">
-          {dict.auth.signUp.createAccountButton}
+          {t("auth.signUp.createAccountButton")}
         </form.SubmitButton>
       </form.Form>
     </form.AppForm>

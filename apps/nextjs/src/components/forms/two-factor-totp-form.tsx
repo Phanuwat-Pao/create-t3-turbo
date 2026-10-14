@@ -4,29 +4,28 @@ import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface TwoFactorTotpFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
-  dict: Dictionary;
 }
 
 export function TwoFactorTotpForm({
   onSuccess,
   onError,
-  dict,
 }: TwoFactorTotpFormProps) {
+  const { t } = useTranslation();
   const [isVerified, setIsVerified] = useState(false);
 
   const totpSchema = z.object({
     code: z
       .string()
-      .length(6, dict.auth.twoFactor.codeMustBe6Digits)
-      .regex(/^\d+$/u, dict.auth.twoFactor.codeMustBeDigitsOnly),
+      .length(6, t("auth.twoFactor.codeMustBe6Digits"))
+      .regex(/^\d+$/u, t("auth.twoFactor.codeMustBeDigitsOnly")),
   });
 
   const form = useAppForm({
@@ -49,8 +48,8 @@ export function TwoFactorTotpForm({
         if (res.data?.token) {
           return undefined;
         }
-        onError?.(dict.auth.twoFactor.invalidCode);
-        return { fields: { code: dict.auth.twoFactor.invalidCode } };
+        onError?.(t("auth.twoFactor.invalidCode"));
+        return { fields: { code: t("auth.twoFactor.invalidCode") } };
       },
     },
   });
@@ -60,7 +59,7 @@ export function TwoFactorTotpForm({
       <div className="flex flex-col items-center justify-center space-y-2 py-4">
         <CheckCircle2 className="h-12 w-12 text-green-500" />
         <p className="text-lg font-semibold">
-          {dict.auth.twoFactor.verificationSuccess}
+          {t("auth.twoFactor.verificationSuccess")}
         </p>
       </div>
     );
@@ -76,16 +75,16 @@ export function TwoFactorTotpForm({
                 autoComplete="one-time-code"
                 id="totp-code"
                 inputMode="numeric"
-                label={dict.auth.twoFactor.codeLabel}
+                label={t("auth.twoFactor.codeLabel")}
                 maxLength={6}
-                placeholder={dict.auth.twoFactor.codePlaceholder}
+                placeholder={t("auth.twoFactor.codePlaceholder")}
                 type="text"
               />
             )}
           </form.AppField>
         </FieldGroup>
         <form.SubmitButton className="w-full">
-          {dict.auth.twoFactor.verifyButton}
+          {t("auth.twoFactor.verifyButton")}
         </form.SubmitButton>
       </form.Form>
     </form.AppForm>

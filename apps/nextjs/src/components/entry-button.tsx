@@ -2,14 +2,13 @@ import type { Session } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 import Link from "next/link";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
+import { getT } from "~/i18n/server";
 
 interface Props {
   session: Session | null;
-  dict: Dictionary;
 }
 
-const SignInButton = ({ dict }: { dict: Dictionary }) => (
+const SignInButton = ({ label }: { label: string }) => (
   <Button className="gap-2" variant="default" asChild>
     <Link href="/sign-in">
       <svg
@@ -23,12 +22,12 @@ const SignInButton = ({ dict }: { dict: Dictionary }) => (
           d="M5 3H3v4h2V5h14v14H5v-2H3v4h18V3zm12 8h-2V9h-2V7h-2v2h2v2H3v2h10v2h-2v2h2v-2h2v-2h2z"
         />
       </svg>
-      <span>{dict.entryButton.signIn}</span>
+      <span>{label}</span>
     </Link>
   </Button>
 );
 
-const DashboardButton = ({ dict }: { dict: Dictionary }) => (
+const DashboardButton = ({ label }: { label: string }) => (
   <Button className="gap-2" variant="default" asChild>
     <Link href="/dashboard">
       <svg
@@ -39,18 +38,19 @@ const DashboardButton = ({ dict }: { dict: Dictionary }) => (
       >
         <path fill="currentColor" d="M2 3h20v18H2zm18 16V7H4v12z" />
       </svg>
-      <span>{dict.entryButton.dashboard}</span>
+      <span>{label}</span>
     </Link>
   </Button>
 );
 
-const EntryButton = ({ session, dict }: Props) => {
+const EntryButton = async ({ session }: Props) => {
+  const { t } = await getT();
   const hasSession = !!session?.session;
 
   return hasSession ? (
-    <DashboardButton dict={dict} />
+    <DashboardButton label={t("entryButton.dashboard")} />
   ) : (
-    <SignInButton dict={dict} />
+    <SignInButton label={t("entryButton.signIn")} />
   );
 };
 

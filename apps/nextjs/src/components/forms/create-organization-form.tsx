@@ -2,16 +2,15 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { useOrganizationCreateMutation } from "~/data/organization/organization-create-mutation";
 import { uploadFile } from "~/data/storage/upload-file";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface CreateOrganizationFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
-  dict: Dictionary;
 }
 
 const slugify = (value: string) =>
@@ -24,21 +23,21 @@ const slugify = (value: string) =>
 export function CreateOrganizationForm({
   onSuccess,
   onError,
-  dict,
 }: CreateOrganizationFormProps) {
+  const { t } = useTranslation();
   const createMutation = useOrganizationCreateMutation();
 
   const createOrganizationSchema = z.object({
     logo: z.file().nullable(),
     name: z
       .string()
-      .min(2, dict.validation.nameMinLength)
-      .max(50, dict.validation.nameMaxLength),
+      .min(2, t("validation.nameMinLength"))
+      .max(50, t("validation.nameMaxLength")),
     slug: z
       .string()
-      .min(2, dict.validation.slugMinLength)
-      .max(50, dict.validation.slugMaxLength)
-      .regex(/^[a-z0-9-]+$/u, dict.validation.slugInvalidChars),
+      .min(2, t("validation.slugMinLength"))
+      .max(50, t("validation.slugMaxLength"))
+      .regex(/^[a-z0-9-]+$/u, t("validation.slugInvalidChars")),
   });
 
   const form = useAppForm({
@@ -63,7 +62,7 @@ export function CreateOrganizationForm({
         onError?.(
           error instanceof Error
             ? error.message
-            : dict.validation.failedToProcessImage
+            : t("validation.failedToProcessImage")
         );
         return;
       }
@@ -99,8 +98,8 @@ export function CreateOrganizationForm({
               <field.TextField
                 disabled={isSubmitting}
                 id="org-name"
-                label={dict.organization.create.nameLabel}
-                placeholder={dict.organization.create.namePlaceholder}
+                label={t("organization.create.nameLabel")}
+                placeholder={t("organization.create.namePlaceholder")}
               />
             )}
           </form.AppField>
@@ -110,8 +109,8 @@ export function CreateOrganizationForm({
               <field.TextField
                 disabled={isSubmitting}
                 id="org-slug"
-                label={dict.organization.create.slugLabel}
-                placeholder={dict.organization.create.slugPlaceholder}
+                label={t("organization.create.slugLabel")}
+                placeholder={t("organization.create.slugPlaceholder")}
               />
             )}
           </form.AppField>
@@ -124,14 +123,14 @@ export function CreateOrganizationForm({
                 clearLabel="Clear logo"
                 disabled={isSubmitting}
                 id="org-logo"
-                label={dict.organization.create.logoLabel}
-                previewAlt={dict.organization.create.logoAlt}
+                label={t("organization.create.logoLabel")}
+                previewAlt={t("organization.create.logoAlt")}
               />
             )}
           </form.AppField>
 
           <form.SubmitButton>
-            {dict.organization.create.createButton}
+            {t("organization.create.createButton")}
           </form.SubmitButton>
         </FieldGroup>
       </form.Form>

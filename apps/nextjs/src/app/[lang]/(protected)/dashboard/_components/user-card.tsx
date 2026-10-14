@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
@@ -57,7 +58,6 @@ import { UpdateUserForm } from "~/components/forms/update-user-form";
 import { useRevokeSessionMutation } from "~/data/user/revoke-session-mutation";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { getAvatarUrl } from "~/lib/avatar";
 
 // Extended user type with twoFactor plugin fields
@@ -70,7 +70,6 @@ interface SessionItemProps {
   currentSessionId: string | undefined;
   isTerminating: boolean;
   onRevoke: (token: string) => void;
-  dict: Dictionary;
 }
 
 const SessionItem = memo(
@@ -79,8 +78,8 @@ const SessionItem = memo(
     currentSessionId,
     isTerminating,
     onRevoke,
-    dict,
   }: SessionItemProps) => {
+    const { t } = useTranslation();
     const isCurrentSession = session.id === currentSessionId;
 
     const handleRevoke = useCallback(() => {
@@ -107,10 +106,10 @@ const SessionItem = memo(
             {isTerminating && <Loader2 size={15} className="animate-spin" />}
             {!isTerminating &&
               isCurrentSession &&
-              dict.dashboard.sessions.signOut}
+              t("dashboard.sessions.signOut")}
             {!isTerminating &&
               !isCurrentSession &&
-              dict.dashboard.sessions.terminate}
+              t("dashboard.sessions.terminate")}
           </button>
         </div>
       </div>
@@ -119,7 +118,8 @@ const SessionItem = memo(
 );
 SessionItem.displayName = "SessionItem";
 
-function EditUserDialog({ dict }: { dict: Dictionary }) {
+function EditUserDialog() {
+  const { t } = useTranslation();
   const { data } = useSessionQuery();
   const [open, setOpen] = useState<boolean>(false);
 
@@ -130,27 +130,27 @@ function EditUserDialog({ dict }: { dict: Dictionary }) {
       <DialogTrigger asChild>
         <Button size="sm" className="gap-2" variant="default">
           <Edit size={13} />
-          {dict.dashboard.user.editUser}
+          {t("dashboard.user.editUser")}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dict.dashboard.user.editUser}</DialogTitle>
+          <DialogTitle>{t("dashboard.user.editUser")}</DialogTitle>
           <DialogDescription>
-            {dict.dashboard.user.editUserDescription}
+            {t("dashboard.user.editUserDescription")}
           </DialogDescription>
         </DialogHeader>
         <UpdateUserForm
           currentName={data?.user.name}
           onSuccess={handleSuccess}
-          dict={dict}
         />
       </DialogContent>
     </Dialog>
   );
 }
 
-function ChangePassword({ dict }: { dict: Dictionary }) {
+function ChangePassword() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
 
   const handleSuccess = useCallback(() => setOpen(false), []);
@@ -171,24 +171,25 @@ function ChangePassword({ dict }: { dict: Dictionary }) {
             />
           </svg>
           <span className="text-muted-foreground text-sm">
-            {dict.dashboard.changePassword.title}
+            {t("dashboard.changePassword.title")}
           </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dict.dashboard.changePassword.title}</DialogTitle>
+          <DialogTitle>{t("dashboard.changePassword.title")}</DialogTitle>
           <DialogDescription>
-            {dict.dashboard.changePassword.description}
+            {t("dashboard.changePassword.description")}
           </DialogDescription>
         </DialogHeader>
-        <ChangePasswordForm onSuccess={handleSuccess} dict={dict} />
+        <ChangePasswordForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function AddPasskey({ dict }: { dict: Dictionary }) {
+function AddPasskey() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSuccess = useCallback(() => setIsOpen(false), []);
@@ -198,19 +199,18 @@ function AddPasskey({ dict }: { dict: Dictionary }) {
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2 text-xs md:text-sm">
           <Plus size={15} />
-          {dict.dashboard.passkeys.addNew}
+          {t("dashboard.passkeys.addNew")}
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dict.dashboard.passkeys.addNew}</DialogTitle>
+          <DialogTitle>{t("dashboard.passkeys.addNew")}</DialogTitle>
           <DialogDescription>
-            {dict.dashboard.passkeys.addNewDescription}
+            {t("dashboard.passkeys.addNewDescription")}
           </DialogDescription>
         </DialogHeader>
         <AddPasskeyForm
-          dict={dict}
-          label={dict.dashboard.passkeys.nameLabel}
+          label={t("dashboard.passkeys.nameLabel")}
           onSuccess={handleSuccess}
         />
       </DialogContent>
@@ -222,11 +222,11 @@ interface PasskeyRowProps {
   passkey: { id: string; name?: string | null };
   isDeleting: boolean;
   onDelete: (id: string) => void;
-  dict: Dictionary;
 }
 
 const PasskeyRow = memo(
-  ({ passkey, isDeleting, onDelete, dict }: PasskeyRowProps) => {
+  ({ passkey, isDeleting, onDelete }: PasskeyRowProps) => {
+    const { t } = useTranslation();
     const handleDelete = useCallback(() => {
       onDelete(passkey.id);
     }, [passkey.id, onDelete]);
@@ -234,7 +234,7 @@ const PasskeyRow = memo(
     return (
       <TableRow className="flex items-center justify-between">
         <TableCell>
-          {passkey.name || dict.dashboard.passkeys.defaultName}
+          {passkey.name || t("dashboard.passkeys.defaultName")}
         </TableCell>
         <TableCell className="text-right">
           <button type="button" onClick={handleDelete}>
@@ -251,7 +251,8 @@ const PasskeyRow = memo(
 );
 PasskeyRow.displayName = "PasskeyRow";
 
-function ListPasskeys({ dict }: { dict: Dictionary }) {
+function ListPasskeys() {
+  const { t } = useTranslation();
   const { data } = authClient.useListPasskeys();
   const [isOpen, setIsOpen] = useState(false);
   const [deletingPasskeyId, setDeletingPasskeyId] = useState<string | null>(
@@ -268,14 +269,14 @@ function ListPasskeys({ dict }: { dict: Dictionary }) {
             setDeletingPasskeyId(null);
           },
           onSuccess: () => {
-            toast(dict.dashboard.passkeys.deletedSuccess);
+            toast(t("dashboard.passkeys.deletedSuccess"));
             setDeletingPasskeyId(null);
           },
         },
         id: passkeyId,
       });
     },
-    [dict]
+    [t]
   );
 
   const handleClose = useCallback(() => setIsOpen(false), []);
@@ -286,23 +287,23 @@ function ListPasskeys({ dict }: { dict: Dictionary }) {
         <Button variant="outline" className="text-xs md:text-sm">
           <Fingerprint className="mr-2 h-4 w-4" />
           <span>
-            {dict.dashboard.passkeys.title}{" "}
+            {t("dashboard.passkeys.title")}{" "}
             {data?.length ? `[${data?.length}]` : ""}
           </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dict.dashboard.passkeys.listTitle}</DialogTitle>
+          <DialogTitle>{t("dashboard.passkeys.listTitle")}</DialogTitle>
           <DialogDescription>
-            {dict.dashboard.passkeys.listDescription}
+            {t("dashboard.passkeys.listDescription")}
           </DialogDescription>
         </DialogHeader>
         {data?.length ? (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{dict.common.name}</TableHead>
+                <TableHead>{t("common.name")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -312,25 +313,23 @@ function ListPasskeys({ dict }: { dict: Dictionary }) {
                   passkey={passkey}
                   isDeleting={deletingPasskeyId === passkey.id}
                   onDelete={handleDeletePasskey}
-                  dict={dict}
                 />
               ))}
             </TableBody>
           </Table>
         ) : (
           <p className="text-muted-foreground text-sm">
-            {dict.dashboard.passkeys.noPasskeys}
+            {t("dashboard.passkeys.noPasskeys")}
           </p>
         )}
         {!data?.length && (
           <AddPasskeyForm
-            dict={dict}
-            label={dict.dashboard.passkeys.newPasskey}
-            placeholder={dict.dashboard.passkeys.defaultName}
+            label={t("dashboard.passkeys.newPasskey")}
+            placeholder={t("dashboard.passkeys.defaultName")}
           />
         )}
         <DialogFooter>
-          <Button onClick={handleClose}>{dict.common.close}</Button>
+          <Button onClick={handleClose}>{t("common.close")}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -340,9 +339,8 @@ function ListPasskeys({ dict }: { dict: Dictionary }) {
 const UserCard = (props: {
   session: Session | null;
   activeSessions: Session["session"][];
-  dict: Dictionary;
 }) => {
-  const { dict } = props;
+  const { t } = useTranslation();
   const router = useRouter();
   const signOutMutation = useSignOutMutation();
   const revokeSessionMutation = useRevokeSessionMutation();
@@ -373,12 +371,12 @@ const UserCard = (props: {
           setEmailVerificationPending(true);
         },
         onSuccess() {
-          toast.success(dict.dashboard.emailVerification.sentSuccess);
+          toast.success(t("dashboard.emailVerification.sentSuccess"));
           setEmailVerificationPending(false);
         },
       }
     );
-  }, [session?.user.email, dict]);
+  }, [session?.user.email, t]);
 
   const handleRevokeSession = useCallback(
     (token: string) => {
@@ -430,7 +428,7 @@ const UserCard = (props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{dict.dashboard.user.title}</CardTitle>
+        <CardTitle>{t("dashboard.user.title")}</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-8">
         <div className="flex flex-col gap-2">
@@ -441,7 +439,7 @@ const UserCard = (props: {
                   src={
                     session?.user.id ? getAvatarUrl(session.user.id) : undefined
                   }
-                  alt={dict.dashboard.user.avatarAlt}
+                  alt={t("dashboard.user.avatarAlt")}
                   className="object-cover"
                 />
                 <AvatarFallback>{session?.user.name.charAt(0)}</AvatarFallback>
@@ -455,14 +453,14 @@ const UserCard = (props: {
                 <p className="text-sm">{session?.user.email}</p>
               </div>
             </div>
-            <EditUserDialog dict={dict} />
+            <EditUserDialog />
           </div>
         </div>{" "}
         {session?.user.emailVerified ? null : (
           <Alert>
-            <AlertTitle>{dict.dashboard.emailVerification.title}</AlertTitle>
+            <AlertTitle>{t("dashboard.emailVerification.title")}</AlertTitle>
             <AlertDescription className="text-muted-foreground">
-              {dict.dashboard.emailVerification.description}
+              {t("dashboard.emailVerification.description")}
               <Button
                 size="sm"
                 variant="secondary"
@@ -472,14 +470,14 @@ const UserCard = (props: {
                 {emailVerificationPending ? (
                   <Loader2 size={15} className="animate-spin" />
                 ) : (
-                  dict.dashboard.emailVerification.resendButton
+                  t("dashboard.emailVerification.resendButton")
                 )}
               </Button>
             </AlertDescription>
           </Alert>
         )}
         <div className="flex w-max flex-col gap-1 border-l-2 px-2">
-          <p className="text-xs font-medium">{dict.dashboard.sessions.title}</p>
+          <p className="text-xs font-medium">{t("dashboard.sessions.title")}</p>
           {activeSessions
             .filter((activeSession) => activeSession.userAgent)
             .map((activeSession) => (
@@ -492,20 +490,19 @@ const UserCard = (props: {
                   revokeSessionMutation.variables?.token === activeSession.token
                 }
                 onRevoke={handleRevokeSession}
-                dict={dict}
               />
             ))}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 border-y py-4">
           <div className="flex flex-col gap-2">
-            <p className="text-sm">{dict.dashboard.passkeys.title}</p>
+            <p className="text-sm">{t("dashboard.passkeys.title")}</p>
             <div className="flex flex-wrap gap-2">
-              <AddPasskey dict={dict} />
-              <ListPasskeys dict={dict} />
+              <AddPasskey />
+              <ListPasskeys />
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <p className="text-sm">{dict.dashboard.twoFactor.title}</p>
+            <p className="text-sm">{t("dashboard.twoFactor.title")}</p>
             <div className="flex gap-2">
               {!!(session?.user as ExtendedUser)?.twoFactorEnabled && (
                 <Dialog>
@@ -513,17 +510,17 @@ const UserCard = (props: {
                     <Button variant="outline" className="gap-2">
                       <QrCode size={16} />
                       <span className="text-xs md:text-sm">
-                        {dict.dashboard.twoFactor.scanQrCode}
+                        {t("dashboard.twoFactor.scanQrCode")}
                       </span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="w-11/12 sm:max-w-[425px]">
                     <DialogHeader>
                       <DialogTitle>
-                        {dict.dashboard.twoFactor.scanQrCode}
+                        {t("dashboard.twoFactor.scanQrCode")}
                       </DialogTitle>
                       <DialogDescription>
-                        {dict.dashboard.twoFactor.scanQrDescription}
+                        {t("dashboard.twoFactor.scanQrDescription")}
                       </DialogDescription>
                     </DialogHeader>
                     <TwoFactorQrForm />
@@ -547,8 +544,8 @@ const UserCard = (props: {
                     )}
                     <span className="text-xs md:text-sm">
                       {(session?.user as ExtendedUser)?.twoFactorEnabled
-                        ? dict.dashboard.twoFactor.disable
-                        : dict.dashboard.twoFactor.enable}
+                        ? t("dashboard.twoFactor.disable")
+                        : t("dashboard.twoFactor.enable")}
                     </span>
                   </Button>
                 </DialogTrigger>
@@ -556,13 +553,13 @@ const UserCard = (props: {
                   <DialogHeader>
                     <DialogTitle>
                       {(session?.user as ExtendedUser)?.twoFactorEnabled
-                        ? dict.dashboard.twoFactor.disable
-                        : dict.dashboard.twoFactor.enable}
+                        ? t("dashboard.twoFactor.disable")
+                        : t("dashboard.twoFactor.enable")}
                     </DialogTitle>
                     <DialogDescription>
                       {(session?.user as ExtendedUser)?.twoFactorEnabled
-                        ? dict.dashboard.twoFactor.disableDescription
-                        : dict.dashboard.twoFactor.enableDescription}
+                        ? t("dashboard.twoFactor.disableDescription")
+                        : t("dashboard.twoFactor.enableDescription")}
                     </DialogDescription>
                   </DialogHeader>
                   {(session?.user as ExtendedUser)?.twoFactorEnabled ? (
@@ -577,7 +574,7 @@ const UserCard = (props: {
         </div>
       </CardContent>
       <CardFooter className="items-center justify-between gap-2">
-        <ChangePassword dict={dict} />
+        <ChangePassword />
         {(session?.session as ExtendedSessionData)?.impersonatedBy ? (
           <Button
             className="z-10 gap-2"
@@ -591,7 +588,7 @@ const UserCard = (props: {
               ) : (
                 <div className="flex items-center gap-2">
                   <StopCircle size={16} color="red" />
-                  {dict.dashboard.user.stopImpersonation}
+                  {t("dashboard.user.stopImpersonation")}
                 </div>
               )}
             </span>
@@ -609,7 +606,7 @@ const UserCard = (props: {
               ) : (
                 <div className="flex items-center gap-2">
                   <LogOut size={16} />
-                  {dict.dashboard.user.signOut}
+                  {t("dashboard.user.signOut")}
                 </div>
               )}
             </span>

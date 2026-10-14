@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { auth } from "~/auth/server";
-import { getDictionary } from "~/i18n/get-dictionary";
-import type { Locale } from "~/i18n/i18n-config";
+import { getT } from "~/i18n/server";
 
 import { SelectAccountBtn } from "./_components/account-button";
 import { AnotherAccountBtn } from "./_components/another-account-button";
@@ -15,13 +14,8 @@ export const metadata: Metadata = {
   title: "Select Account",
 };
 
-interface PageProps {
-  params: Promise<{ lang: Locale }>;
-}
-
-export default async function SelectAccountPage({ params }: PageProps) {
-  const { lang } = await params;
-  const dict = await getDictionary(lang);
+export default async function SelectAccountPage() {
+  const { t } = await getT();
   const sessions = await auth.api.listDeviceSessions({
     headers: await headers(),
   });
@@ -32,15 +26,15 @@ export default async function SelectAccountPage({ params }: PageProps) {
           <Card className="w-full rounded-none border-zinc-800 bg-zinc-900">
             <CardHeader>
               <CardTitle className="text-lg md:text-xl">
-                {dict.oauth.selectAccount.title}
+                {t("oauth.selectAccount.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               {sessions.map((s: (typeof sessions)[number]) => (
-                <SelectAccountBtn key={s.session.id} session={s} dict={dict} />
+                <SelectAccountBtn key={s.session.id} session={s} />
               ))}
             </CardContent>
-            <AnotherAccountBtn dict={dict} />
+            <AnotherAccountBtn />
           </Card>
         </div>
       </div>

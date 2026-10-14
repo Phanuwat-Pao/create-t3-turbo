@@ -13,15 +13,12 @@ import {
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ForgetPasswordForm } from "~/components/forms/forget-password-form";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
-interface ForgetPasswordPageProps {
-  dict: Dictionary;
-}
-
-export default function ForgetPasswordPage({ dict }: ForgetPasswordPageProps) {
+export default function ForgetPasswordPage() {
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const handleSuccess = useCallback(() => setIsSubmitted(true), []);
 
@@ -30,16 +27,16 @@ export default function ForgetPasswordPage({ dict }: ForgetPasswordPageProps) {
       <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
         <Card className="w-[350px]">
           <CardHeader>
-            <CardTitle>{dict.auth.forgotPassword.checkEmail}</CardTitle>
+            <CardTitle>{t("auth.forgotPassword.checkEmail")}</CardTitle>
             <CardDescription>
-              {dict.auth.forgotPassword.emailSentDescription}
+              {t("auth.forgotPassword.emailSentDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Alert variant="default">
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
-                {dict.auth.forgotPassword.checkSpam}
+                {t("auth.forgotPassword.checkSpam")}
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -47,7 +44,7 @@ export default function ForgetPasswordPage({ dict }: ForgetPasswordPageProps) {
             <Link href="/sign-in">
               <Button variant="link" className="gap-2 px-0">
                 <ArrowLeft size={15} />
-                {dict.auth.forgotPassword.backToSignIn}
+                {t("auth.forgotPassword.backToSignIn")}
               </Button>
             </Link>
           </CardFooter>
@@ -60,19 +57,19 @@ export default function ForgetPasswordPage({ dict }: ForgetPasswordPageProps) {
     <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{dict.auth.forgotPassword.title}</CardTitle>
+          <CardTitle>{t("auth.forgotPassword.title")}</CardTitle>
           <CardDescription>
-            {dict.auth.forgotPassword.description}
+            {t("auth.forgotPassword.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ForgetPasswordForm onSuccess={handleSuccess} dict={dict} />
+          <ForgetPasswordForm onSuccess={handleSuccess} />
         </CardContent>
         <CardFooter className="flex justify-center">
           <Link href="/sign-in">
             <Button variant="link" className="gap-2 px-0">
               <ArrowLeft size={15} />
-              {dict.auth.forgotPassword.backToSignIn}
+              {t("auth.forgotPassword.backToSignIn")}
             </Button>
           </Link>
         </CardFooter>

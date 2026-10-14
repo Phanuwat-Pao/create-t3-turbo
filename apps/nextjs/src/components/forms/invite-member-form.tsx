@@ -4,10 +4,10 @@ import type { OrganizationRole } from "@acme/auth";
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
 import { SelectItem } from "@acme/ui/select";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { useInviteMemberMutation } from "~/data/organization/invitation-member-mutation";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 const ORGANIZATION_ROLES = {
   ADMIN: "admin",
@@ -19,20 +19,19 @@ type InviteRole = (typeof ORGANIZATION_ROLES)[keyof typeof ORGANIZATION_ROLES];
 interface InviteMemberFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
-  dict: Dictionary;
 }
 
 export function InviteMemberForm({
   onSuccess,
   onError,
-  dict,
 }: InviteMemberFormProps) {
+  const { t } = useTranslation();
   const inviteMutation = useInviteMemberMutation();
 
   const inviteMemberSchema = z.object({
-    email: z.email(dict.validation.emailRequired),
+    email: z.email(t("validation.emailRequired")),
     role: z.enum([ORGANIZATION_ROLES.ADMIN, ORGANIZATION_ROLES.MEMBER], {
-      message: dict.validation.roleRequired,
+      message: t("validation.roleRequired"),
     }),
   });
 
@@ -48,7 +47,7 @@ export function InviteMemberForm({
           role: value.role as OrganizationRole,
         });
       } catch (error) {
-        onError?.(error instanceof Error ? error.message : dict.common.error);
+        onError?.(error instanceof Error ? error.message : t("common.error"));
         return;
       }
       formApi.reset();
@@ -71,8 +70,8 @@ export function InviteMemberForm({
               <field.TextField
                 disabled={isSubmitting}
                 id="invite-email"
-                label={dict.organization.invite.emailLabel}
-                placeholder={dict.organization.invite.emailPlaceholder}
+                label={t("organization.invite.emailLabel")}
+                placeholder={t("organization.invite.emailPlaceholder")}
                 type="email"
               />
             )}
@@ -83,21 +82,21 @@ export function InviteMemberForm({
               <field.SelectField
                 disabled={isSubmitting}
                 id="invite-role"
-                label={dict.organization.invite.roleLabel}
-                placeholder={dict.organization.invite.rolePlaceholder}
+                label={t("organization.invite.roleLabel")}
+                placeholder={t("organization.invite.rolePlaceholder")}
               >
                 <SelectItem value={ORGANIZATION_ROLES.ADMIN}>
-                  {dict.organization.admin}
+                  {t("organization.admin")}
                 </SelectItem>
                 <SelectItem value={ORGANIZATION_ROLES.MEMBER}>
-                  {dict.organization.member}
+                  {t("organization.member")}
                 </SelectItem>
               </field.SelectField>
             )}
           </form.AppField>
 
           <form.SubmitButton>
-            {dict.organization.invite.inviteButton}
+            {t("organization.invite.inviteButton")}
           </form.SubmitButton>
         </FieldGroup>
       </form.Form>

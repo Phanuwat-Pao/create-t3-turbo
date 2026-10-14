@@ -5,8 +5,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 
 import { auth } from "~/auth/server";
-import { getDictionary } from "~/i18n/get-dictionary";
-import type { Locale } from "~/i18n/i18n-config";
+import { getT } from "~/i18n/server";
 
 import { GoBackBtn } from "./_components/go-back-button";
 import { SelectOrganizationBtn } from "./_components/org-buttons";
@@ -17,13 +16,8 @@ export const metadata: Metadata = {
   title: "Select Organization",
 };
 
-interface PageProps {
-  params: Promise<{ lang: Locale }>;
-}
-
-export default async function SelectOrganizationPage({ params }: PageProps) {
-  const { lang } = await params;
-  const dict = await getDictionary(lang);
+export default async function SelectOrganizationPage() {
+  const { t } = await getT();
   const organizations = await auth.api.listOrganizations({
     headers: await headers(),
   });
@@ -34,29 +28,25 @@ export default async function SelectOrganizationPage({ params }: PageProps) {
           <Card className="w-full rounded-none border-zinc-800 bg-zinc-900">
             <CardHeader>
               <CardTitle className="text-lg md:text-xl">
-                {dict.oauth.selectOrganization.title}
+                {t("oauth.selectOrganization.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               {organizations.length ? (
                 organizations.map((o: (typeof organizations)[number]) => (
-                  <SelectOrganizationBtn
-                    key={o.id}
-                    organization={o}
-                    dict={dict}
-                  />
+                  <SelectOrganizationBtn key={o.id} organization={o} />
                 ))
               ) : (
                 <div>
-                  <p>{dict.oauth.selectOrganization.noOrganizations}</p>
+                  <p>{t("oauth.selectOrganization.noOrganizations")}</p>
                   <br />
                   <div className="flex flex-col gap-1">
                     <Link href="/dashboard">
                       <Button className="w-full">
-                        {dict.oauth.selectOrganization.createOrganization}
+                        {t("oauth.selectOrganization.createOrganization")}
                       </Button>
                     </Link>
-                    <GoBackBtn dict={dict} />
+                    <GoBackBtn />
                   </div>
                 </div>
               )}

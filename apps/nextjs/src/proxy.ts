@@ -1,26 +1,15 @@
-import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { getSessionCookie } from "better-auth/cookies";
-import Negotiator from "negotiator";
+import { createProxy } from "next-i18next/proxy";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { i18n } from "./i18n/i18n-config";
+import { i18n, i18nConfig } from "./i18n/i18n-config";
 
-function getLocale(request: NextRequest): string | undefined {
-  const negotiatorHeaders: Record<string, string> = {};
-  for (const [key, value] of request.headers) {
-    negotiatorHeaders[key] = value;
-  }
-
-  const locales = [...i18n.locales];
-
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages(
-    locales
-  );
-
-  const locale = matchLocale(languages, locales, i18n.defaultLocale);
-
-  return locale;
-}
+/**
+ * Redirects locale-less paths to `/{lng}{path}`, picking the language from
+ * the `i18next` cookie, then Accept-Language, then the default locale, and
+ * remembers the choice in that cookie.
+ */
+const i18nProxy = createProxy(i18nConfig);
 
 const publicRoutes = [""];
 
@@ -30,17 +19,16 @@ export default function proxy(request: NextRequest) {
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
+  const response = i18nProxy(request);
   if (!pathnameHasLocale) {
-    const locale = getLocale(request);
-    request.nextUrl.pathname = `/${locale}${pathname}`;
-    return NextResponse.redirect(request.nextUrl);
+    return response;
   }
 
   if (
     pathname.slice(3) === "" ||
     publicRoutes.some((route) => pathname.slice(3).startsWith(route))
   ) {
-    return NextResponse.next();
+    return response;
   }
 
   const sessionCookie = getSessionCookie(request);
@@ -51,7 +39,7 @@ export default function proxy(request: NextRequest) {
     );
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

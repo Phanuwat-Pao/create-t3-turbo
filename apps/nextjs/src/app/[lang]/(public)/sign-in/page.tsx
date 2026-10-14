@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { getDictionary } from "~/i18n/get-dictionary";
 import type { Locale } from "~/i18n/i18n-config";
+import { getT } from "~/i18n/server";
 import { pageMetadata } from "~/lib/metadata";
 import { getSiteUrl } from "~/lib/site-url";
 
@@ -15,20 +15,17 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
+  const { t } = await getT();
   return pageMetadata({
-    description: dict.seo.signIn.description,
-    dict,
+    description: t("seo.signIn.description"),
     locale: lang,
     path: "/sign-in",
+    siteName: t("seo.siteName"),
     siteUrl: await getSiteUrl(),
-    title: dict.seo.signIn.title,
+    title: t("seo.signIn.title"),
   });
 }
 
-export default async function Page({ params }: PageProps) {
-  const { lang } = await params;
-  const dict = await getDictionary(lang);
-
-  return <SignInPage dict={dict} />;
+export default function Page() {
+  return <SignInPage />;
 }

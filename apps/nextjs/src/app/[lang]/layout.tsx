@@ -1,26 +1,19 @@
 import { cn } from "@acme/ui";
 import type { Metadata, Viewport } from "next";
+import { I18nProvider } from "next-i18next/client";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { BackgroundRippleEffect } from "~/components/background-ripple-effect";
 import Header from "~/components/header";
 import Providers from "~/components/providers";
-import { getDictionary } from "~/i18n/get-dictionary";
-import { i18n, type Locale } from "~/i18n/i18n-config";
+import { i18n } from "~/i18n/i18n-config";
+import { getResources, getT } from "~/i18n/server";
 import { getSiteUrl } from "~/lib/site-url";
 
 import "~/app/styles.css";
 
 interface LayoutProps {
   children: React.ReactNode;
-  /** Next types the segment as `string`; the proxy guarantees a supported locale. */
-  params: Promise<{ lang: string }>;
-}
-
-function toLocale(lang: string): Locale {
-  return (i18n.locales as readonly string[]).includes(lang)
-    ? (lang as Locale)
-    : i18n.defaultLocale;
 }
 
 /**
@@ -28,16 +21,12 @@ function toLocale(lang: string): Locale {
  * the current request, so relative Open Graph and icon URLs resolve on the
  * same host (www or bare) the visitor is using.
  */
-export async function generateMetadata({
-  params,
-}: LayoutProps): Promise<Metadata> {
-  const { lang: requestedLang } = await params;
-  const lang = toLocale(requestedLang);
-  const dict = await getDictionary(lang);
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
 
   return {
-    applicationName: dict.seo.siteName,
-    description: dict.seo.description,
+    applicationName: t("seo.siteName"),
+    description: t("seo.description"),
     icons: {
       apple: "/favicon/apple-touch-icon.png",
       icon: [
@@ -56,12 +45,12 @@ export async function generateMetadata({
     },
     metadataBase: await getSiteUrl(),
     openGraph: {
-      siteName: dict.seo.siteName,
+      siteName: t("seo.siteName"),
       type: "website",
     },
     title: {
-      default: dict.seo.defaultTitle,
-      template: dict.seo.titleTemplate,
+      default: t("seo.defaultTitle"),
+      template: t("seo.titleTemplate"),
     },
     twitter: {
       card: "summary_large_image",
@@ -89,11 +78,15 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 });
 
-export default async function RootLayout({ children, params }: LayoutProps) {
-  const { lang: requestedLang } = await params;
-  const lang = toLocale(requestedLang);
+/**
+ * `getT()` reads the `[lang]` root param and falls back to the default locale
+ * for anything unsupported. Client Components get only the current language's
+ * resources; th and en carry the same keys, so nothing needs a fallback.
+ */
+export default async function RootLayout({ children }: LayoutProps) {
+  const { i18n: i18nInstance, lng } = await getT();
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={lng} suppressHydrationWarning>
       <body
         className={cn(
           "bg-background text-foreground min-h-screen font-sans antialiased",
@@ -101,22 +94,28 @@ export default async function RootLayout({ children, params }: LayoutProps) {
           geistMono.variable
         )}
       >
-        <Providers>
-          <div className="relative mt-14 min-h-[calc(100vh-3.5rem)] w-full">
-            {/* Site Header */}
-            <Header />
+        <I18nProvider
+          defaultNS="translation"
+          language={lng}
+          resources={getResources(i18nInstance, ["translation"], [lng])}
+        >
+          <Providers>
+            <div className="relative mt-14 min-h-[calc(100vh-3.5rem)] w-full">
+              {/* Site Header */}
+              <Header />
 
-            {/* Background Ripple Effect */}
-            <div className="absolute inset-0 z-0">
-              <BackgroundRippleEffect />
-            </div>
+              {/* Background Ripple Effect */}
+              <div className="absolute inset-0 z-0">
+                <BackgroundRippleEffect />
+              </div>
 
-            {/* Content */}
-            <div className="relative z-10 mx-auto w-full max-w-4xl p-6">
-              {children}
+              {/* Content */}
+              <div className="relative z-10 mx-auto w-full max-w-4xl p-6">
+                {children}
+              </div>
             </div>
-          </div>
-        </Providers>
+          </Providers>
+        </I18nProvider>
       </body>
     </html>
   );

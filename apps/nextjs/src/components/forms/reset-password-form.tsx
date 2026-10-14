@@ -2,32 +2,31 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface ResetPasswordFormProps {
   token: string;
   onSuccess?: () => void;
-  dict: Dictionary;
 }
 
 export function ResetPasswordForm({
   token,
   onSuccess,
-  dict,
 }: ResetPasswordFormProps) {
+  const { t } = useTranslation();
   const resetPasswordSchema = z
     .object({
       confirmPassword: z
         .string()
-        .min(1, dict.validation.confirmPasswordRequired),
-      password: z.string().min(8, dict.validation.passwordMinLength),
+        .min(1, t("validation.confirmPasswordRequired")),
+      password: z.string().min(8, t("validation.passwordMinLength")),
     })
     .refine((data) => data.password === data.confirmPassword, {
-      message: dict.validation.passwordsDoNotMatch,
+      message: t("validation.passwordsDoNotMatch"),
       path: ["confirmPassword"],
     });
 
@@ -45,7 +44,7 @@ export function ResetPasswordForm({
         toast.error(res.error.message);
         return;
       }
-      toast.success(dict.auth.resetPassword.successMessage);
+      toast.success(t("auth.resetPassword.successMessage"));
       onSuccess?.();
     },
     validationLogic: revalidateLogic(),
@@ -63,8 +62,8 @@ export function ResetPasswordForm({
               <field.PasswordField
                 autoComplete="new-password"
                 id="reset-password"
-                label={dict.auth.resetPassword.newPasswordLabel}
-                placeholder={dict.auth.resetPassword.newPasswordPlaceholder}
+                label={t("auth.resetPassword.newPasswordLabel")}
+                placeholder={t("auth.resetPassword.newPasswordPlaceholder")}
               />
             )}
           </form.AppField>
@@ -73,14 +72,14 @@ export function ResetPasswordForm({
               <field.PasswordField
                 autoComplete="new-password"
                 id="reset-confirm-password"
-                label={dict.auth.resetPassword.confirmPasswordLabel}
-                placeholder={dict.auth.resetPassword.confirmPasswordPlaceholder}
+                label={t("auth.resetPassword.confirmPasswordLabel")}
+                placeholder={t("auth.resetPassword.confirmPasswordPlaceholder")}
               />
             )}
           </form.AppField>
         </FieldGroup>
         <form.SubmitButton className="w-full">
-          {dict.auth.resetPassword.resetButton}
+          {t("auth.resetPassword.resetButton")}
         </form.SubmitButton>
       </form.Form>
     </form.AppForm>

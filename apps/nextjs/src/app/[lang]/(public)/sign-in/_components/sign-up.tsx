@@ -11,16 +11,13 @@ import {
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 import { SignUpForm } from "~/components/forms/sign-up-form";
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { getCallbackURL } from "~/lib/shared";
 
-interface SignUpProps {
-  dict: Dictionary;
-}
-
-export function SignUp({ dict }: SignUpProps) {
+export function SignUp() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
   const callbackURL = getCallbackURL(params);
@@ -33,23 +30,19 @@ export function SignUp({ dict }: SignUpProps) {
     <Card className="w-full rounded-md rounded-t-none">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">
-          {dict.auth.signUp.title}
+          {t("auth.signUp.title")}
         </CardTitle>
         <CardDescription className="text-xs md:text-sm">
-          {dict.auth.signUp.description}
+          {t("auth.signUp.description")}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <SignUpForm
-          onSuccess={handleSuccess}
-          callbackURL={callbackURL}
-          dict={dict}
-        />
+        <SignUpForm onSuccess={handleSuccess} callbackURL={callbackURL} />
       </CardContent>
       <CardFooter>
         <div className="flex w-full justify-center border-t pt-4">
           <p className="text-center text-xs text-neutral-500">
-            {dict.auth.signUp.builtWith}{" "}
+            {t("auth.signUp.builtWith")}{" "}
             <Link
               href="https://better-auth.com"
               className="underline"

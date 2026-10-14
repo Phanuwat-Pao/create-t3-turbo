@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { i18n, type Locale } from "~/i18n/i18n-config";
 
 const OG_LOCALES: Record<Locale, string> = {
@@ -44,9 +43,9 @@ export function languageAlternates(
 }
 
 interface PageMetadataInput {
-  dict: Dictionary;
   locale: Locale;
   path: PublicPath;
+  siteName: string;
   siteUrl: URL;
   title: string;
   description: string;
@@ -58,9 +57,9 @@ interface PageMetadataInput {
  * bare) the visitor is on.
  */
 export function pageMetadata({
-  dict,
   locale,
   path,
+  siteName,
   siteUrl,
   title,
   description,
@@ -76,7 +75,7 @@ export function pageMetadata({
     openGraph: {
       description,
       locale: OG_LOCALES[locale],
-      siteName: dict.seo.siteName,
+      siteName,
       title,
       type: "website",
       url: canonical,

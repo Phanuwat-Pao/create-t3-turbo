@@ -25,6 +25,7 @@ import { ChevronDownIcon, PlusIcon } from "@radix-ui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, MailPlus } from "lucide-react";
 import { memo, useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { CreateOrganizationForm } from "~/components/forms/create-organization-form";
 import { InviteMemberForm } from "~/components/forms/invite-member-form";
@@ -34,7 +35,6 @@ import { useOrganizationActiveMutation } from "~/data/organization/organization-
 import { useOrganizationDetailQuery } from "~/data/organization/organization-detail-query";
 import { useOrganizationListQuery } from "~/data/organization/organization-list-query";
 import { useSessionQuery } from "~/data/user/session-query";
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { getAvatarUrl, getOrgLogoUrl } from "~/lib/avatar";
 
 const ORGANIZATION_ROLES = {
@@ -82,11 +82,11 @@ interface MemberItemProps {
   currentMember: { id: string; role: OrganizationRole } | undefined;
   isRemoving: boolean;
   onRemove: (memberId: string) => void;
-  dict: Dictionary;
 }
 
 const MemberItem = memo(
-  ({ member, currentMember, isRemoving, onRemove, dict }: MemberItemProps) => {
+  ({ member, currentMember, isRemoving, onRemove }: MemberItemProps) => {
+    const { t } = useTranslation();
     const handleRemove = useCallback(() => {
       onRemove(member.id);
     }, [member.id, onRemove]);
@@ -118,10 +118,10 @@ const MemberItem = memo(
               {isRemoving && <Loader2 className="animate-spin" size={16} />}
               {!isRemoving &&
                 currentMember?.id === member.id &&
-                dict.organization.leave}
+                t("organization.leave")}
               {!isRemoving &&
                 currentMember?.id !== member.id &&
-                dict.organization.remove}
+                t("organization.remove")}
             </Button>
           )}
       </div>
@@ -134,11 +134,11 @@ interface InvitationItemProps {
   invitation: { id: string; email: string; role: OrganizationRole };
   isCanceling: boolean;
   onCancel: (invitationId: string) => void;
-  dict: Dictionary;
 }
 
 const InvitationItem = memo(
-  ({ invitation, isCanceling, onCancel, dict }: InvitationItemProps) => {
+  ({ invitation, isCanceling, onCancel }: InvitationItemProps) => {
+    const { t } = useTranslation();
     const handleCancel = useCallback(() => {
       onCancel(invitation.id);
     }, [invitation.id, onCancel]);
@@ -170,7 +170,7 @@ const InvitationItem = memo(
             {isCanceling ? (
               <Loader2 className="animate-spin" size={16} />
             ) : (
-              dict.organization.revoke
+              t("organization.revoke")
             )}
           </Button>
           <div>
@@ -185,11 +185,12 @@ const InvitationItem = memo(
 );
 InvitationItem.displayName = "InvitationItem";
 
-function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
+function OrganizationCardSkeleton() {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{dict.organization.title}</CardTitle>
+        <CardTitle>{t("organization.title")}</CardTitle>
         <div className="mt-2 flex justify-between">
           <Skeleton className="h-5 w-24" />
           <Skeleton className="h-8 w-32" />
@@ -206,7 +207,7 @@ function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              {dict.organization.members}
+              {t("organization.members")}
             </p>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
@@ -220,7 +221,7 @@ function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
           </div>
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              {dict.organization.invites}
+              {t("organization.invites")}
             </p>
             <Skeleton className="h-4 w-32" />
           </div>
@@ -230,7 +231,8 @@ function OrganizationCardSkeleton({ dict }: { dict: Dictionary }) {
   );
 }
 
-function CreateOrganizationDialog({ dict }: { dict: Dictionary }) {
+function CreateOrganizationDialog() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const handleSuccess = useCallback(() => setOpen(false), []);
@@ -240,23 +242,24 @@ function CreateOrganizationDialog({ dict }: { dict: Dictionary }) {
       <DialogTrigger asChild>
         <Button size="sm" className="w-full gap-2" variant="default">
           <PlusIcon />
-          <p>{dict.organization.newOrganization}</p>
+          <p>{t("organization.newOrganization")}</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dict.organization.newOrganization}</DialogTitle>
+          <DialogTitle>{t("organization.newOrganization")}</DialogTitle>
           <DialogDescription>
-            {dict.organization.newOrganizationDescription}
+            {t("organization.newOrganizationDescription")}
           </DialogDescription>
         </DialogHeader>
-        <CreateOrganizationForm onSuccess={handleSuccess} dict={dict} />
+        <CreateOrganizationForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function InviteMemberDialog({ dict }: { dict: Dictionary }) {
+function InviteMemberDialog() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const handleSuccess = useCallback(() => setOpen(false), []);
@@ -266,27 +269,24 @@ function InviteMemberDialog({ dict }: { dict: Dictionary }) {
       <DialogTrigger asChild>
         <Button size="sm" className="w-full gap-2" variant="outline">
           <MailPlus size={16} />
-          <p>{dict.organization.inviteMember}</p>
+          <p>{t("organization.inviteMember")}</p>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{dict.organization.inviteMember}</DialogTitle>
+          <DialogTitle>{t("organization.inviteMember")}</DialogTitle>
           <DialogDescription>
-            {dict.organization.inviteMemberDescription}
+            {t("organization.inviteMemberDescription")}
           </DialogDescription>
         </DialogHeader>
-        <InviteMemberForm onSuccess={handleSuccess} dict={dict} />
+        <InviteMemberForm onSuccess={handleSuccess} />
       </DialogContent>
     </Dialog>
   );
 }
 
-const OrganizationCard = (props: {
-  session: Session | null;
-  dict: Dictionary;
-}) => {
-  const { dict } = props;
+const OrganizationCard = (props: { session: Session | null }) => {
+  const { t } = useTranslation();
   const { data: sessionData } = useSessionQuery();
   const { data: organizations } = useOrganizationListQuery();
   const { data: activeOrganization, isFetching: isOrganizationFetching } =
@@ -326,20 +326,20 @@ const OrganizationCard = (props: {
   );
 
   if (isOrganizationFetching) {
-    return <OrganizationCardSkeleton dict={dict} />;
+    return <OrganizationCardSkeleton />;
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{dict.organization.title}</CardTitle>
+        <CardTitle>{t("organization.title")}</CardTitle>
         <div className="flex justify-between">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <div className="flex cursor-pointer items-center gap-1">
                 <p className="text-sm">
                   <span className="font-bold" />{" "}
-                  {activeOrganization?.name || dict.organization.personal}
+                  {activeOrganization?.name || t("organization.personal")}
                 </p>
 
                 <ChevronDownIcon />
@@ -347,7 +347,7 @@ const OrganizationCard = (props: {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem className="py-1" onClick={handleSelectPersonal}>
-                <p className="sm text-sm">{dict.organization.personal}</p>
+                <p className="sm text-sm">{t("organization.personal")}</p>
               </DropdownMenuItem>
               {organizations?.map((org: { id: string; name: string }) => (
                 <OrganizationDropdownItem
@@ -361,7 +361,7 @@ const OrganizationCard = (props: {
             </DropdownMenuContent>
           </DropdownMenu>
           <div>
-            <CreateOrganizationDialog dict={dict} />
+            <CreateOrganizationDialog />
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -379,10 +379,10 @@ const OrganizationCard = (props: {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p>{activeOrganization?.name || dict.organization.personal}</p>
+            <p>{activeOrganization?.name || t("organization.personal")}</p>
             <p className="text-muted-foreground text-xs">
               {activeOrganization?.members?.length || 1}{" "}
-              {dict.organization.membersCount}
+              {t("organization.membersCount")}
             </p>
           </div>
         </div>
@@ -391,7 +391,7 @@ const OrganizationCard = (props: {
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              {dict.organization.members}
+              {t("organization.members")}
             </p>
             <div className="flex flex-col gap-2">
               {activeOrganization?.members?.map(
@@ -406,7 +406,6 @@ const OrganizationCard = (props: {
                         member.id
                     }
                     onRemove={handleRemoveMember}
-                    dict={dict}
                   />
                 )
               )}
@@ -428,7 +427,7 @@ const OrganizationCard = (props: {
                     <div>
                       <p className="text-sm">{session?.user.name}</p>
                       <p className="text-muted-foreground text-xs">
-                        {dict.organization.owner}
+                        {t("organization.owner")}
                       </p>
                     </div>
                   </div>
@@ -438,7 +437,7 @@ const OrganizationCard = (props: {
           </div>
           <div className="flex grow flex-col gap-2">
             <p className="border-b-foreground/10 border-b-2 font-medium">
-              {dict.organization.invites}
+              {t("organization.invites")}
             </p>
             <div className="flex flex-col gap-2">
               <AnimatePresence>
@@ -457,7 +456,6 @@ const OrganizationCard = (props: {
                           invitation.id
                       }
                       onCancel={handleCancelInvitation}
-                      dict={dict}
                     />
                   ))}
               </AnimatePresence>
@@ -471,12 +469,12 @@ const OrganizationCard = (props: {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  {dict.organization.noActiveInvitations}
+                  {t("organization.noActiveInvitations")}
                 </motion.p>
               )}
               {!activeOrganization?.id && (
                 <Label className="text-muted-foreground text-xs">
-                  {dict.organization.cantInvitePersonal}
+                  {t("organization.cantInvitePersonal")}
                 </Label>
               )}
             </div>
@@ -484,9 +482,7 @@ const OrganizationCard = (props: {
         </div>
         <div className="mt-4 flex w-full justify-end">
           <div>
-            <div>
-              {activeOrganization?.id && <InviteMemberDialog dict={dict} />}
-            </div>
+            <div>{activeOrganization?.id && <InviteMemberDialog />}</div>
           </div>
         </div>
       </CardContent>

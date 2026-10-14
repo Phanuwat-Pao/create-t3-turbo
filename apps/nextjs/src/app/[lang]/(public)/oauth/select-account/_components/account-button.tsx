@@ -3,24 +3,24 @@
 import type { DeviceSession } from "@acme/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import { Button } from "@acme/ui/button";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { getAvatarUrl } from "~/lib/avatar";
 
 interface SelectAccountBtnProps {
   session: DeviceSession;
-  dict: Dictionary;
 }
 
-export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
+export function SelectAccountBtn({ session }: SelectAccountBtnProps) {
+  const { t } = useTranslation();
   // No manual useCallback: the React Compiler memoizes this itself and flags
   // manual memoization it cannot preserve (PreserveManualMemo).
   const handleClick = async () => {
     try {
       if (!session.session?.token) {
-        toast.error(dict.oauth.selectAccount.noSession);
+        toast.error(t("oauth.selectAccount.noSession"));
         return;
       }
       const { data: active, error: activeError } =
@@ -29,7 +29,7 @@ export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
         });
       if (activeError || !active?.session) {
         toast.error(
-          activeError?.message ?? dict.oauth.selectAccount.failedToSetActive
+          activeError?.message ?? t("oauth.selectAccount.failedToSetActive")
         );
         return;
       }
@@ -38,7 +38,7 @@ export function SelectAccountBtn({ session, dict }: SelectAccountBtnProps) {
       });
       if (error || !active?.session || !data.redirect || !data?.url) {
         toast.error(
-          error?.message ?? dict.oauth.selectAccount.failedToContinue
+          error?.message ?? t("oauth.selectAccount.failedToContinue")
         );
         return;
       }

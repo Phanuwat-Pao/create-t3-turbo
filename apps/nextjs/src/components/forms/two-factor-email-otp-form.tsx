@@ -5,36 +5,35 @@ import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { CheckCircle2, Loader2, Mail } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
+import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface TwoFactorEmailOtpFormProps {
   onSuccess?: () => void;
   onError?: (error: string) => void;
   userEmail?: string;
-  dict: Dictionary;
 }
 
 export function TwoFactorEmailOtpForm({
   onSuccess,
   onError,
   userEmail,
-  dict,
 }: TwoFactorEmailOtpFormProps) {
+  const { t } = useTranslation();
   const [isSending, startSending] = useTransition();
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [message, setMessage] = useState("");
 
-  const displayEmail = userEmail ?? dict.auth.twoFactor.yourEmail;
+  const displayEmail = userEmail ?? t("auth.twoFactor.yourEmail");
 
   const otpSchema = z.object({
     code: z
       .string()
-      .length(6, dict.auth.twoFactor.otpMustBe6Digits)
-      .regex(/^\d+$/u, dict.auth.twoFactor.otpMustBeDigitsOnly),
+      .length(6, t("auth.twoFactor.otpMustBe6Digits"))
+      .regex(/^\d+$/u, t("auth.twoFactor.otpMustBeDigitsOnly")),
   });
 
   const form = useAppForm({
@@ -43,7 +42,7 @@ export function TwoFactorEmailOtpForm({
     },
     onSubmit: () => {
       setIsVerified(true);
-      setMessage(dict.auth.twoFactor.otpValidatedSuccess);
+      setMessage(t("auth.twoFactor.otpValidatedSuccess"));
       onSuccess?.();
     },
     validationLogic: revalidateLogic(),
@@ -56,8 +55,8 @@ export function TwoFactorEmailOtpForm({
         if (res.data) {
           return undefined;
         }
-        onError?.(dict.auth.twoFactor.invalidOtp);
-        return { fields: { code: dict.auth.twoFactor.invalidOtp } };
+        onError?.(t("auth.twoFactor.invalidOtp"));
+        return { fields: { code: t("auth.twoFactor.invalidOtp") } };
       },
     },
   });
@@ -66,18 +65,16 @@ export function TwoFactorEmailOtpForm({
     startSending(async () => {
       await authClient.twoFactor.sendOtp();
       setIsOtpSent(true);
-      setMessage(
-        dict.auth.twoFactor.otpSentTo.replace("{{email}}", displayEmail)
-      );
+      setMessage(t("auth.twoFactor.otpSentTo", { email: displayEmail }));
     });
-  }, [dict.auth.twoFactor.otpSentTo, displayEmail]);
+  }, [t, displayEmail]);
 
   if (isVerified) {
     return (
       <div className="flex flex-col items-center justify-center space-y-2 py-4">
         <CheckCircle2 className="h-12 w-12 text-green-500" />
         <p className="text-lg font-semibold">
-          {dict.auth.twoFactor.verificationSuccess}
+          {t("auth.twoFactor.verificationSuccess")}
         </p>
       </div>
     );
@@ -97,7 +94,7 @@ export function TwoFactorEmailOtpForm({
           ) : (
             <>
               <Mail className="mr-2 h-4 w-4" />{" "}
-              {dict.auth.twoFactor.sendOtpButton}
+              {t("auth.twoFactor.sendOtpButton")}
             </>
           )}
         </Button>
@@ -123,16 +120,16 @@ export function TwoFactorEmailOtpForm({
                 }
                 id="email-otp-code"
                 inputMode="numeric"
-                label={dict.auth.twoFactor.otpCodeLabel}
+                label={t("auth.twoFactor.otpCodeLabel")}
                 maxLength={6}
-                placeholder={dict.auth.twoFactor.otpCodePlaceholder}
+                placeholder={t("auth.twoFactor.otpCodePlaceholder")}
                 type="text"
               />
             )}
           </form.AppField>
         </FieldGroup>
         <form.SubmitButton className="w-full">
-          {dict.auth.twoFactor.validateOtpButton}
+          {t("auth.twoFactor.validateOtpButton")}
         </form.SubmitButton>
       </form.Form>
     </form.AppForm>

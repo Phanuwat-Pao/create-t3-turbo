@@ -9,15 +9,12 @@ import {
 } from "@acme/ui/card";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 import { TwoFactorEmailOtpForm } from "~/components/forms/two-factor-email-otp-form";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
-interface TwoFactorOtpClientProps {
-  dict: Dictionary;
-}
-
-export function TwoFactorOtpClient({ dict }: TwoFactorOtpClientProps) {
+export function TwoFactorOtpClient() {
+  const { t } = useTranslation();
   const router = useRouter();
   const handleSuccess = useCallback(() => router.push("/dashboard"), [router]);
 
@@ -25,13 +22,13 @@ export function TwoFactorOtpClient({ dict }: TwoFactorOtpClientProps) {
     <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{dict.auth.twoFactor.otpTitle}</CardTitle>
+          <CardTitle>{t("auth.twoFactor.otpTitle")}</CardTitle>
           <CardDescription>
-            {dict.auth.twoFactor.otpDescription}
+            {t("auth.twoFactor.otpDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <TwoFactorEmailOtpForm onSuccess={handleSuccess} dict={dict} />
+          <TwoFactorEmailOtpForm onSuccess={handleSuccess} />
         </CardContent>
       </Card>
     </main>

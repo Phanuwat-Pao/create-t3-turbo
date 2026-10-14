@@ -3,32 +3,31 @@
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
 import { useIsHydrated } from "~/hooks/use-hydrated";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
 interface SignInFormProps {
   onSuccess?: () => void;
   callbackURL?: string;
   showPasswordToggle?: boolean;
-  dict: Dictionary;
 }
 
 export function SignInForm({
   onSuccess,
   callbackURL = "/dashboard",
   showPasswordToggle = false,
-  dict,
 }: SignInFormProps) {
+  const { t } = useTranslation();
   const isMounted = useIsHydrated();
 
   const signInSchema = z.object({
-    email: z.email(dict.validation.emailRequired),
-    password: z.string().min(1, dict.validation.passwordRequired),
+    email: z.email(t("validation.emailRequired")),
+    password: z.string().min(1, t("validation.passwordRequired")),
     rememberMe: z.boolean(),
   });
 
@@ -51,7 +50,7 @@ export function SignInForm({
             toast.error(context.error.message);
           },
           onSuccess() {
-            toast.success(dict.auth.signIn.successMessage);
+            toast.success(t("auth.signIn.successMessage"));
             onSuccess?.();
           },
         }
@@ -68,7 +67,7 @@ export function SignInForm({
       className="text-foreground ml-auto inline-block text-sm underline"
       href="/forget-password"
     >
-      {dict.auth.signIn.forgotPassword}
+      {t("auth.signIn.forgotPassword")}
     </Link>
   );
 
@@ -81,8 +80,8 @@ export function SignInForm({
               <field.TextField
                 autoComplete="email"
                 id="sign-in-email"
-                label={dict.auth.signIn.emailLabel}
-                placeholder={dict.auth.signIn.emailPlaceholder}
+                label={t("auth.signIn.emailLabel")}
+                placeholder={t("auth.signIn.emailPlaceholder")}
                 type="email"
               />
             )}
@@ -93,17 +92,17 @@ export function SignInForm({
                 <field.PasswordField
                   autoComplete="current-password"
                   id="sign-in-password"
-                  label={dict.auth.signIn.passwordLabel}
+                  label={t("auth.signIn.passwordLabel")}
                   labelSuffix={forgotPasswordLink}
-                  placeholder={dict.auth.signIn.passwordPlaceholder}
+                  placeholder={t("auth.signIn.passwordPlaceholder")}
                 />
               ) : (
                 <field.TextField
                   autoComplete="current-password"
                   id="sign-in-password"
-                  label={dict.auth.signIn.passwordLabel}
+                  label={t("auth.signIn.passwordLabel")}
                   labelSuffix={forgotPasswordLink}
-                  placeholder={dict.auth.signIn.passwordPlaceholder}
+                  placeholder={t("auth.signIn.passwordPlaceholder")}
                   type="password"
                 />
               )
@@ -113,13 +112,13 @@ export function SignInForm({
             {(field) => (
               <field.CheckboxField
                 id="sign-in-remember"
-                label={dict.auth.signIn.rememberMe}
+                label={t("auth.signIn.rememberMe")}
               />
             )}
           </form.AppField>
         </FieldGroup>
         <form.SubmitButton className="relative w-full">
-          {dict.auth.signIn.loginButton}
+          {t("auth.signIn.loginButton")}
           {isMounted && authClient.isLastUsedLoginMethod("email") && (
             <LastUsedIndicator />
           )}

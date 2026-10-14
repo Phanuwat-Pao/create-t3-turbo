@@ -5,8 +5,8 @@ import Link from "next/link";
 import { auth } from "~/auth/server";
 import EntryButton from "~/components/entry-button";
 import { JsonLd } from "~/components/json-ld";
-import { getDictionary } from "~/i18n/get-dictionary";
 import { i18n, type Locale } from "~/i18n/i18n-config";
+import { getT } from "~/i18n/server";
 import { localizedPath, pageMetadata } from "~/lib/metadata";
 import { getSiteUrl } from "~/lib/site-url";
 
@@ -18,14 +18,14 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
+  const { t } = await getT();
   return pageMetadata({
-    description: dict.seo.home.description,
-    dict,
+    description: t("seo.home.description"),
     locale: lang,
     path: "/",
+    siteName: t("seo.siteName"),
     siteUrl: await getSiteUrl(),
-    title: dict.seo.home.title,
+    title: t("seo.home.title"),
   });
 }
 
@@ -90,7 +90,7 @@ export default async function HomePage({ params }: PageProps) {
   const session = await auth.api.getSession({
     headers: requestHeaders,
   });
-  const dict = await getDictionary(lang);
+  const { t } = await getT();
   const siteUrl = await getSiteUrl();
 
   return (
@@ -99,26 +99,26 @@ export default async function HomePage({ params }: PageProps) {
         data={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          description: dict.seo.description,
+          description: t("seo.description"),
           inLanguage: i18n.locales,
-          name: dict.seo.siteName,
+          name: t("seo.siteName"),
           url: new URL(localizedPath(lang, "/"), siteUrl).href,
         }}
       />
       <div className="flex flex-col items-center justify-center gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            {dict.landing.title}
+            {t("landing.title")}
           </h1>
           <p className="text-center text-sm wrap-break-word md:text-base">
-            {dict.landing.description}{" "}
+            {t("landing.description")}{" "}
             <a
               href="https://better-auth.com"
               target="_blank"
               className="italic underline"
               rel="noreferrer"
             >
-              {dict.landing.linkText}
+              {t("landing.linkText")}
             </a>{" "}
             features and capabilities. <br />
           </p>
@@ -127,7 +127,7 @@ export default async function HomePage({ params }: PageProps) {
           <div className="flex flex-col flex-wrap gap-3 pt-2">
             <div className="bg-secondary/70 border border-dashed p-2">
               <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
-                <span className="text-center">{dict.landing.infoBox}</span>
+                <span className="text-center">{t("landing.infoBox")}</span>
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
@@ -139,14 +139,14 @@ export default async function HomePage({ params }: PageProps) {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {dict.landing.features[feature.key]}
+                  {t(`landing.features.${feature.key}`)}
                 </Link>
               ))}
             </div>
           </div>
 
           <div className="flex items-center justify-center">
-            <EntryButton session={session} dict={dict} />
+            <EntryButton session={session} />
           </div>
         </div>
       </div>

@@ -12,15 +12,12 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 import { TwoFactorTotpForm } from "~/components/forms/two-factor-totp-form";
-import type { Dictionary } from "~/i18n/get-dictionary";
 
-interface TwoFactorTotpClientProps {
-  dict: Dictionary;
-}
-
-export function TwoFactorTotpClient({ dict }: TwoFactorTotpClientProps) {
+export function TwoFactorTotpClient() {
+  const { t } = useTranslation();
   const router = useRouter();
   const handleSuccess = useCallback(() => router.push("/dashboard"), [router]);
 
@@ -28,16 +25,16 @@ export function TwoFactorTotpClient({ dict }: TwoFactorTotpClientProps) {
     <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{dict.auth.twoFactor.title}</CardTitle>
-          <CardDescription>{dict.auth.twoFactor.description}</CardDescription>
+          <CardTitle>{t("auth.twoFactor.title")}</CardTitle>
+          <CardDescription>{t("auth.twoFactor.description")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <TwoFactorTotpForm onSuccess={handleSuccess} dict={dict} />
+          <TwoFactorTotpForm onSuccess={handleSuccess} />
         </CardContent>
         <CardFooter className="text-muted-foreground gap-2 text-sm">
           <Link href="/two-factor/otp">
             <Button variant="link" size="sm">
-              {dict.auth.twoFactor.switchToEmail}
+              {t("auth.twoFactor.switchToEmail")}
             </Button>
           </Link>
         </CardFooter>

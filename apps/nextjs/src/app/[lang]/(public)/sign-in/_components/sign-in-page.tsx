@@ -3,20 +3,17 @@
 import { Tabs } from "@acme/ui/tabs2";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
-import type { Dictionary } from "~/i18n/get-dictionary";
 import { getCallbackURL } from "~/lib/shared";
 
 import SignIn from "./sign-in";
 import { SignUp } from "./sign-up";
 
-interface SignInPageProps {
-  dict: Dictionary;
-}
-
-export default function SignInPage({ dict }: SignInPageProps) {
+export default function SignInPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const params = useSearchParams();
 
@@ -24,15 +21,15 @@ export default function SignInPage({ dict }: SignInPageProps) {
     authClient.oneTap({
       fetchOptions: {
         onError: ({ error }: { error: { message?: string } }) => {
-          toast.error(error.message || dict.common.error);
+          toast.error(error.message || t("common.error"));
         },
         onSuccess: () => {
-          toast.success(dict.auth.signIn.successMessage);
+          toast.success(t("auth.signIn.successMessage"));
           router.push(getCallbackURL(params));
         },
       },
     });
-  }, [router, params, dict]);
+  }, [router, params, t]);
 
   return (
     <div className="w-full">
@@ -41,13 +38,13 @@ export default function SignInPage({ dict }: SignInPageProps) {
           <Tabs
             tabs={[
               {
-                content: <SignIn dict={dict} />,
-                title: dict.auth.signIn.title,
+                content: <SignIn />,
+                title: t("auth.signIn.title"),
                 value: "sign-in",
               },
               {
-                content: <SignUp dict={dict} />,
-                title: dict.auth.signUp.title,
+                content: <SignUp />,
+                title: t("auth.signUp.title"),
                 value: "sign-up",
               },
             ]}
