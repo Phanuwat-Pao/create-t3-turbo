@@ -25,3 +25,5 @@ pre-commit:
             run: pnpm lint:ws
           - name: build
             run: pnpm build
+          - name: timestamptz
+            run: pnpm -F @acme/db check:timestamptz

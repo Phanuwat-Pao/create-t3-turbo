@@ -20,6 +20,7 @@
   "scripts": {
     "ncu": "ncu -u",
     "build": "tsc",
+    "check:timestamptz": "node script/check-timestamptz.ts",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
     "push": "pnpm with-env drizzle-kit push",

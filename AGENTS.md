@@ -31,7 +31,9 @@ version of this stack. Two standing policies follow from that:
 1. **Bypassing git hooks.** Never `git commit --no-verify` (or `-n`). The
    pre-commit suite is: `check:fix` (repo-wide format+lint with
    `stage_fixed: true`), then parallel `audit-critical`, `typecheck`,
-   `lint:ws` (sherif), and `build`. The audit takes ~10 minutes — accept it.
+   `lint:ws` (sherif), `build`, and `timestamptz` (fails on any Drizzle
+   `timestamp` column without a time zone; `pnpm -F @acme/db
+   check:timestamptz`). The audit takes ~10 minutes — accept it.
    If a gate fails, fix the cause and commit again through the hooks.
 2. **Hand-editing generated auth schema.** `packages/db/src/auth-schema.ts`
    comes from `pnpm auth:generate` (Better Auth CLI). Change auth config in
@@ -40,7 +42,8 @@ version of this stack. Two standing policies follow from that:
    `relations()` blocks the CLI emits (relations live in `relations.ts` via
    `defineRelations`), and add `{ withTimezone: true }` to every
    `timestamp(...)` column — this repo's columns are `timestamptz`, while the
-   CLI emits plain `timestamp`.
+   CLI emits plain `timestamp`. The `timestamptz` gate blocks the commit if
+   that second fixup is missed.
 3. **Pushing schema at the wrong database.** `pnpm db:push` applies
    `packages/db/src/schema.ts` directly to `POSTGRES_URL` from `.env` (it
    swaps port 6543 → 5432 for the non-pooling connection). Know which
