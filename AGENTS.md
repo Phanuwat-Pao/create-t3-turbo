@@ -36,7 +36,9 @@ version of this stack. Two standing policies follow from that:
    check:timestamptz`). The audit takes ~10 minutes — accept it.
    If a gate fails, fix the cause and commit again through the hooks.
 2. **Hand-editing generated auth schema.** `packages/db/src/auth-schema.ts`
-   comes from `pnpm auth:generate` (Better Auth CLI). Change auth config in
+   comes from `pnpm auth:generate` (the `auth` CLI package; the old
+   `@better-auth/cli` is deprecated, stuck at 1.4, and generates a schema
+   that no longer matches Better Auth 1.7). Change auth config in
    `packages/auth/src/index.ts`, then regenerate. Two post-regen fixups this
    repo maintains (re-apply them after every regen): strip the drizzle-v0
    `relations()` blocks the CLI emits (relations live in `relations.ts` via

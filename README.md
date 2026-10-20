@@ -135,7 +135,7 @@ This project uses [Better Auth](https://www.better-auth.com) for authentication.
 pnpm auth:generate
 ```
 
-This command runs the Better Auth CLI with the following configuration:
+This command runs the Better Auth CLI (the `auth` package on npm; the older `@better-auth/cli` package is deprecated) with the following configuration:
 
 - **Config file**: `packages/auth/script/auth-cli.ts` - A CLI-only configuration file (isolated from src to prevent imports)
 - **Output**: `packages/db/src/auth-schema.ts` - Generated Drizzle schema for authentication tables
