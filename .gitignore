@@ -59,3 +59,4 @@ dist/
 
 .code
 .worktrees/
+.claude/worktrees/
