@@ -42,9 +42,15 @@ FROM installer AS builder
 
 # Build the project
 COPY --from=pruner /app/out/full/ .
-# COPY --from=pruner /app/.env .
-COPY --from=pruner /app/.env.example ./.env
 COPY turbo.json turbo.json
+
+# The build needs no deployment secrets. `.env.example` only gives the
+# modules that read `process.env` at import time (the db client) something to
+# read; SKIP_ENV_VALIDATION keeps the t3-env schema from rejecting those
+# placeholders. Real values arrive at runtime from the environment, where the
+# schema is enforced again on the first import.
+COPY --from=pruner /app/.env.example ./.env
+ENV SKIP_ENV_VALIDATION=true
 
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
@@ -72,7 +78,6 @@ COPY --from=builder /app/apps/nextjs/package.json .
 COPY --from=builder --chown=nextjs:nodejs /app/apps/nextjs/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/nextjs/.next/static ./apps/nextjs/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/nextjs/public ./apps/nextjs/public
-COPY --from=builder --chown=nextjs:nodejs /app/.env ./apps/nextjs/.env
 
 ENV NODE_ENV=production
 CMD ["node", "apps/nextjs/server.js"]

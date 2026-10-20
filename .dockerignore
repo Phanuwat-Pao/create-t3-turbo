@@ -1,0 +1,19 @@
+# Keep the build context small and secret-free. Everything the image needs is
+# rebuilt inside the Dockerfile from source and the lockfile.
+.git
+**/node_modules
+**/.next
+**/.turbo
+**/.expo
+**/dist
+**/build
+**/coverage
+**/playwright-report
+**/test-results
+.env
+.env.*
+!.env.example
+.claude
+.idea
+.vscode
+*.log
