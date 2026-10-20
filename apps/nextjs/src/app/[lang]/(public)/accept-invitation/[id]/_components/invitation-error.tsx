@@ -10,7 +10,8 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 import { AlertCircle } from "lucide-react";
-import Link from "next/link";
+
+import Link from "~/components/link";
 
 export function InvitationError() {
   return (

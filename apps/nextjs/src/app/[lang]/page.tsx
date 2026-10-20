@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import Link from "next/link";
 
 import { auth } from "~/auth/server";
 import EntryButton from "~/components/entry-button";
 import { JsonLd } from "~/components/json-ld";
+import Link from "~/components/link";
 import { i18n, type Locale } from "~/i18n/i18n-config";
+import { localizedPath } from "~/i18n/localized-path";
 import { getT } from "~/i18n/server";
-import { localizedPath, pageMetadata } from "~/lib/metadata";
+import { pageMetadata } from "~/lib/metadata";
 import { getSiteUrl } from "~/lib/site-url";
 
 interface PageProps {

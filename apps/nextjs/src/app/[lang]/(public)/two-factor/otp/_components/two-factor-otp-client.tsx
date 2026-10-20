@@ -12,11 +12,17 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import { TwoFactorEmailOtpForm } from "~/components/forms/two-factor-email-otp-form";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 export function TwoFactorOtpClient() {
   const { t } = useTranslation();
   const router = useRouter();
-  const handleSuccess = useCallback(() => router.push("/dashboard"), [router]);
+  const locale = useLocale();
+  const handleSuccess = useCallback(
+    () => router.push(withLocale("/dashboard", locale)),
+    [locale, router]
+  );
 
   return (
     <main className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">

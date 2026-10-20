@@ -10,11 +10,10 @@ import {
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 
 import { auth } from "~/auth/server";
 import { Logo } from "~/components/logo";
-import { getT } from "~/i18n/server";
+import { getT, localizedRedirect } from "~/i18n/server";
 import { getAvatarUrl } from "~/lib/avatar";
 
 import { ConsentBtns } from "./_components/consent-buttons";
@@ -50,9 +49,7 @@ export default async function AuthorizePage({
         client_id,
       },
     }),
-  ]).catch((_error) => {
-    throw redirect("/sign-in");
-  });
+  ]).catch(() => localizedRedirect("/sign-in"));
 
   const organization = (
     session?.session as { activeOrganizationId?: string } | undefined

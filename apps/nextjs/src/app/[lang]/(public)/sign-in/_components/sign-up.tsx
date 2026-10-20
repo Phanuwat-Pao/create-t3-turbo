@@ -8,19 +8,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import { SignUpForm } from "~/components/forms/sign-up-form";
+import Link from "~/components/link";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 import { getCallbackURL } from "~/lib/shared";
 
 export function SignUp() {
   const { t } = useTranslation();
   const router = useRouter();
+  const locale = useLocale();
   const params = useSearchParams();
-  const callbackURL = getCallbackURL(params);
+  const callbackURL = withLocale(getCallbackURL(params), locale);
 
   const handleSuccess = useCallback(() => {
     router.push(callbackURL);

@@ -29,6 +29,8 @@ import { Toaster, toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 import { AuditLogCard } from "./_components/audit-log-card";
 
@@ -163,6 +165,7 @@ const banUserSchema = z.object({
 function AdminDashboard() {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const locale = useLocale();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<string | undefined>();
   const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
@@ -301,7 +304,7 @@ function AdminDashboard() {
       try {
         await authClient.admin.impersonateUser({ userId: id });
         toast.success("Impersonated user");
-        router.push("/dashboard");
+        router.push(withLocale("/dashboard", locale));
       } catch (error: unknown) {
         const message =
           error instanceof Error ? error.message : "Failed to impersonate user";
@@ -309,7 +312,7 @@ function AdminDashboard() {
       }
       setIsLoading(undefined);
     },
-    [router]
+    [locale, router]
   );
 
   const handleBanToggle = useCallback(
@@ -481,15 +484,16 @@ export default function Page() {
   const { data: session, isPending: isSessionLoading } =
     authClient.useSession();
   const router = useRouter();
+  const locale = useLocale();
 
   // Cast user to include role from admin plugin
   const userRole = (session?.user as { role?: string } | undefined)?.role;
 
   useEffect(() => {
     if (!isSessionLoading && userRole !== "admin") {
-      router.push("/dashboard");
+      router.push(withLocale("/dashboard", locale));
     }
-  }, [userRole, isSessionLoading, router]);
+  }, [userRole, isSessionLoading, locale, router]);
 
   if (isSessionLoading) {
     return (

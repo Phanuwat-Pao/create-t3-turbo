@@ -20,6 +20,8 @@ import { authClient } from "~/auth/client";
 import { getQueryClient } from "~/data/query-client";
 import { userKeys } from "~/data/user/keys";
 import { type SessionData, useSessionQuery } from "~/data/user/session-query";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 import { getAvatarUrl } from "~/lib/avatar";
 
 const noop = () => {
@@ -68,6 +70,7 @@ export default function AccountSwitcher({
   const { data: currentUser } = useSessionQuery(initialSession);
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const locale = useLocale();
 
   const handleSwitchAccount = useCallback(
     async (sessionToken: string) => {
@@ -88,9 +91,9 @@ export default function AccountSwitcher({
   );
 
   const handleAddAccount = useCallback(() => {
-    router.push("/sign-in");
+    router.push(withLocale("/sign-in", locale));
     setOpen(false);
-  }, [router]);
+  }, [locale, router]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

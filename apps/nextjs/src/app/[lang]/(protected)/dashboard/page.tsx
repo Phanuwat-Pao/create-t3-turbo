@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import { auth } from "~/auth/server";
 import AccountSwitcher from "~/components/account-switch";
 import type { SessionData } from "~/data/user/session-query";
+import { localizedRedirect } from "~/i18n/server";
 import { NOINDEX } from "~/lib/metadata";
 
 import OrganizationCard from "./_components/organization-card";
@@ -19,7 +19,7 @@ export default async function Page() {
     headers: requestHeaders,
   })) as SessionData | null;
   if (!session) {
-    redirect("/sign-in");
+    return localizedRedirect("/sign-in");
   }
 
   const [activeSessions, deviceSessions] = await Promise.all([

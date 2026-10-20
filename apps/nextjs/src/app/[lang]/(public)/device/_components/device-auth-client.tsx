@@ -10,10 +10,13 @@ import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 export function DeviceAuthClient() {
   const { t } = useTranslation();
   const router = useRouter();
+  const locale = useLocale();
   const params = useSearchParams();
   const initialUserCode = params.get("user_code") ?? "";
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -41,7 +44,9 @@ export function DeviceAuthClient() {
         });
 
         if (response.data) {
-          router.push(`/device/approve?user_code=${finalCode}`);
+          router.push(
+            withLocale(`/device/approve?user_code=${finalCode}`, locale)
+          );
         }
       } catch (error: unknown) {
         setErrorMessage(

@@ -10,10 +10,13 @@ import { useTranslation } from "react-i18next";
 
 import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 export function DeviceApproveClient() {
   const { t } = useTranslation();
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const userCode = searchParams.get("user_code");
   const { data: session } = useSessionQuery();
@@ -33,13 +36,13 @@ export function DeviceApproveClient() {
         await authClient.device.approve({
           userCode,
         });
-        router.push("/device/success");
+        router.push(withLocale("/device/success", locale));
       } catch (error: unknown) {
         const errorObj = error as { error?: { message?: string } };
         setErrorMessage(errorObj.error?.message ?? t("device.failedToApprove"));
       }
     });
-  }, [t, router, userCode]);
+  }, [t, locale, router, userCode]);
 
   const handleDeny = useCallback(() => {
     if (!userCode) {
@@ -53,13 +56,13 @@ export function DeviceApproveClient() {
         await authClient.device.deny({
           userCode,
         });
-        router.push("/device/denied");
+        router.push(withLocale("/device/denied", locale));
       } catch (error: unknown) {
         const errorObj = error as { error?: { message?: string } };
         setErrorMessage(errorObj.error?.message ?? t("device.failedToDeny"));
       }
     });
-  }, [t, router, userCode]);
+  }, [t, locale, router, userCode]);
 
   if (!session) {
     return null;

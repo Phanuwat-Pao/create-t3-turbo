@@ -8,6 +8,8 @@ import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import { uploadFile } from "~/data/storage/upload-file";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 interface SignUpFormProps {
   onSuccess?: () => void;
@@ -19,6 +21,7 @@ export function SignUpForm({
   callbackURL = "/dashboard",
 }: SignUpFormProps) {
   const { t } = useTranslation();
+  const locale = useLocale();
   const signUpSchema = z
     .object({
       email: z.email(t("validation.emailRequired")),
@@ -46,7 +49,7 @@ export function SignUpForm({
     },
     onSubmit: async ({ value }) => {
       await authClient.signUp.email({
-        callbackURL,
+        callbackURL: withLocale(callbackURL, locale),
         email: value.email,
         fetchOptions: {
           onError: (ctx: { error: { message: string } }) => {

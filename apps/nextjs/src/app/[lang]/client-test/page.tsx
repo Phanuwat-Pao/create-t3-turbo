@@ -19,6 +19,8 @@ import * as z from "zod";
 import { authClient } from "~/auth/client";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 import { getAvatarUrl } from "~/lib/avatar";
 
 const signInSchema = z.object({
@@ -27,6 +29,7 @@ const signInSchema = z.object({
 });
 
 export default function Page() {
+  const locale = useLocale();
   const { data: session, isPending, error } = useSessionQuery();
   const signOutMutation = useSignOutMutation();
 
@@ -38,7 +41,7 @@ export default function Page() {
     onSubmit: async ({ formApi, value }) => {
       await authClient.signIn.email(
         {
-          callbackURL: "/client-test",
+          callbackURL: withLocale("/client-test", locale),
           email: value.email,
           password: value.password,
         },

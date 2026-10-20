@@ -12,16 +12,19 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ResetPasswordForm } from "~/components/forms/reset-password-form";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 export function ResetPasswordClient() {
   const { t } = useTranslation();
   const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
 
   const handleSuccess = useCallback(() => {
-    router.push("/sign-in");
-  }, [router]);
+    router.push(withLocale("/sign-in", locale));
+  }, [locale, router]);
 
   return (
     <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center">

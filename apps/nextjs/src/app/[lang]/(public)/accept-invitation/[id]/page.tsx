@@ -16,6 +16,8 @@ import { useCallback, useState } from "react";
 import { useInviteAcceptMutation } from "~/data/organization/invitation-accept-mutation";
 import { useInvitationQuery } from "~/data/organization/invitation-query";
 import { useInviteRejectMutation } from "~/data/organization/invitation-reject-mutation";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 import { InvitationError } from "./_components/invitation-error";
 import { InvitationSkeleton } from "./_components/invitation-skeleton";
@@ -25,6 +27,7 @@ export default function Page() {
     id: string;
   }>();
   const router = useRouter();
+  const locale = useLocale();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const { data: invitation, isLoading, error } = useInvitationQuery(params.id);
@@ -37,11 +40,11 @@ export default function Page() {
       {
         onSuccess: () => {
           setIsRedirecting(true);
-          router.push("/dashboard");
+          router.push(withLocale("/dashboard", locale));
         },
       }
     );
-  }, [acceptMutation, params.id, router]);
+  }, [acceptMutation, locale, params.id, router]);
 
   const handleReject = useCallback(() => {
     rejectMutation.mutate(
@@ -49,11 +52,11 @@ export default function Page() {
       {
         onSuccess: () => {
           setIsRedirecting(true);
-          router.push("/dashboard");
+          router.push(withLocale("/dashboard", locale));
         },
       }
     );
-  }, [rejectMutation, params.id, router]);
+  }, [rejectMutation, locale, params.id, router]);
 
   if (isLoading || isRedirecting) {
     return (

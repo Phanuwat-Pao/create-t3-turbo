@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 import { getCallbackURL } from "~/lib/shared";
 
 import SignIn from "./sign-in";
@@ -15,6 +17,7 @@ import { SignUp } from "./sign-up";
 export default function SignInPage() {
   const { t } = useTranslation();
   const router = useRouter();
+  const locale = useLocale();
   const params = useSearchParams();
 
   useEffect(() => {
@@ -25,11 +28,11 @@ export default function SignInPage() {
         },
         onSuccess: () => {
           toast.success(t("auth.signIn.successMessage"));
-          router.push(getCallbackURL(params));
+          router.push(withLocale(getCallbackURL(params), locale));
         },
       },
     });
-  }, [router, params, t]);
+  }, [locale, router, params, t]);
 
   return (
     <div className="w-full">

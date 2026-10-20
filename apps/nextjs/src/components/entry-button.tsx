@@ -1,7 +1,7 @@
 import type { Session } from "@acme/auth";
 import { Button } from "@acme/ui/button";
-import Link from "next/link";
 
+import Link from "~/components/link";
 import { getT } from "~/i18n/server";
 
 interface Props {

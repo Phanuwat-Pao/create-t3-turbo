@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { i18n, type Locale } from "~/i18n/i18n-config";
+import { localizedPath } from "~/i18n/localized-path";
 
 const OG_LOCALES: Record<Locale, string> = {
   en: "en_US",
@@ -15,11 +16,6 @@ export const PUBLIC_PATHS = [
   "/forget-password",
 ] as const;
 export type PublicPath = (typeof PUBLIC_PATHS)[number];
-
-/** Locale-prefixed path, collapsing "/" so the root is "/en" rather than "/en/". */
-export function localizedPath(locale: Locale, path: string): string {
-  return path === "/" ? `/${locale}` : `/${locale}${path}`;
-}
 
 /**
  * hreflang map for one path: every locale plus `x-default`, which points at

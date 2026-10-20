@@ -2,9 +2,9 @@ import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import Link from "next/link";
 
 import { auth } from "~/auth/server";
+import Link from "~/components/link";
 import { getT } from "~/i18n/server";
 
 import { GoBackBtn } from "./_components/go-back-button";

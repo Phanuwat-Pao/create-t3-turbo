@@ -58,6 +58,8 @@ import { UpdateUserForm } from "~/components/forms/update-user-form";
 import { useRevokeSessionMutation } from "~/data/user/revoke-session-mutation";
 import { useSessionQuery } from "~/data/user/session-query";
 import { useSignOutMutation } from "~/data/user/sign-out-mutation";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 import { getAvatarUrl } from "~/lib/avatar";
 
 // Extended user type with twoFactor plugin fields
@@ -342,6 +344,7 @@ const UserCard = (props: {
 }) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const locale = useLocale();
   const signOutMutation = useSignOutMutation();
   const revokeSessionMutation = useRevokeSessionMutation();
   const { data } = useSessionQuery();
@@ -390,7 +393,7 @@ const UserCard = (props: {
             if (sessionToRemove) {
               removeActiveSession(sessionToRemove.id);
               if (sessionToRemove.id === props.session?.session.id) {
-                router.push("/");
+                router.push(withLocale("/", locale));
               }
             }
           },
@@ -403,6 +406,7 @@ const UserCard = (props: {
       removeActiveSession,
       props.session?.session.id,
       router,
+      locale,
     ]
   );
 
@@ -414,16 +418,16 @@ const UserCard = (props: {
     setIsSignOut(true);
     await authClient.admin.stopImpersonating();
     setIsSignOut(false);
-    router.push("/admin");
-  }, [router]);
+    router.push(withLocale("/admin", locale));
+  }, [locale, router]);
 
   const handleSignOut = useCallback(() => {
     signOutMutation.mutate(undefined, {
       onSuccess: () => {
-        router.push("/");
+        router.push(withLocale("/", locale));
       },
     });
-  }, [signOutMutation, router]);
+  }, [locale, signOutMutation, router]);
 
   return (
     <Card>

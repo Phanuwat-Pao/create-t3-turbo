@@ -1,9 +1,10 @@
 "use client";
 
 import { Button } from "@acme/ui/button";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "react-i18next";
+
+import Link from "~/components/link";
 
 export function AnotherAccountBtn() {
   const { t } = useTranslation();

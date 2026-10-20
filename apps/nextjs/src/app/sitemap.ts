@@ -1,11 +1,8 @@
 import type { MetadataRoute } from "next";
 
 import { i18n } from "~/i18n/i18n-config";
-import {
-  languageAlternates,
-  localizedPath,
-  PUBLIC_PATHS,
-} from "~/lib/metadata";
+import { localizedPath } from "~/i18n/localized-path";
+import { languageAlternates, PUBLIC_PATHS } from "~/lib/metadata";
 import { getSiteUrl } from "~/lib/site-url";
 
 /**

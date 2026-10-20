@@ -11,11 +11,11 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
-import Link from "next/link";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { ForgetPasswordForm } from "~/components/forms/forget-password-form";
+import Link from "~/components/link";
 
 export default function ForgetPasswordPage() {
   const { t } = useTranslation();

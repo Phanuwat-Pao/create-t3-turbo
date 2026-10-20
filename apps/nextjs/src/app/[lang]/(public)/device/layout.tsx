@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import { auth } from "~/auth/server";
+import { localizedRedirect } from "~/i18n/server";
 
 export default async function DevicePage({
   children,
@@ -12,7 +12,7 @@ export default async function DevicePage({
     headers: await headers(),
   });
   if (session === null) {
-    throw redirect("/sign-in?callbackUrl=/device");
+    return localizedRedirect("/sign-in?callbackUrl=/device");
   }
   return children;
 }

@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 import { Key } from "lucide-react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,7 +18,10 @@ import { toast } from "sonner";
 import { authClient } from "~/auth/client";
 import { SignInForm } from "~/components/forms/sign-in-form";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
+import Link from "~/components/link";
 import { useIsHydrated } from "~/hooks/use-hydrated";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 import { getCallbackURL } from "~/lib/shared";
 import { cn } from "~/lib/utils";
 
@@ -27,39 +29,41 @@ export default function SignIn() {
   const { t } = useTranslation();
   const isMounted = useIsHydrated();
   const router = useRouter();
+  const locale = useLocale();
   const params = useSearchParams();
+  const callbackURL = withLocale(getCallbackURL(params), locale);
 
   const handleSuccess = useCallback(() => {
-    router.push(getCallbackURL(params));
-  }, [router, params]);
+    router.push(callbackURL);
+  }, [router, callbackURL]);
 
   const handleGoogleSignIn = useCallback(async () => {
     await authClient.signIn.social({
-      callbackURL: "/dashboard",
+      callbackURL: withLocale("/dashboard", locale),
       provider: "google",
     });
-  }, []);
+  }, [locale]);
 
   const handleGitHubSignIn = useCallback(async () => {
     await authClient.signIn.social({
-      callbackURL: "/dashboard",
+      callbackURL: withLocale("/dashboard", locale),
       provider: "github",
     });
-  }, []);
+  }, [locale]);
 
   const handleMicrosoftSignIn = useCallback(async () => {
     await authClient.signIn.social({
-      callbackURL: "/dashboard",
+      callbackURL: withLocale("/dashboard", locale),
       provider: "microsoft",
     });
-  }, []);
+  }, [locale]);
 
   const handleVercelSignIn = useCallback(async () => {
     await authClient.signIn.social({
-      callbackURL: "/dashboard",
+      callbackURL: withLocale("/dashboard", locale),
       provider: "vercel",
     });
-  }, []);
+  }, [locale]);
 
   const handlePasskeySignIn = useCallback(async () => {
     await authClient.signIn.passkey({
@@ -69,11 +73,11 @@ export default function SignIn() {
         },
         onSuccess() {
           toast.success(t("auth.signIn.successMessage"));
-          router.push(getCallbackURL(params));
+          router.push(callbackURL);
         },
       },
     });
-  }, [router, params, t]);
+  }, [router, callbackURL, t]);
 
   return (
     <Card className="max-h-[90vh] w-full overflow-y-auto rounded-none">

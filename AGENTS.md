@@ -87,6 +87,14 @@ most common defect. Before calling work done, walk this list:
   key-for-key; the web client only receives the current language, and a
   test enforces the parity. User-visible strings need entries in both apps
   where they appear.
+- **Locale in every in-app URL.** Links come from `~/components/link` (lint
+  rejects `next/link`), client navigations go through
+  `withLocale(path, useLocale())`, server redirects through
+  `localizedRedirect(path)`, and Better Auth `callbackURL`/`redirectTo`
+  values are localized before they leave the client. A locale-less path
+  still works via the proxy's redirect, but Next's segment prefetches break
+  on it and every click pays a second hop;
+  `apps/e2e/src/tests/locale-links.test.ts` guards it.
 - **Env.** New environment variables go through the t3-env definitions
   (`apps/nextjs/src/env.ts`, `packages/auth/env.ts`) and `turbo.json`'s
   `globalEnv` when tasks depend on them.

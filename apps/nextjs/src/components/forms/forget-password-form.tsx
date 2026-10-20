@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 interface ForgetPasswordFormProps {
   onSuccess?: () => void;
@@ -19,6 +21,7 @@ export function ForgetPasswordForm({
   redirectTo = "/reset-password",
 }: ForgetPasswordFormProps) {
   const { t } = useTranslation();
+  const locale = useLocale();
   const forgetPasswordSchema = z.object({
     email: z.email(t("validation.emailRequired")),
   });
@@ -31,7 +34,7 @@ export function ForgetPasswordForm({
       try {
         await authClient.requestPasswordReset({
           email: value.email,
-          redirectTo,
+          redirectTo: withLocale(redirectTo, locale),
         });
       } catch {
         onError?.(t("common.error"));

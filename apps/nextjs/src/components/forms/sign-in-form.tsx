@@ -2,14 +2,16 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
-import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 import { LastUsedIndicator } from "~/components/last-used-indicator";
+import Link from "~/components/link";
 import { useIsHydrated } from "~/hooks/use-hydrated";
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 
 interface SignInFormProps {
   onSuccess?: () => void;
@@ -23,6 +25,7 @@ export function SignInForm({
   showPasswordToggle = false,
 }: SignInFormProps) {
   const { t } = useTranslation();
+  const locale = useLocale();
   const isMounted = useIsHydrated();
 
   const signInSchema = z.object({
@@ -40,7 +43,7 @@ export function SignInForm({
     onSubmit: async ({ value }) => {
       await authClient.signIn.email(
         {
-          callbackURL,
+          callbackURL: withLocale(callbackURL, locale),
           email: value.email,
           password: value.password,
           rememberMe: value.rememberMe,

@@ -17,6 +17,7 @@ import { createAuthClient } from "better-auth/react";
 import { toast } from "sonner";
 
 import { env } from "~/env";
+import { toLocale, withLocale } from "~/i18n/localized-path";
 
 import type { auth } from "./server";
 
@@ -33,7 +34,10 @@ export const authClient = createAuthClient({
     organizationClient(),
     twoFactorClient({
       onTwoFactorRedirect() {
-        window.location.href = "/two-factor";
+        window.location.href = withLocale(
+          "/two-factor",
+          toLocale(window.location.pathname.split("/")[1])
+        );
       },
     }),
     adminClient(),

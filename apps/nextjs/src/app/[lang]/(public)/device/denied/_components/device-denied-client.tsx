@@ -3,8 +3,9 @@
 import { Button } from "@acme/ui/button";
 import { Card } from "@acme/ui/card";
 import { X } from "lucide-react";
-import Link from "next/link";
 import { useTranslation } from "react-i18next";
+
+import Link from "~/components/link";
 
 export function DeviceDeniedClient() {
   const { t } = useTranslation();

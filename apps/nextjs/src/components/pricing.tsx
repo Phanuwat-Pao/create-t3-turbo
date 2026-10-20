@@ -16,6 +16,8 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import { withLocale } from "~/i18n/localized-path";
+import { useLocale } from "~/i18n/use-locale";
 import { cn } from "~/lib/utils";
 
 function useMediaQuery(query: string) {
@@ -66,11 +68,12 @@ function getXOffset(index: number): number {
 
 const PlanCard = memo(
   ({ plan, index, isDesktop, isMonthly }: PlanCardProps) => {
+    const locale = useLocale();
     const handleUpgrade = useCallback(() => {
       if (plan.href) {
-        window.location.href = plan.href;
+        window.location.href = withLocale(plan.href, locale);
       }
-    }, [plan.href]);
+    }, [locale, plan.href]);
 
     return (
       <motion.div
