@@ -19,16 +19,5 @@
       "Bash(pnpx oxfmt:*)",
       "Bash(npm view:*)"
     ]
-  },
-  "PostToolUse": [
-    {
-      "matcher": "Write|Edit",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "pnpm check:fix"
-        }
-      ]
-    }
-  ]
+  }
 }
