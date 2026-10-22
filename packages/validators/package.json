@@ -24,6 +24,6 @@
     "@acme/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:",
-    "vitest": "^5.0.3"
+    "vitest": "catalog:"
   }
 }
