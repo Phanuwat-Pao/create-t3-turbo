@@ -104,6 +104,13 @@ auditConfig:
     # query-string@7 is CJS, so an override breaks it at runtime. Drop once
     # expo-router moves off query-string@7.
     - GHSA-vcc3-ghjq-m6fr
+    # No patched release exists (braces 3.0.3 and node-forge 1.4.0 are the
+    # newest). braces arrives through dev tooling (ultracite's fast-glob,
+    # Metro's file matching) and node-forge through
+    # @expo/code-signing-certificates; the Next.js server loads neither.
+    # Drop each once a fixed version ships.
+    - GHSA-vfj7-8cjw-p6xm
+    - GHSA-86w9-cpqp-85rv
 
 overrides:
   # Patch within 4.0: @scalar/agent-chat's ai-sdk deps pin 4.0.5 exactly.
