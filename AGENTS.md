@@ -101,7 +101,11 @@ most common defect. Before calling work done, walk this list:
 - **SEO.** A new public page needs `generateMetadata` built with
   `pageMetadata` from `~/lib/metadata`, its path added to `PUBLIC_PATHS` so
   the sitemap and hreflang alternates pick it up, and `seo.*` strings in
-  both locale files. Anything behind a session or mid-flow (auth steps,
+  both locale files. `pageMetadata` sets `openGraph`, which replaces the
+  parent's object along with the image from `[lang]/opengraph-image`, so
+  the page's folder also needs an `opengraph-image.tsx` that re-exports that
+  one (see `pricing/`); `seo.test.ts` walks the sitemap and fails on a page
+  without it. Anything behind a session or mid-flow (auth steps,
   OAuth consent, device codes) exports `robots: NOINDEX` instead; a
   `"use client"` page cannot export metadata, so give its folder a layout
   that does. Never hard-code a domain: `getSiteUrl()` reads the request's
