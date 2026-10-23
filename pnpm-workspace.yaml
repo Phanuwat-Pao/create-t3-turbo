@@ -93,12 +93,8 @@ minimumReleaseAgeExclude:
   - uniwind@1.12.2
   - postcss@8.5.29
 
-# image-size DoS advisories (dev-only, via metro): patched release 2.0.3 is not
-# published as of 2026-08-13 — drop these once it ships and can be overridden.
 auditConfig:
   ignoreGhsas:
-    - GHSA-w3rx-r6r6-pgpr
-    - GHSA-5p2g-fcmc-qvqq
     # decode-uri-component ReDoS (moderate) via query-string@7, which
     # expo-router 57 pins. The only patched release (0.5.0) is ESM-only and
     # query-string@7 is CJS, so an override breaks it at runtime. Drop once
