@@ -1,4 +1,4 @@
-# GuardTour (create-t3-turbo)
+# create-t3-turbo
 
 A pnpm + Turborepo monorepo built on the T3 stack: a Next.js 16 web app and an
 Expo SDK 57 mobile app sharing one typed oRPC API, one Drizzle v1 Postgres
