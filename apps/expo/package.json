@@ -14,9 +14,9 @@
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
-    "@better-auth/oauth-provider": "^1.7.12",
-    "@better-auth/passkey": "^1.7.12",
-    "@better-auth/sso": "^1.7.12",
+    "@better-auth/oauth-provider": "catalog:",
+    "@better-auth/passkey": "catalog:",
+    "@better-auth/sso": "catalog:",
     "@expo/metro": "~56.1.0",
     "@expo/vector-icons": "^15.1.1",
     "@legendapp/list": "^3.6.0",

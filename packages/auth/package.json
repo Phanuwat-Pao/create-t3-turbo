@@ -19,10 +19,10 @@
     "@acme/db": "workspace:*",
     "@better-auth/expo": "catalog:",
     "@better-auth/i18n": "^1.7.12",
-    "@better-auth/oauth-provider": "^1.7.12",
-    "@better-auth/passkey": "^1.7.12",
+    "@better-auth/oauth-provider": "catalog:",
+    "@better-auth/passkey": "catalog:",
     "@better-auth/scim": "^1.7.12",
-    "@better-auth/sso": "^1.7.12",
+    "@better-auth/sso": "catalog:",
     "@t3-oss/env-core": "^0.13.11",
     "better-auth": "catalog:",
     "zod": "catalog:"
