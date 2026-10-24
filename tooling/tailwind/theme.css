@@ -48,7 +48,11 @@
   --tracking-normal: 0rem;
   --spacing: 0.25rem;
 
-  @variant dark {
+  /* The selector the web app's dark variant expands to, written out. Uniwind
+     (Expo) requires every @variant theme block to declare the same
+     variables, while here light is the base above and dark overrides it.
+     Uniwind reads the theme from this selector just the same. */
+  &:where(.dark, .dark *) {
     --background: oklch(0.1836 0.0111 311.9111);
     --foreground: oklch(0.9788 0.0057 308.3962);
     --card: oklch(0.1836 0.0111 311.9111);

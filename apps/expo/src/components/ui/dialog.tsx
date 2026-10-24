@@ -89,9 +89,9 @@ const DialogContent = React.forwardRef<
           <DialogPrimitive.Close className="web:group web:ring-offset-background web:transition-opacity web:hover:opacity-100 web:focus:outline-none web:focus:ring-2 web:focus:ring-ring web:focus:ring-offset-2 web:disabled:pointer-events-none absolute top-4 right-4 rounded-sm p-0.5 opacity-70">
             <X
               size={Platform.OS === "web" ? 16 : 18}
-              className={cn(
-                "text-muted-foreground",
-                open && "text-accent-foreground"
+              colorClassName={cn(
+                "accent-muted-foreground",
+                open && "accent-accent-foreground"
               )}
             />
           </DialogPrimitive.Close>

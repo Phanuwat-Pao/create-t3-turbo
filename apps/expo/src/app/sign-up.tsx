@@ -9,7 +9,7 @@ import { revalidateLogic, useAppForm } from "~/components/ui/form";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
-import logoImage from "../../images/logo.png";
+import logoImage from "../../assets/images/logo.png";
 
 export default function SignUp() {
   const router = useRouter();

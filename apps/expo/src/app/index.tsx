@@ -3,9 +3,9 @@ import { router, Stack, useNavigationContainerRef } from "expo-router";
 import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Image, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import * as z from "zod";
 
+import { SafeAreaView } from "~/components/safe-area-view";
 import { Button } from "~/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import { revalidateLogic, useAppForm } from "~/components/ui/form";
@@ -13,7 +13,7 @@ import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { authClient } from "~/utils/auth";
 
-import logoImage from "../../images/logo.png";
+import logoImage from "../../assets/images/logo.png";
 
 export default function Index() {
   const { data: isAuthenticated } = authClient.useSession();
