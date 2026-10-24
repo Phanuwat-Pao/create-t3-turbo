@@ -94,17 +94,32 @@ minimumReleaseAgeExclude:
   - lefthook@2.1.17
   - uniwind@1.12.2
   - postcss@8.5.29
+  - "@expo/cli@58.1.15"
+  - "@expo/config@58.0.8"
+  - "@expo/local-build-cache-provider@58.0.8"
+  - "@expo/metro-config@58.0.17"
+  - "@expo/prebuild-config@58.0.16"
+  - "@expo/router-server@58.0.17"
+  - babel-preset-expo@58.0.20
+  - expo-dev-client@58.0.15
+  - expo-dev-launcher@58.0.15
+  - expo-file-system@58.0.11
+  - expo-font@58.0.10
+  - expo-glass-effect@58.0.5
+  - expo-modules-autolinking@58.0.15
+  - expo-modules-cli@0.3.2
+  - expo-modules-core@58.0.26
+  - expo-modules-jsi@58.0.19
+  - expo-router@58.0.26
+  - expo-server@58.0.6
+  - expo-sqlite@58.0.14
+  - expo@58.0.19
 
 auditConfig:
   ignoreGhsas:
-    # decode-uri-component ReDoS (moderate) via query-string@7, which
-    # expo-router 57 pins. The only patched release (0.5.0) is ESM-only and
-    # query-string@7 is CJS, so an override breaks it at runtime. Drop once
-    # expo-router moves off query-string@7.
-    - GHSA-vcc3-ghjq-m6fr
     # node-forge (high): no patched release exists, 1.4.0 is the newest. It
-    # arrives only through @expo/code-signing-certificates; the Next.js
-    # server never loads it. Drop once a fixed version ships.
+    # arrives only through @expo/cli and its @expo/code-signing-certificates;
+    # the Next.js server never loads it. Drop once a fixed version ships.
     - GHSA-86w9-cpqp-85rv
     # zod memory exhaustion on oversized constrained collections (high),
     # fixed only in 4.6.6. zod 3.25.76 is @expo/cli's, which pins ^3.25.76;
@@ -156,16 +171,16 @@ overrides:
   picomatch: ">=2.3.2"
   postcss: ">=8.5.29"
   qs: ">=6.15.2"
-  # Expo SDK 57 pins the React Native family (see expo/bundledNativeModules.json).
+  # Expo SDK 58 pins the React Native family (see expo/bundledNativeModules.json).
   # Auto-installed peers in the non-Expo workspaces (drizzle-orm -> expo-sqlite,
   # better-auth -> expo-router) would otherwise drift to the newest release and
   # put a second copy of each in the tree.
-  react-native: "~0.86.3"
-  react-native-gesture-handler: "~2.32.0"
-  react-native-reanimated: "~4.5.1"
-  react-native-safe-area-context: "~5.7.0"
-  react-native-screens: "~4.26.2"
-  react-native-worklets: "~0.10.1"
+  react-native: "~0.88.0"
+  react-native-gesture-handler: "~3.3.0"
+  react-native-reanimated: "~4.7.1"
+  react-native-safe-area-context: "~5.10.1"
+  react-native-screens: "~4.30.0"
+  react-native-worklets: "~0.13.0"
   shell-quote: ">=1.8.5"
   # next 16.4 still pins 0.35.4; 0.35.5 patches the librsvg advisory.
   sharp: ">=0.35.5"

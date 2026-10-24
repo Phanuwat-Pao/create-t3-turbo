@@ -1,7 +1,7 @@
 # create-t3-turbo
 
 A pnpm + Turborepo monorepo built on the T3 stack: a Next.js 16 web app and an
-Expo SDK 57 mobile app sharing one typed oRPC API, one Drizzle v1 Postgres
+Expo SDK 58 mobile app sharing one typed oRPC API, one Drizzle v1 Postgres
 schema, and one Better Auth setup.
 
 ## What makes this repo special?
@@ -116,7 +116,7 @@ most common defect. Before calling work done, walk this list:
 - `apps/nextjs` — Next.js 16 App Router under `src/`, React 19 + React
   Compiler, Tailwind CSS 4, oRPC client + TanStack Query/Form, Better Auth
   client, presigned-S3 storage helpers.
-- `apps/expo` — Expo SDK 57 (expo-router, React Native 0.86, uniwind) under
+- `apps/expo` — Expo SDK 58 (expo-router, React Native 0.88, uniwind) under
   `src/`. Ships OTA updates through EAS Update: the `fingerprint` runtime
   policy, update URL and `owner` live in `app.config.ts`, channels in
   `eas.json`, and `src/hooks/use-ota-updates.ts` applies a downloaded update.

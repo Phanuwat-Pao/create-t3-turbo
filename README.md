@@ -1,7 +1,7 @@
 # create-t3-turbo
 
 A T3-style monorepo, kept aggressively current: a Next.js 16 web app and an
-Expo SDK 57 mobile app sharing one typed oRPC API, one Drizzle v1 Postgres
+Expo SDK 58 mobile app sharing one typed oRPC API, one Drizzle v1 Postgres
 schema, and one Better Auth setup — with dual-language (th/en) i18n across
 every surface.
 
@@ -9,7 +9,7 @@ every surface.
 
 > [!NOTE]
 >
-> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json) before proceeding (Node ≥ 22, pnpm ≥ 11).
+> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json) before proceeding (Node 22.18+, 24.3+ or 26+, pnpm ≥ 11).
 
 Use this repository as a template, or init via Turbo's CLI (use PNPM as the package manager):
 
@@ -29,7 +29,7 @@ It uses [Turborepo](https://turborepo.com) and contains:
   └─ Recommended extensions and settings for VSCode users
 apps
   ├─ expo
-  │   ├─ Expo SDK 57 (React Native 0.86, React 19)
+  │   ├─ Expo SDK 58 (React Native 0.88, React 19)
   │   ├─ Navigation using Expo Router
   │   ├─ Tailwind CSS v4 using uniwind
   │   ├─ i18next with th/en resources

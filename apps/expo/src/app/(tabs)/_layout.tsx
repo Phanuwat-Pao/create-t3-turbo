@@ -41,7 +41,7 @@ const ContactsTabBarIcon = ({ color, size }: TabBarIconProps) => (
 );
 
 const SettingsTabBarIcon = ({ color, size }: TabBarIconProps) => (
-  <Ionicons color={color} name="menu" size={size} />
+  <Ionicons color={color as string} name="menu" size={size} />
 );
 
 export default function LineTabsLayout() {
