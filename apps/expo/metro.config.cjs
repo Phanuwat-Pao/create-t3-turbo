@@ -1,20 +1,13 @@
-/* eslint-disable unicorn/prefer-module */
-/* eslint-disable eslint-plugin-node/no-path-concat */
 // Learn more: https://docs.expo.dev/guides/monorepos/
+// CommonJS (.cjs) so the config can use require and __dirname without lint
+// suppressions.
 const { getDefaultConfig } = require("expo/metro-config");
-// metro-cache is not a direct dependency; @expo/metro re-exports it so the
-// import resolves under pnpm's isolated node_modules.
-const { FileStore } = require("@expo/metro/metro-cache");
 const { withUniwindConfig } = require("uniwind/metro");
 
 const config = getDefaultConfig(__dirname);
 
-config.cacheStores = [
-  new FileStore({
-    root: `${__dirname}/node_modules/.cache/metro`,
-  }),
-];
-
+// No cacheStores here: withUniwindConfig replaces them with its own store in
+// the OS temp dir, which skips caching the CSS entry so theme edits show up.
 /** @type {import('expo/metro-config').MetroConfig} */
 module.exports = withUniwindConfig(config, {
   cssEntryFile: "./src/styles.css",

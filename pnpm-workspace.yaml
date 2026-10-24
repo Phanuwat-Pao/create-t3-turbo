@@ -30,7 +30,7 @@ catalog:
   tailwindcss: ^4.3.3
   typescript: ^7.0.2
   vitest: ^5.0.5
-  zod: ^4.6.5
+  zod: ^4.6.7
 
 catalogs:
   react19:
@@ -103,13 +103,17 @@ auditConfig:
     # query-string@7 is CJS, so an override breaks it at runtime. Drop once
     # expo-router moves off query-string@7.
     - GHSA-vcc3-ghjq-m6fr
-    # No patched release exists (braces 3.0.3 and node-forge 1.4.0 are the
-    # newest). braces arrives through dev tooling (ultracite's fast-glob,
-    # Metro's file matching) and node-forge through
-    # @expo/code-signing-certificates; the Next.js server loads neither.
-    # Drop each once a fixed version ships.
-    - GHSA-vfj7-8cjw-p6xm
+    # node-forge (high): no patched release exists, 1.4.0 is the newest. It
+    # arrives only through @expo/code-signing-certificates; the Next.js
+    # server never loads it. Drop once a fixed version ships.
     - GHSA-86w9-cpqp-85rv
+    # zod memory exhaustion on oversized constrained collections (high),
+    # fixed only in 4.6.6. zod 3.25.76 is @expo/cli's, which pins ^3.25.76;
+    # it validates local devtools plugin manifests in the dev server, never
+    # network input. Our own zod is the catalog's 4.x, floored past the fix.
+    # Forcing 4.x onto the CLI would cross a major. Drop once @expo/cli moves
+    # to zod 4.
+    - GHSA-mrhx-c7xc-m3w5
 
 overrides:
   # Patch within 4.0: @scalar/agent-chat's ai-sdk deps pin 4.0.5 exactly.
