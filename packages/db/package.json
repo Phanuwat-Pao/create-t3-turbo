@@ -29,7 +29,7 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "drizzle-orm": "1.0.0-rc.4",
+    "drizzle-orm": "1.0.0-rc.5",
     "nanoid": "^6.0.2",
     "pg": "^8.23.1",
     "zod": "catalog:"
@@ -37,7 +37,7 @@
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
     "@types/pg": "^8.23.1",
-    "drizzle-kit": "1.0.0-rc.4",
+    "drizzle-kit": "1.0.0-rc.5",
     "typescript": "catalog:"
   }
 }
