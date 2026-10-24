@@ -33,14 +33,14 @@
     "dotenv-cli": "^11.0.0",
     "lefthook": "^2.1.17",
     "npm-check-updates": "^23.1.0",
-    "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
     "turbo": "^2.11.7",
     "typescript": "catalog:",
-    "ultracite": "7.12.4"
+    "ultracite": "8.0.2"
   },
   "engines": {
-    "node": ">=22.12.0",
+    "node": ">=22.18.0",
     "pnpm": ">=11.3.0"
   },
   "packageManager": "pnpm@11.25.0"

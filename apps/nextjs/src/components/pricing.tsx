@@ -11,6 +11,7 @@ import { Star } from "lucide-react";
 import {
   memo,
   useCallback,
+  useId,
   useRef,
   useState,
   useSyncExternalStore,
@@ -201,6 +202,7 @@ export function Pricing({
   const [isMonthly, setIsMonthly] = useState(true);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const switchRef = useRef<HTMLButtonElement>(null);
+  const billingSwitchId = useId();
 
   const handleToggle = useCallback((checked: boolean) => {
     setIsMonthly(!checked);
@@ -244,18 +246,20 @@ export function Pricing({
 
       <div className="mb-10 flex justify-center">
         <div className="relative inline-flex cursor-pointer items-center">
-          <Label>
-            <Switch
-              ref={switchRef as React.RefObject<HTMLButtonElement>}
-              checked={!isMonthly}
-              onCheckedChange={handleToggle}
-              className="relative"
-            />
-          </Label>
+          <Switch
+            id={billingSwitchId}
+            ref={switchRef as React.RefObject<HTMLButtonElement>}
+            checked={!isMonthly}
+            onCheckedChange={handleToggle}
+            className="relative"
+          />
         </div>
-        <span className="ml-2 font-semibold">
+        <Label
+          htmlFor={billingSwitchId}
+          className="ml-2 block text-base leading-normal font-semibold"
+        >
           Annual billing <span className="text-primary">(Save 20%)</span>
-        </span>
+        </Label>
       </div>
 
       <div className="sm:2 grid grid-cols-1 gap-4 md:grid-cols-3">

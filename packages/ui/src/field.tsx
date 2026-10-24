@@ -111,6 +111,7 @@ function FieldLabel({
   ...props
 }: React.ComponentProps<typeof Label>) {
   return (
+    // oxlint-disable-next-line jsx-a11y/label-has-associated-control -- vendored shadcn wrapper; callers pass htmlFor and the text through props
     <Label
       data-slot="field-label"
       className={cn(
