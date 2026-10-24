@@ -1,18 +1,18 @@
+# Runs the web image on one host. build-push.yml pushes it as
+# <REGISTRY_URL>/<repository name>/web, with :latest tracking main; change the
+# image below to match your registry and repository.
+#
+# The image carries no env. The service reads the .env next to this file on
+# the host (start from the repo's .env.example), so a changed variable needs
+# only `docker compose up -d`. Without it the app answers 500 with "Invalid
+# environment variables".
 services:
-  turbo-nextjs:
-    image: registry.telecorpthailand.com/turbo/turbo-nextjs-uat:latest
-    container_name: turbo-nextjs
+  web:
+    image: registry.telecorpthailand.com/create-t3-turbo/web:latest
+    container_name: create-t3-turbo-web
     ports:
       - "63700:3000"
-    environment:
-      - PNPM_HOME=/pnpm
-    working_dir: /app
-    restart: always
-    labels:
-      com.centurylinklabs.watchtower.enable: "true"
-  turbo-expressjs:
-    image: registry.telecorpthailand.com/turbo/turbo-expressjs-uat:latest
-    container_name: turbo-expressjs
+    env_file: .env
     environment:
       - PNPM_HOME=/pnpm
     working_dir: /app
