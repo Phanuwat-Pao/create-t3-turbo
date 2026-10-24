@@ -13,7 +13,7 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  "@better-auth/expo": ^1.7.7
+  "@better-auth/expo": ^1.7.12
   "@orpc/client": ^1.15.4
   "@orpc/server": ^1.15.4
   "@orpc/tanstack-query": ^1.15.4
@@ -21,7 +21,7 @@ catalog:
   "@tanstack/react-form": ^1.33.5
   "@tanstack/react-query": ^5.104.1
   "@types/node": ^26.6.4
-  better-auth: ^1.7.7
+  better-auth: ^1.7.12
   i18next: ^26.4.4
   react-i18next: ^17.0.16
   tailwindcss: ^4.3.3
