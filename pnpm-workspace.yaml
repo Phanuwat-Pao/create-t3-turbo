@@ -5,6 +5,7 @@ packages:
 
 allowBuilds:
   "@tailwindcss/oxide": true
+  "@tsc-rs/typescript": true
   bufferutil: true
   esbuild: true
   lefthook: true
@@ -28,7 +29,7 @@ catalog:
   i18next: ^26.4.4
   react-i18next: ^17.0.16
   tailwindcss: ^4.3.3
-  typescript: ^7.0.2
+  typescript: npm:@tsc-rs/typescript@0.8.0
   vitest: ^5.0.5
   zod: ^4.6.7
 
@@ -41,7 +42,14 @@ catalogs:
 
 linkWorkspacePackages: true
 
+# typescript is @tsc-rs/typescript, whose npm version (0.8.x) is outside every
+# typescript peer range.
+peerDependencyRules:
+  allowAny:
+    - typescript
+
 minimumReleaseAgeExclude:
+  - "@tsc-rs/*"
   - "@aws-sdk/client-s3@3.1049.0 || 3.1109.0 || 3.1125.0"
   - "@aws-sdk/core@3.974.12"
   - "@aws-sdk/credential-provider-env@3.972.38"
