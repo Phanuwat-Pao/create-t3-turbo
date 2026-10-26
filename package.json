@@ -1,6 +1,7 @@
 {
-  "name": "guardtour",
+  "name": "create-t3-turbo",
   "private": true,
+  "type": "module",
   "scripts": {
     "ncu": "ncu -u",
     "ncu:workspaces": "turbo run ncu",
