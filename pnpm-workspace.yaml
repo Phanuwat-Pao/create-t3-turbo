@@ -149,11 +149,18 @@ overrides:
   "@babel/core@<7.29.1": ">=7.29.1 <8"
   # @vercel/otel pulls the OTel SDK family as auto-installed peers; keep the
   # family in lockstep since each sdk-* pins @opentelemetry/core exactly.
-  "@opentelemetry/core": ">=2.11.0"
-  "@opentelemetry/resources": ">=2.11.0"
-  "@opentelemetry/sdk-logs": ">=0.222.0"
-  "@opentelemetry/sdk-metrics": ">=2.11.0"
-  "@opentelemetry/sdk-trace-base": ">=2.11.0"
+  # The ceilings are @vercel/otel 2.1's own peer ranges. Without them the
+  # override widens those ranges, and OTel 3.0's resources, sdk-logs and
+  # sdk-metrics install beside 2.x packages. 3.0 needs @opentelemetry/api
+  # 1.10, and 2.x needs below 1.10, so no api version satisfies both. api
+  # gets the 2.x ceiling too: @vercel/otel accepts any 1.x, and a fresh
+  # resolution would otherwise pick 1.10.
+  "@opentelemetry/api": ">=1.9.0 <1.10.0"
+  "@opentelemetry/core": ">=2.11.0 <3"
+  "@opentelemetry/resources": ">=2.11.0 <3"
+  "@opentelemetry/sdk-logs": ">=0.222.0 <0.300.0"
+  "@opentelemetry/sdk-metrics": ">=2.11.0 <3"
+  "@opentelemetry/sdk-trace-base": ">=2.11.0 <3"
   brace-expansion: ">=1.1.13 <2 || >=5.0.9"
   browserslist: ">=4.28.7"
   defu: ">=6.1.5"
