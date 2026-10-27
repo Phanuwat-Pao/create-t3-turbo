@@ -15,6 +15,10 @@ export default {
   experimentalTailwindcss: {
     functions: ["cva", "cx", "cn"],
   },
+  // JSON written as Handlebars templates for `turbo gen`. oxfmt formats .hbs
+  // as page markup and reflows the text, which breaks strings across lines
+  // and leaves the generated package.json unparseable.
+  ignorePatterns: ["turbo/generators/templates/**"],
   importOrder: [
     "<TYPES>",
     "^(react/(.*)$)|^(react$)|^(react-native(.*)$)",
