@@ -22,9 +22,11 @@ npx create-turbo@latest -e https://github.com/t3-oss/create-t3-turbo
 It uses [Turborepo](https://turborepo.com) and contains:
 
 ```text
-.github
+.gitea
   └─ workflows
-        └─ CI with pnpm cache setup
+        ├─ CI on pushes to develop, release/* and feature/*, and on PRs
+        ├─ Manual image build and push
+        └─ Manual deploy or rollback through MiniIDP
 .vscode
   └─ Recommended extensions and settings for VSCode users
 apps
@@ -64,8 +66,6 @@ packages
   └─ validators
       └─ Shared Zod v4 schemas
 tooling
-  ├─ github
-  │   └─ CI setup action
   ├─ tailwind
   │   └─ shared tailwind theme and configuration
   └─ typescript

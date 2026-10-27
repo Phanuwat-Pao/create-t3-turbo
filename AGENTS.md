@@ -131,7 +131,7 @@ most common defect. Before calling work done, walk this list:
 - `packages/ui` — shared shadcn/radix components. Add new ones with
   `pnpm ui-add`, not by hand-copying.
 - `packages/validators` — shared Zod schemas and helpers.
-- `tooling/*` — shared TypeScript, Tailwind, and GitHub Actions config.
+- `tooling/*` — shared TypeScript and Tailwind config.
 
 Keep new code in each workspace's `src/` and group files by feature.
 
