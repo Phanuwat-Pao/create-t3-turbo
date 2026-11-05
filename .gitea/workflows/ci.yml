@@ -104,8 +104,9 @@ jobs:
           node-version-file: ".nvmrc"
 
       - name: Install pnpm
-        # Version comes from the "packageManager" field in package.json
-        run: corepack enable
+        # Node 25 and later ship without corepack, so install it first. It
+        # takes the pnpm version from the "packageManager" field in package.json.
+        run: npm i -g corepack@latest && corepack enable
 
       - name: Configure pnpm store
         run: pnpm config set store-dir "${RUNNER_TEMP}/pnpm-store"
@@ -222,8 +223,9 @@ jobs:
           node-version-file: ".nvmrc"
 
       - name: Install pnpm
-        # Rely on the "packageManager" field in package.json for the version
-        run: corepack enable
+        # Node 25 and later ship without corepack, so install it first. It
+        # takes the pnpm version from the "packageManager" field in package.json.
+        run: npm i -g corepack@latest && corepack enable
 
       - name: Configure pnpm store
         run: pnpm config set store-dir "${RUNNER_TEMP}/pnpm-store"
@@ -400,7 +402,7 @@ jobs:
             --cache-from type=registry,ref=${IMAGE}:buildcache \
             --cache-to   type=registry,ref=${IMAGE}:buildcache,mode=max \
             --build-arg IMAGE_TAG="${TAG}" \
-            --build-arg NODE_IMAGE=registry.telecorpthailand.com/dockerhub/library/node:24-alpine \
+            --build-arg NODE_IMAGE=registry.telecorpthailand.com/dockerhub/library/node:26-alpine \
             -t "${IMAGE}:${TAG}" \
             -t "${IMAGE}:latest" \
             -f ${{ matrix.dockerfile }} \

@@ -4,7 +4,7 @@
 #
 # Debian, not Alpine like Dockerfile.nextjs: ultimate-express runs on
 # uWebSockets.js, which ships glibc builds only and throws on Alpine's musl.
-ARG NODE_IMAGE=node:24-trixie-slim
+ARG NODE_IMAGE=node:26-trixie-slim
 
 FROM ${NODE_IMAGE} AS node_base_image
 
@@ -67,9 +67,9 @@ COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 # bunchee can't inline, such as one with native code, has to be listed in
 # dependencies to reach the image.
 #
-# uWebSockets.js, under ultimate-express, ships 24 prebuilt binaries (about
-# 125 MB), one per platform and Node ABI, and loads only the one named after
-# this image's. The rest are deleted.
+# uWebSockets.js, under ultimate-express, ships one prebuilt binary per
+# platform and Node ABI (15 binaries, about 90 MB, in v20.70.0) and loads only
+# the one named after this image's. The rest are deleted.
 RUN pnpm install --prod --frozen-lockfile --filter @acme/expressjs \
   && keep="uws_$(node -p 'process.platform + "_" + process.arch + "_" + process.versions.modules').node" \
   && find node_modules/.pnpm -name 'uws_*.node' ! -name "$keep" -delete

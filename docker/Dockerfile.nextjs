@@ -1,7 +1,7 @@
 # Full image reference so CI can point the build at a registry proxy-cache
 # (avoids Docker Hub's anonymous pull rate limit); defaults to Docker Hub for
 # local builds.
-ARG NODE_IMAGE=node:24-alpine
+ARG NODE_IMAGE=node:26-alpine
 
 FROM ${NODE_IMAGE} AS alpine
 
