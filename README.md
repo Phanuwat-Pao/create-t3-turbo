@@ -9,7 +9,7 @@ every surface.
 
 > [!NOTE]
 >
-> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json) before proceeding (Node 22.18+, 24.3+ or 26+, pnpm ≥ 11).
+> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json) before proceeding (Node 22.18+, 24.3+ or 26+, pnpm ≥ 12).
 
 Use this repository as a template, or init via Turbo's CLI (use PNPM as the package manager):
 
