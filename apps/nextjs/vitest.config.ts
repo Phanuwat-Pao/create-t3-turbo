@@ -4,6 +4,11 @@ import path from "node:path";
 // node_modules/.vite-temp before running it and rewrites only that literal to
 // this folder, so a destructured `import.meta` gives the temp folder instead.
 export default {
+  // tsconfig.json keeps JSX for Next (`jsx: preserve`); tests that render
+  // components (the email templates) need it compiled.
+  oxc: {
+    jsx: { runtime: "automatic" },
+  },
   resolve: {
     alias: {
       "~": path.resolve(import.meta.dirname, "./src"),

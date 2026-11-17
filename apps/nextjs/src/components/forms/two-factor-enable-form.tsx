@@ -85,7 +85,11 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
           <p className="text-muted-foreground text-sm">
             {t("dashboard.twoFactor.copyUri")}
           </p>
-          <CopyButton textToCopy={totpURI} />
+          <CopyButton
+            copiedLabel={t("common.copied")}
+            copyLabel={t("common.copyToClipboard")}
+            textToCopy={totpURI}
+          />
         </div>
         <otpForm.AppForm>
           <otpForm.Form className="flex flex-col gap-4">
@@ -118,9 +122,11 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
             {(field) => (
               <field.PasswordField
                 autoComplete="current-password"
+                hidePasswordLabel={t("common.hidePassword")}
                 id="enable-password"
                 label={t("common.password")}
                 placeholder={t("dashboard.twoFactor.passwordPlaceholder")}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </passwordForm.AppField>

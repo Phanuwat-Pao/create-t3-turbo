@@ -189,6 +189,8 @@ const InvitationItem = memo(
           </Button>
           <div>
             <CopyButton
+              copiedLabel={t("common.copied")}
+              copyLabel={t("common.copyToClipboard")}
               textToCopy={`${window.location.origin}/accept-invitation/${invitation.id}`}
             />
           </div>
@@ -259,7 +261,10 @@ function CreateOrganizationDialog() {
           <p>{t("organization.newOrganization")}</p>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
+      <DialogContent
+        className="w-11/12 sm:max-w-[425px]"
+        closeLabel={t("common.close")}
+      >
         <DialogHeader>
           <DialogTitle>{t("organization.newOrganization")}</DialogTitle>
           <DialogDescription>
@@ -286,7 +291,10 @@ function InviteMemberDialog() {
           <p>{t("organization.inviteMember")}</p>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
+      <DialogContent
+        className="w-11/12 sm:max-w-[425px]"
+        closeLabel={t("common.close")}
+      >
         <DialogHeader>
           <DialogTitle>{t("organization.inviteMember")}</DialogTitle>
           <DialogDescription>

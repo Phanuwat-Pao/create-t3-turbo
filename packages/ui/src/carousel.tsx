@@ -190,10 +190,14 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
 
 function CarouselPrevious({
   className,
+  label = "Previous slide",
   variant = "outline",
   size = "icon",
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<typeof Button> & {
+  /** Screen-reader text of the button. */
+  label?: string;
+}) {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
   return (
@@ -213,17 +217,21 @@ function CarouselPrevious({
       {...props}
     >
       <ArrowLeft />
-      <span className="sr-only">Previous slide</span>
+      <span className="sr-only">{label}</span>
     </Button>
   );
 }
 
 function CarouselNext({
   className,
+  label = "Next slide",
   variant = "outline",
   size = "icon",
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<typeof Button> & {
+  /** Screen-reader text of the button. */
+  label?: string;
+}) {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
   return (
@@ -243,7 +251,7 @@ function CarouselNext({
       {...props}
     >
       <ArrowRight />
-      <span className="sr-only">Next slide</span>
+      <span className="sr-only">{label}</span>
     </Button>
   );
 }

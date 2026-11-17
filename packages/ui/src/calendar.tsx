@@ -2,6 +2,7 @@
 
 import { cn } from "@acme/ui";
 import { Button, buttonVariants } from "@acme/ui/button";
+import { format } from "date-fns";
 import {
   ChevronDownIcon,
   ChevronLeftIcon,
@@ -54,6 +55,11 @@ function CalendarDayButton({
   );
 }
 
+/**
+ * Month and weekday names, and the navigation labels, come from `locale`:
+ * pass a locale from `react-day-picker/locale` (a date-fns locale extended
+ * with translated labels), or a plain date-fns locale. English by default.
+ */
 function Calendar({
   className,
   classNames,
@@ -79,8 +85,9 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString("default", { month: "short" }),
+        // DayPicker's date library carries the `locale` prop.
+        formatMonthDropdown: (date, dateLib) =>
+          dateLib ? dateLib.format(date, "LLL") : format(date, "LLL"),
         ...formatters,
       }}
       classNames={{

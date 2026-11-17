@@ -79,8 +79,12 @@ function BreadcrumbSeparator({
 
 function BreadcrumbEllipsis({
   className,
+  label = "More",
   ...props
-}: React.ComponentProps<"span">) {
+}: React.ComponentProps<"span"> & {
+  /** Screen-reader text for the collapsed items. */
+  label?: string;
+}) {
   return (
     <span
       data-slot="breadcrumb-ellipsis"
@@ -90,7 +94,7 @@ function BreadcrumbEllipsis({
       {...props}
     >
       <MoreHorizontal className="size-4" />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{label}</span>
     </span>
   );
 }

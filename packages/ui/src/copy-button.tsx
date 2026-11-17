@@ -12,9 +12,17 @@ import { useCallback, useEffect, useState } from "react";
 
 interface CopyButtonProps {
   textToCopy: string;
+  /** Tooltip and screen-reader text before copying. */
+  copyLabel?: string;
+  /** Tooltip text for two seconds after a successful copy. */
+  copiedLabel?: string;
 }
 
-export default function CopyButton({ textToCopy }: CopyButtonProps) {
+export default function CopyButton({
+  textToCopy,
+  copyLabel = "Copy to clipboard",
+  copiedLabel = "Copied!",
+}: CopyButtonProps) {
   const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
@@ -48,11 +56,11 @@ export default function CopyButton({ textToCopy }: CopyButtonProps) {
             ) : (
               <CopyIcon className="h-4 w-4" />
             )}
-            <span className="sr-only">Copy to clipboard</span>
+            <span className="sr-only">{copyLabel}</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{isCopied ? "Copied!" : "Copy to clipboard"}</p>
+          <p>{isCopied ? copiedLabel : copyLabel}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

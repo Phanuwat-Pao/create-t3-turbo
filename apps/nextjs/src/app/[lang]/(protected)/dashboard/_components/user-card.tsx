@@ -135,7 +135,10 @@ function EditUserDialog() {
           {t("dashboard.user.editUser")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
+      <DialogContent
+        className="w-11/12 sm:max-w-[425px]"
+        closeLabel={t("common.close")}
+      >
         <DialogHeader>
           <DialogTitle>{t("dashboard.user.editUser")}</DialogTitle>
           <DialogDescription>
@@ -177,7 +180,10 @@ function ChangePassword() {
           </span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
+      <DialogContent
+        className="w-11/12 sm:max-w-[425px]"
+        closeLabel={t("common.close")}
+      >
         <DialogHeader>
           <DialogTitle>{t("dashboard.changePassword.title")}</DialogTitle>
           <DialogDescription>
@@ -204,7 +210,10 @@ function AddPasskey() {
           {t("dashboard.passkeys.addNew")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
+      <DialogContent
+        className="w-11/12 sm:max-w-[425px]"
+        closeLabel={t("common.close")}
+      >
         <DialogHeader>
           <DialogTitle>{t("dashboard.passkeys.addNew")}</DialogTitle>
           <DialogDescription>
@@ -294,7 +303,10 @@ function ListPasskeys() {
           </span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-11/12 sm:max-w-[425px]">
+      <DialogContent
+        className="w-11/12 sm:max-w-[425px]"
+        closeLabel={t("common.close")}
+      >
         <DialogHeader>
           <DialogTitle>{t("dashboard.passkeys.listTitle")}</DialogTitle>
           <DialogDescription>
@@ -522,7 +534,10 @@ const UserCard = (props: {
                       </span>
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="w-11/12 sm:max-w-[425px]">
+                  <DialogContent
+                    className="w-11/12 sm:max-w-[425px]"
+                    closeLabel={t("common.close")}
+                  >
                     <DialogHeader>
                       <DialogTitle>
                         {t("dashboard.twoFactor.scanQrCode")}
@@ -557,7 +572,10 @@ const UserCard = (props: {
                     </span>
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="w-11/12 sm:max-w-[425px]">
+                <DialogContent
+                  className="w-11/12 sm:max-w-[425px]"
+                  closeLabel={t("common.close")}
+                >
                   <DialogHeader>
                     <DialogTitle>
                       {(session?.user as ExtendedUser)?.twoFactorEnabled

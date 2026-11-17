@@ -61,9 +61,11 @@ export function ResetPasswordForm({
             {(field) => (
               <field.PasswordField
                 autoComplete="new-password"
+                hidePasswordLabel={t("common.hidePassword")}
                 id="reset-password"
                 label={t("auth.resetPassword.newPasswordLabel")}
                 placeholder={t("auth.resetPassword.newPasswordPlaceholder")}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </form.AppField>
@@ -71,9 +73,11 @@ export function ResetPasswordForm({
             {(field) => (
               <field.PasswordField
                 autoComplete="new-password"
+                hidePasswordLabel={t("common.hidePassword")}
                 id="reset-confirm-password"
                 label={t("auth.resetPassword.confirmPasswordLabel")}
                 placeholder={t("auth.resetPassword.confirmPasswordPlaceholder")}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </form.AppField>

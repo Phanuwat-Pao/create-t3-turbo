@@ -76,11 +76,13 @@ export function ChangePasswordForm({
               <field.PasswordField
                 autoComplete="current-password"
                 disabled={isSubmitting}
+                hidePasswordLabel={t("common.hidePassword")}
                 id="current-password"
                 label={t("dashboard.changePassword.currentPasswordLabel")}
                 placeholder={t(
                   "dashboard.changePassword.currentPasswordPlaceholder"
                 )}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </form.AppField>
@@ -90,11 +92,13 @@ export function ChangePasswordForm({
               <field.PasswordField
                 autoComplete="new-password"
                 disabled={isSubmitting}
+                hidePasswordLabel={t("common.hidePassword")}
                 id="new-password"
                 label={t("dashboard.changePassword.newPasswordLabel")}
                 placeholder={t(
                   "dashboard.changePassword.newPasswordPlaceholder"
                 )}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </form.AppField>
@@ -104,11 +108,13 @@ export function ChangePasswordForm({
               <field.PasswordField
                 autoComplete="new-password"
                 disabled={isSubmitting}
+                hidePasswordLabel={t("common.hidePassword")}
                 id="confirm-password"
                 label={t("dashboard.changePassword.confirmPasswordLabel")}
                 placeholder={t(
                   "dashboard.changePassword.confirmPasswordPlaceholder"
                 )}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </form.AppField>

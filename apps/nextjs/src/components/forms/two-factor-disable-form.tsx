@@ -51,9 +51,11 @@ export function TwoFactorDisableForm({ onSuccess }: TwoFactorDisableFormProps) {
             {(field) => (
               <field.PasswordField
                 autoComplete="current-password"
+                hidePasswordLabel={t("common.hidePassword")}
                 id="disable-password"
                 label={t("common.password")}
                 placeholder={t("dashboard.twoFactor.passwordPlaceholder")}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </form.AppField>

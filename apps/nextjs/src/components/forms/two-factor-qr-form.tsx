@@ -57,7 +57,11 @@ export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
           <p className="text-muted-foreground text-sm">
             {t("dashboard.twoFactor.copyUri")}
           </p>
-          <CopyButton textToCopy={totpURI} />
+          <CopyButton
+            copiedLabel={t("common.copied")}
+            copyLabel={t("common.copyToClipboard")}
+            textToCopy={totpURI}
+          />
         </div>
       </div>
     );
@@ -71,9 +75,11 @@ export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
             {(field) => (
               <field.PasswordField
                 autoComplete="current-password"
+                hidePasswordLabel={t("common.hidePassword")}
                 id="qr-password"
                 label={t("common.password")}
                 placeholder={t("dashboard.twoFactor.passwordPlaceholder")}
+                showPasswordLabel={t("common.showPassword")}
               />
             )}
           </form.AppField>

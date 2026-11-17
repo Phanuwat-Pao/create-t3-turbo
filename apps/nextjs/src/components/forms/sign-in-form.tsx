@@ -94,10 +94,12 @@ export function SignInForm({
               showPasswordToggle ? (
                 <field.PasswordField
                   autoComplete="current-password"
+                  hidePasswordLabel={t("common.hidePassword")}
                   id="sign-in-password"
                   label={t("auth.signIn.passwordLabel")}
                   labelSuffix={forgotPasswordLink}
                   placeholder={t("auth.signIn.passwordPlaceholder")}
+                  showPasswordLabel={t("common.showPassword")}
                 />
               ) : (
                 <field.TextField

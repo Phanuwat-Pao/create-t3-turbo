@@ -39,6 +39,7 @@ import {
 import { format } from "date-fns";
 import { CalendarIcon, Loader2, X } from "lucide-react";
 import * as React from "react";
+import type { DayPickerLocale } from "react-day-picker";
 
 const { fieldContext, formContext, useFieldContext, useFormContext } =
   createFormHookContexts();
@@ -277,6 +278,11 @@ function SelectField({
 
 interface DateFieldProps extends BaseFieldProps {
   disabled?: boolean;
+  /**
+   * Language of the calendar and of the picked date on the button. A locale
+   * from `react-day-picker/locale` also translates the calendar's labels.
+   */
+  locale?: DayPickerLocale;
   placeholder?: string;
 }
 
@@ -285,6 +291,7 @@ function DateField({
   disabled,
   id,
   label,
+  locale,
   placeholder = "Pick a date",
 }: DateFieldProps) {
   const field = useFieldContext<Date | undefined>();
@@ -319,12 +326,17 @@ function DateField({
             variant="outline"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {value ? format(value, "PPP") : <span>{placeholder}</span>}
+            {value ? (
+              format(value, "PPP", { locale })
+            ) : (
+              <span>{placeholder}</span>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
           <Calendar
             autoFocus
+            locale={locale}
             mode="single"
             onSelect={handleSelect}
             selected={value}

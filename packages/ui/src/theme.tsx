@@ -168,7 +168,26 @@ export function useTheme() {
   return context;
 }
 
-export function ThemeToggle() {
+interface ThemeToggleLabels {
+  dark: string;
+  light: string;
+  system: string;
+  toggle: string;
+}
+
+const DEFAULT_THEME_TOGGLE_LABELS: ThemeToggleLabels = {
+  dark: "Dark",
+  light: "Light",
+  system: "System",
+  toggle: "Toggle theme",
+};
+
+export function ThemeToggle({
+  labels = DEFAULT_THEME_TOGGLE_LABELS,
+}: {
+  /** Menu item texts and the trigger's screen-reader text. */
+  labels?: ThemeToggleLabels;
+}) {
   const { setTheme } = useTheme();
 
   const setLight = React.useCallback(() => setTheme("light"), [setTheme]);
@@ -186,13 +205,13 @@ export function ThemeToggle() {
           <SunIcon className="light:scale-100! auto:scale-0!" />
           <MoonIcon className="auto:scale-0! dark:scale-100!" />
           <DesktopIcon className="auto:scale-100!" />
-          <span className="sr-only">Toggle theme</span>
+          <span className="sr-only">{labels.toggle}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={setLight}>Light</DropdownMenuItem>
-        <DropdownMenuItem onClick={setDark}>Dark</DropdownMenuItem>
-        <DropdownMenuItem onClick={setAuto}>System</DropdownMenuItem>
+        <DropdownMenuItem onClick={setLight}>{labels.light}</DropdownMenuItem>
+        <DropdownMenuItem onClick={setDark}>{labels.dark}</DropdownMenuItem>
+        <DropdownMenuItem onClick={setAuto}>{labels.system}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -9,9 +9,15 @@ import * as React from "react";
 const PasswordInput = ({
   ref,
   className,
+  hidePasswordLabel = "Hide password",
+  showPasswordLabel = "Show password",
   ...props
 }: React.ComponentPropsWithoutRef<"input"> & {
+  /** Screen-reader text of the toggle while the password is visible. */
+  hidePasswordLabel?: string;
   ref?: React.RefObject<HTMLInputElement>;
+  /** Screen-reader text of the toggle while the password is hidden. */
+  showPasswordLabel?: string;
 }) => {
   const [showPassword, setShowPassword] = React.useState(false);
   const disabled =
@@ -45,7 +51,7 @@ const PasswordInput = ({
           <EyeClosedIcon className="h-4 w-4" aria-hidden="true" />
         )}
         <span className="sr-only">
-          {showPassword ? "Hide password" : "Show password"}
+          {showPassword ? hidePasswordLabel : showPasswordLabel}
         </span>
       </Button>
 

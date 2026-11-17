@@ -30,6 +30,7 @@ import { Toaster, toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
+import { dateLocales } from "~/i18n/date-locale";
 import { withLocale } from "~/i18n/localized-path";
 import { useLocale } from "~/i18n/use-locale";
 
@@ -393,7 +394,7 @@ function AdminDashboard() {
                 <Plus className="mr-2 h-4 w-4" /> {t("admin.createUser")}
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent closeLabel={t("common.close")}>
               <DialogHeader>
                 <DialogTitle>{t("admin.createUserTitle")}</DialogTitle>
               </DialogHeader>
@@ -453,7 +454,7 @@ function AdminDashboard() {
             </DialogContent>
           </Dialog>
           <Dialog open={isBanDialogOpen} onOpenChange={setIsBanDialogOpen}>
-            <DialogContent>
+            <DialogContent closeLabel={t("common.close")}>
               <DialogHeader>
                 <DialogTitle>{t("admin.banUser")}</DialogTitle>
               </DialogHeader>
@@ -472,6 +473,7 @@ function AdminDashboard() {
                       {(field) => (
                         <field.DateField
                           id="expirationDate"
+                          locale={dateLocales[locale]}
                           label={t("admin.expirationDateLabel")}
                           placeholder={t("admin.expirationDatePlaceholder")}
                         />
