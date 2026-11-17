@@ -1,6 +1,6 @@
 import { appRouter, createContext } from "@acme/api";
 import { onError } from "@orpc/server";
-import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
+import { RPCHandler } from "@orpc/server/fetch";
 import { CORSPlugin } from "@orpc/server/plugins";
 
 import { auth } from "~/auth/server";
@@ -14,12 +14,14 @@ function logError(error: unknown) {
 const handler = new RPCHandler(appRouter, {
   interceptors: [onError(logError)],
   plugins: [
+    // No CompressionPlugin: Next 16.4.6 drops a route handler's
+    // Content-Encoding (GHSA-pc58-hwjq-p385) and gzips the body itself,
+    // so the plugin's gzip went out twice under one header.
     new CORSPlugin({
       credentials: true,
       exposeHeaders: ["Content-Disposition"],
       origin: origins,
     }),
-    new CompressionPlugin(),
   ],
 });
 
