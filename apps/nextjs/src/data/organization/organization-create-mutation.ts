@@ -32,8 +32,8 @@ export const useOrganizationCreateMutation = () => {
     onError: (error) => {
       toast.error(error.message || "Failed to create organization");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: organizationKeys.all(),
       });
       toast.success("Organization created successfully");

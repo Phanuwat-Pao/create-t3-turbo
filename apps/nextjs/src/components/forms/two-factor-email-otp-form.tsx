@@ -6,6 +6,7 @@ import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { CheckCircle2, Loader2, Mail } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
@@ -63,11 +64,17 @@ export function TwoFactorEmailOtpForm({
 
   const handleSendOtp = useCallback(() => {
     startSending(async () => {
-      await authClient.twoFactor.sendOtp();
+      const { error } = await authClient.twoFactor.sendOtp();
+      if (error) {
+        const errorMessage = error.message || t("common.error");
+        toast.error(errorMessage);
+        onError?.(errorMessage);
+        return;
+      }
       setIsOtpSent(true);
       setMessage(t("auth.twoFactor.otpSentTo", { email: displayEmail }));
     });
-  }, [t, displayEmail]);
+  }, [t, displayEmail, onError]);
 
   if (isVerified) {
     return (

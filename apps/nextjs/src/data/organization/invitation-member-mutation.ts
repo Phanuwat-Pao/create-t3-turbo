@@ -31,8 +31,8 @@ export const useInviteMemberMutation = () => {
     onError: (error) => {
       toast.error(error.message || "Failed to invite member");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: organizationKeys.detail(),
       });
       toast.success("Member invited successfully");

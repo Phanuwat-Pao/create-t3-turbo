@@ -3,6 +3,7 @@
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
@@ -31,13 +32,23 @@ export function ForgetPasswordForm({
       email: "",
     },
     onSubmit: async ({ value }) => {
+      let message: string | null = null;
       try {
-        await authClient.requestPasswordReset({
+        // Unknown emails succeed too; an error here is a rate limit, a bad
+        // request or a server failure, so the email was not sent.
+        const { error } = await authClient.requestPasswordReset({
           email: value.email,
           redirectTo: withLocale(redirectTo, locale),
         });
+        if (error) {
+          message = error.message || t("common.error");
+        }
       } catch {
-        onError?.(t("common.error"));
+        message = t("common.error");
+      }
+      if (message) {
+        toast.error(message);
+        onError?.(message);
         return;
       }
       onSuccess?.();

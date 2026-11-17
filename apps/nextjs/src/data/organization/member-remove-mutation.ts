@@ -28,8 +28,8 @@ export const useMemberRemoveMutation = () => {
     onError: (error) => {
       toast.error(error.message || "Failed to remove member");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: organizationKeys.detail(),
       });
       toast.success("Member removed successfully");

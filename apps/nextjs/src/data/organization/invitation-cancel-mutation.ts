@@ -28,8 +28,8 @@ export const useInvitationCancelMutation = () => {
     onError: (error) => {
       toast.error(error.message || "Failed to revoke the invitation");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: organizationKeys.detail(),
       });
       toast.success("Invitation revoked successfully");

@@ -27,8 +27,8 @@ export const useRevokeSessionMutation = () => {
     onError: (error) => {
       toast.error(error.message || "Failed to terminate session");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: userKeys.session(),
       });
       toast.success("Session terminated successfully");

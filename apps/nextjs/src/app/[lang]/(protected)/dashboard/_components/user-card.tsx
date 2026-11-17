@@ -416,10 +416,14 @@ const UserCard = (props: {
 
   const handleStopImpersonation = useCallback(async () => {
     setIsSignOut(true);
-    await authClient.admin.stopImpersonating();
+    const { error } = await authClient.admin.stopImpersonating();
     setIsSignOut(false);
+    if (error) {
+      toast.error(error.message || t("common.error"));
+      return;
+    }
     router.push(withLocale("/admin", locale));
-  }, [locale, router]);
+  }, [locale, router, t]);
 
   const handleSignOut = useCallback(() => {
     signOutMutation.mutate(undefined, {

@@ -15,6 +15,7 @@ import { ChevronDown, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
 import { getQueryClient } from "~/data/query-client";
@@ -75,9 +76,13 @@ export default function AccountSwitcher({
   const handleSwitchAccount = useCallback(
     async (sessionToken: string) => {
       try {
-        await authClient.multiSession.setActive({
+        const { error } = await authClient.multiSession.setActive({
           sessionToken,
         });
+        if (error) {
+          toast.error(error.message || t("common.error"));
+          return;
+        }
         await queryClient.invalidateQueries({
           queryKey: userKeys.all(),
         });
@@ -85,9 +90,10 @@ export default function AccountSwitcher({
         router.refresh();
       } catch (error) {
         console.error("Failed to switch account:", error);
+        toast.error(t("common.error"));
       }
     },
-    [queryClient, router]
+    [queryClient, router, t]
   );
 
   const handleAddAccount = useCallback(() => {

@@ -223,7 +223,7 @@ function AdminDashboard() {
       toast.success("User created successfully");
       formApi.reset();
       setIsDialogOpen(false);
-      invalidateUsers();
+      await invalidateUsers();
     },
     validationLogic: revalidateLogic(),
     validators: {
@@ -253,7 +253,7 @@ function AdminDashboard() {
           toast.success("User banned successfully");
           setIsBanDialogOpen(false);
           formApi.reset();
-          invalidateUsers();
+          await invalidateUsers();
         }
       } catch (error: unknown) {
         toast.error(
@@ -272,9 +272,13 @@ function AdminDashboard() {
     async (id: string) => {
       setIsLoading(`delete-${id}`);
       try {
-        await authClient.admin.removeUser({ userId: id });
-        toast.success("User deleted successfully");
-        invalidateUsers();
+        const { error } = await authClient.admin.removeUser({ userId: id });
+        if (error) {
+          toast.error(error.message || "Failed to delete user");
+        } else {
+          toast.success("User deleted successfully");
+          await invalidateUsers();
+        }
       } catch (error: unknown) {
         const message =
           error instanceof Error ? error.message : "Failed to delete user";
@@ -288,8 +292,14 @@ function AdminDashboard() {
   const handleRevokeSessions = useCallback(async (id: string) => {
     setIsLoading(`revoke-${id}`);
     try {
-      await authClient.admin.revokeUserSessions({ userId: id });
-      toast.success("Sessions revoked for user");
+      const { error } = await authClient.admin.revokeUserSessions({
+        userId: id,
+      });
+      if (error) {
+        toast.error(error.message || "Failed to revoke sessions");
+      } else {
+        toast.success("Sessions revoked for user");
+      }
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Failed to revoke sessions";
@@ -302,9 +312,15 @@ function AdminDashboard() {
     async (id: string) => {
       setIsLoading(`impersonate-${id}`);
       try {
-        await authClient.admin.impersonateUser({ userId: id });
-        toast.success("Impersonated user");
-        router.push(withLocale("/dashboard", locale));
+        const { error } = await authClient.admin.impersonateUser({
+          userId: id,
+        });
+        if (error) {
+          toast.error(error.message || "Failed to impersonate user");
+        } else {
+          toast.success("Impersonated user");
+          router.push(withLocale("/dashboard", locale));
+        }
       } catch (error: unknown) {
         const message =
           error instanceof Error ? error.message : "Failed to impersonate user";
@@ -324,22 +340,22 @@ function AdminDashboard() {
         return;
       }
       setIsLoading(`ban-${user.id}`);
-      await authClient.admin.unbanUser(
-        {
+      try {
+        const { error } = await authClient.admin.unbanUser({
           userId: user.id,
-        },
-        {
-          onError(context: { error: { message?: string } }) {
-            toast.error(context.error.message || "Failed to unban user");
-            setIsLoading(undefined);
-          },
-          onSuccess() {
-            invalidateUsers();
-            toast.success("User unbanned successfully");
-          },
+        });
+        if (error) {
+          toast.error(error.message || "Failed to unban user");
+        } else {
+          await invalidateUsers();
+          toast.success("User unbanned successfully");
         }
-      );
-      invalidateUsers();
+      } catch (error: unknown) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to unban user"
+        );
+      }
+      setIsLoading(undefined);
     },
     [banUserForm, invalidateUsers]
   );
