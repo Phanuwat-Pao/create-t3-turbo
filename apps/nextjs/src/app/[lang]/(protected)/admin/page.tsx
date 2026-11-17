@@ -534,17 +534,30 @@ export default function Page() {
     authClient.useSession();
   const router = useRouter();
   const locale = useLocale();
+  const userId = session?.user.id;
 
-  // Cast user to include role from admin plugin
-  const userRole = (session?.user as { role?: string } | undefined)?.role;
+  // Ask the server rather than reading user.role: ADMIN_USER_IDS grants
+  // admin without the role, and the admin plugin's permission check covers
+  // both.
+  const { data: isAdmin, isPending: isPermissionLoading } = useQuery({
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await authClient.admin.hasPermission({
+        permissions: { user: ["list"] },
+      });
+      return data?.success === true;
+    },
+    queryKey: ["admin", "can-manage-users", userId],
+  });
+  const isLoading = isSessionLoading || (!!userId && isPermissionLoading);
 
   useEffect(() => {
-    if (!isSessionLoading && userRole !== "admin") {
+    if (!isLoading && !isAdmin) {
       router.push(withLocale("/dashboard", locale));
     }
-  }, [userRole, isSessionLoading, locale, router]);
+  }, [isAdmin, isLoading, locale, router]);
 
-  if (isSessionLoading) {
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -552,7 +565,7 @@ export default function Page() {
     );
   }
 
-  if (userRole !== "admin") {
+  if (!isAdmin) {
     return null;
   }
 
