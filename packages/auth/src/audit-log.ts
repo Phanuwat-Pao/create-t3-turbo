@@ -34,14 +34,15 @@ export type AuditLogAction = (typeof AUDIT_LOG_ACTIONS)[number];
 const ACTION_BY_PATH: Record<string, AuditLogAction> = {
   "/change-password": "password_changed",
   "/delete-user": "user_deleted",
-  "/forget-password": "password_reset_requested",
   "/organization/accept-invitation": "invite_accepted",
   "/organization/cancel-invitation": "invite_cancelled",
   "/organization/create": "organization_created",
   "/organization/invite-member": "member_invited",
   "/organization/reject-invitation": "invite_rejected",
   "/organization/remove-member": "member_removed",
+  "/one-tap/callback": "user_signed_in",
   "/organization/update": "organization_updated",
+  "/request-password-reset": "password_reset_requested",
   "/reset-password": "password_reset_completed",
   "/sign-in/email": "user_signed_in",
   "/sign-in/username": "user_signed_in",
@@ -49,8 +50,22 @@ const ACTION_BY_PATH: Record<string, AuditLogAction> = {
   "/sign-up/email": "user_signed_up",
   "/two-factor/disable": "two_factor_disabled",
   "/two-factor/enable": "two_factor_enabled",
+  "/two-factor/verify-backup-code": "user_signed_in",
+  "/two-factor/verify-otp": "user_signed_in",
+  "/two-factor/verify-totp": "user_signed_in",
   "/update-user": "user_profile_updated",
 };
+
+/**
+ * The second step of a two-factor sign-in. The same endpoints confirm 2FA
+ * enrolment, which also issues a new session, but enrolment runs while
+ * signed in; a sign-in has no session until the code checks out.
+ */
+const TWO_FACTOR_VERIFY_PATHS = new Set([
+  "/two-factor/verify-backup-code",
+  "/two-factor/verify-otp",
+  "/two-factor/verify-totp",
+]);
 
 function resolveAction(path: string | undefined): AuditLogAction | null {
   if (!path) {
@@ -97,6 +112,13 @@ export const auditLog = () =>
             // sign-in that still needs a second factor has no session yet, so
             // only a new session proves a sign-in happened.
             if (action === "user_signed_in" && !newSession) {
+              return;
+            }
+            if (
+              ctx.path &&
+              TWO_FACTOR_VERIFY_PATHS.has(ctx.path) &&
+              ctx.context.session
+            ) {
               return;
             }
 
