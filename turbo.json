@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "cacheMaxSize": "10GB",
   "ui": "stream",
   "tasks": {
     "topo": {
