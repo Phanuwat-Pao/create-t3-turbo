@@ -31,6 +31,7 @@ import {
 } from "better-auth/plugins";
 
 import { auditLog } from "./audit-log";
+import { deviceClients } from "./device-clients";
 import { translations } from "./translations";
 
 const SUPPORTED_LOCALES = new Set(["th", "en"]);
@@ -194,10 +195,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       deviceAuthorization({
         expiresIn: "3min",
         interval: "5s",
-        // better-auth 1.6.20 types this plugin's `schema` option as a
-        // non-optional z.custom, which rejects `undefined` under zod 4.4.x.
-        // An empty object is a no-op in mergeSchema, satisfying the parser.
-        schema: {},
+        validateClient: (clientId) => deviceClients.has(clientId),
       }),
       lastLoginMethod(),
       jwt({

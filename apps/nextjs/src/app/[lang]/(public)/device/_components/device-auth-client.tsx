@@ -37,17 +37,19 @@ export function DeviceAuthClient() {
           .replaceAll("-", "")
           .toUpperCase();
         // Get the device authorization status
-        const response = await authClient.device({
+        const { data, error } = await authClient.device({
           query: {
             user_code: finalCode,
           },
         });
 
-        if (response.data) {
-          router.push(
-            withLocale(`/device/approve?user_code=${finalCode}`, locale)
-          );
+        if (error || !data) {
+          setErrorMessage(t("device.invalidCode"));
+          return;
         }
+        router.push(
+          withLocale(`/device/approve?user_code=${finalCode}`, locale)
+        );
       } catch (error: unknown) {
         setErrorMessage(
           error instanceof Error ? error.message : t("device.invalidCode")

@@ -1,5 +1,6 @@
 "use client";
 
+import { deviceClients } from "@acme/auth/device-clients";
 import { Alert, AlertDescription } from "@acme/ui/alert";
 import { Button } from "@acme/ui/button";
 import { Card } from "@acme/ui/card";
@@ -9,9 +10,18 @@ import { useCallback, useState, useTransition } from "react";
 import { useTranslation } from "react-i18next";
 
 import { authClient } from "~/auth/client";
+import { useDeviceRequestQuery } from "~/data/device/device-request-query";
 import { useSessionQuery } from "~/data/user/session-query";
 import { withLocale } from "~/i18n/localized-path";
 import { useLocale } from "~/i18n/use-locale";
+
+// Errors that mean the code itself is no longer usable, as opposed to a
+// failure worth retrying.
+const SPENT_CODE_ERRORS = new Set([
+  "device_code_already_processed",
+  "expired_token",
+  "invalid_request",
+]);
 
 export function DeviceApproveClient() {
   const { t } = useTranslation();
@@ -20,9 +30,24 @@ export function DeviceApproveClient() {
   const searchParams = useSearchParams();
   const userCode = searchParams.get("user_code");
   const { data: session } = useSessionQuery();
+  const deviceRequest = useDeviceRequestQuery(userCode ?? "", !!session);
   const [isApprovePending, startApproveTransition] = useTransition();
   const [isDenyPending, startDenyTransition] = useTransition();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const request =
+    deviceRequest.data?.kind === "pending" ? deviceRequest.data : null;
+  const rejected = deviceRequest.data?.kind === "rejected";
+  let lookupError: string | null = null;
+  if (deviceRequest.isError) {
+    lookupError = t("device.lookupUnavailable");
+  } else if (rejected) {
+    lookupError = t("device.lookupRejected");
+  }
+  const placeholder =
+    deviceRequest.isError || rejected
+      ? t("device.unavailable")
+      : t("device.loading");
 
   const handleApprove = useCallback(() => {
     if (!userCode) {
@@ -33,13 +58,18 @@ export function DeviceApproveClient() {
 
     startApproveTransition(async () => {
       try {
-        await authClient.device.approve({
-          userCode,
-        });
+        const { error } = await authClient.device.approve({ userCode });
+        if (error) {
+          setErrorMessage(
+            SPENT_CODE_ERRORS.has(error.error)
+              ? t("device.lookupRejected")
+              : t("device.failedToApprove")
+          );
+          return;
+        }
         router.push(withLocale("/device/success", locale));
-      } catch (error: unknown) {
-        const errorObj = error as { error?: { message?: string } };
-        setErrorMessage(errorObj.error?.message ?? t("device.failedToApprove"));
+      } catch {
+        setErrorMessage(t("device.failedToApprove"));
       }
     });
   }, [t, locale, router, userCode]);
@@ -53,13 +83,18 @@ export function DeviceApproveClient() {
 
     startDenyTransition(async () => {
       try {
-        await authClient.device.deny({
-          userCode,
-        });
+        const { error } = await authClient.device.deny({ userCode });
+        if (error) {
+          setErrorMessage(
+            SPENT_CODE_ERRORS.has(error.error)
+              ? t("device.lookupRejected")
+              : t("device.failedToDeny")
+          );
+          return;
+        }
         router.push(withLocale("/device/denied", locale));
-      } catch (error: unknown) {
-        const errorObj = error as { error?: { message?: string } };
-        setErrorMessage(errorObj.error?.message ?? t("device.failedToDeny"));
+      } catch {
+        setErrorMessage(t("device.failedToDeny"));
       }
     });
   }, [t, locale, router, userCode]);
@@ -86,14 +121,59 @@ export function DeviceApproveClient() {
             </div>
 
             <div className="bg-muted rounded-lg p-4">
+              <p className="text-sm font-medium">
+                {t("device.requestingClient")}
+              </p>
+              {request ? (
+                <>
+                  <p>
+                    {deviceClients.get(request.clientId) ??
+                      t("device.unrecognizedClient")}
+                  </p>
+                  <p className="text-muted-foreground font-mono text-xs">
+                    {t("device.clientIdSent", { clientId: request.clientId })}
+                  </p>
+                </>
+              ) : (
+                <p>{placeholder}</p>
+              )}
+            </div>
+
+            <div className="bg-muted rounded-lg p-4">
+              <p className="text-sm font-medium">
+                {t("device.requestedScopes")}
+              </p>
+              <p>
+                {request ? request.scope || t("device.noScopes") : placeholder}
+              </p>
+            </div>
+
+            <p className="text-muted-foreground text-sm">
+              {t("device.approveWarning")}
+            </p>
+
+            <div className="bg-muted rounded-lg p-4">
               <p className="text-sm font-medium">{t("device.signedInAs")}</p>
               <p>{session.user.email}</p>
             </div>
 
-            {errorMessage && (
+            {(errorMessage ?? lookupError) && (
               <Alert variant="destructive">
-                <AlertDescription>{errorMessage}</AlertDescription>
+                <AlertDescription>
+                  {errorMessage ?? lookupError}
+                </AlertDescription>
               </Alert>
+            )}
+
+            {deviceRequest.isError && (
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={deviceRequest.isFetching}
+                onClick={() => deviceRequest.refetch()}
+              >
+                {t("device.tryAgain")}
+              </Button>
             )}
 
             <div className="flex gap-3">
@@ -115,7 +195,7 @@ export function DeviceApproveClient() {
               <Button
                 onClick={handleApprove}
                 className="flex-1"
-                disabled={isApprovePending}
+                disabled={isApprovePending || !request}
               >
                 {isApprovePending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
