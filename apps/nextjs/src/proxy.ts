@@ -11,7 +11,12 @@ import { i18n, i18nConfig } from "./i18n/i18n-config";
  */
 const i18nProxy = createProxy(i18nConfig);
 
-const publicRoutes = [""];
+/**
+ * Pages under app/[lang]/(protected). A route group leaves nothing in the
+ * URL, so they are listed here. The check below only looks for the session
+ * cookie; each page still validates the session itself.
+ */
+const protectedRoutes = ["/admin", "/dashboard"];
 
 export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -24,9 +29,11 @@ export default function proxy(request: NextRequest) {
     return response;
   }
 
+  const path = pathname.slice(3);
   if (
-    pathname.slice(3) === "" ||
-    publicRoutes.some((route) => pathname.slice(3).startsWith(route))
+    !protectedRoutes.some(
+      (route) => path === route || path.startsWith(`${route}/`)
+    )
   ) {
     return response;
   }
