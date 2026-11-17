@@ -14,31 +14,31 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  "@better-auth/expo": ^1.7.12
-  "@better-auth/oauth-provider": ^1.7.12
-  "@better-auth/passkey": ^1.7.12
-  "@better-auth/sso": ^1.7.12
-  "@orpc/client": ^1.15.4
-  "@orpc/server": ^1.15.4
-  "@orpc/tanstack-query": ^1.15.4
-  "@tailwindcss/postcss": ^4.3.3
+  "@better-auth/expo": ^1.7.25
+  "@better-auth/oauth-provider": ^1.7.25
+  "@better-auth/passkey": ^1.7.25
+  "@better-auth/sso": ^1.7.25
+  "@orpc/client": ^1.16.2
+  "@orpc/server": ^1.16.2
+  "@orpc/tanstack-query": ^1.16.2
+  "@tailwindcss/postcss": ^4.3.5
   "@tanstack/react-form": ^1.33.5
-  "@tanstack/react-query": ^5.104.1
-  "@types/node": ^26.6.4
-  better-auth: ^1.7.12
-  i18next: ^26.4.4
-  react-i18next: ^17.0.16
-  tailwindcss: ^4.3.3
+  "@tanstack/react-query": ^5.107.1
+  "@types/node": ^26.6.6
+  better-auth: ^1.7.25
+  i18next: ^27.1.3
+  react-i18next: ^18.0.2
+  tailwindcss: ^4.3.5
   typescript: npm:@tsc-rs/typescript@0.8.0
-  vitest: ^5.0.5
+  vitest: ^5.1.0
   zod: ^4.6.7
 
 catalogs:
   react19:
     "@types/react": ^19.3.0
     "@types/react-dom": ^19.3.0
-    react: ^19.3.0
-    react-dom: ^19.3.0
+    react: ^19.3.1
+    react-dom: ^19.3.1
 
 linkWorkspacePackages: true
 
@@ -50,7 +50,7 @@ peerDependencyRules:
 
 minimumReleaseAgeExclude:
   - "@tsc-rs/*"
-  - "@aws-sdk/client-s3@3.1049.0 || 3.1109.0 || 3.1125.0"
+  - "@aws-sdk/client-s3@3.1049.0 || 3.1109.0 || 3.1125.0 || 3.1170.0"
   - "@aws-sdk/core@3.974.12"
   - "@aws-sdk/credential-provider-env@3.972.38"
   - "@aws-sdk/credential-provider-http@3.972.40"
@@ -64,7 +64,7 @@ minimumReleaseAgeExclude:
   - "@aws-sdk/middleware-flexible-checksums@3.974.20"
   - "@aws-sdk/middleware-sdk-s3@3.972.41"
   - "@aws-sdk/nested-clients@3.997.10"
-  - "@aws-sdk/s3-request-presigner@3.1049.0 || 3.1109.0 || 3.1125.0"
+  - "@aws-sdk/s3-request-presigner@3.1049.0 || 3.1109.0 || 3.1125.0 || 3.1170.0"
   - "@aws-sdk/token-providers@3.1049.0"
   - "@tanstack/query-core@5.100.11"
   - "@tanstack/query-devtools@5.100.11"
@@ -83,7 +83,7 @@ minimumReleaseAgeExclude:
   - pg@8.21.0
   - react-native-safe-area-context@5.8.0
   - react-native-screens@4.25.1
-  - react-email@6.1.5
+  - react-email@6.1.5 || 6.11.14
   - ultracite@7.10.3 || 7.12.3
   - "@nanostores/react@2.0.1"
   - lucide-react-native@1.40.0
@@ -122,6 +122,72 @@ minimumReleaseAgeExclude:
   - expo-server@58.0.6
   - expo-sqlite@58.0.14
   - expo@58.0.19
+  - "@oxfmt/binding-android-arm-eabi@0.79.0"
+  - "@oxfmt/binding-android-arm64@0.79.0"
+  - "@oxfmt/binding-darwin-arm64@0.79.0"
+  - "@oxfmt/binding-darwin-x64@0.79.0"
+  - "@oxfmt/binding-freebsd-x64@0.79.0"
+  - "@oxfmt/binding-linux-arm-gnueabihf@0.79.0"
+  - "@oxfmt/binding-linux-arm-musleabihf@0.79.0"
+  - "@oxfmt/binding-linux-arm64-gnu@0.79.0"
+  - "@oxfmt/binding-linux-arm64-musl@0.79.0"
+  - "@oxfmt/binding-linux-ppc64-gnu@0.79.0"
+  - "@oxfmt/binding-linux-riscv64-gnu@0.79.0"
+  - "@oxfmt/binding-linux-riscv64-musl@0.79.0"
+  - "@oxfmt/binding-linux-s390x-gnu@0.79.0"
+  - "@oxfmt/binding-linux-x64-gnu@0.79.0"
+  - "@oxfmt/binding-linux-x64-musl@0.79.0"
+  - "@oxfmt/binding-openharmony-arm64@0.79.0"
+  - "@oxfmt/binding-win32-arm64-msvc@0.79.0"
+  - "@oxfmt/binding-win32-ia32-msvc@0.79.0"
+  - "@oxfmt/binding-win32-x64-msvc@0.79.0"
+  - "@oxlint/binding-android-arm-eabi@1.94.0"
+  - "@oxlint/binding-android-arm64@1.94.0"
+  - "@oxlint/binding-darwin-arm64@1.94.0"
+  - "@oxlint/binding-darwin-x64@1.94.0"
+  - "@oxlint/binding-freebsd-x64@1.94.0"
+  - "@oxlint/binding-linux-arm-gnueabihf@1.94.0"
+  - "@oxlint/binding-linux-arm-musleabihf@1.94.0"
+  - "@oxlint/binding-linux-arm64-gnu@1.94.0"
+  - "@oxlint/binding-linux-arm64-musl@1.94.0"
+  - "@oxlint/binding-linux-ppc64-gnu@1.94.0"
+  - "@oxlint/binding-linux-riscv64-gnu@1.94.0"
+  - "@oxlint/binding-linux-riscv64-musl@1.94.0"
+  - "@oxlint/binding-linux-s390x-gnu@1.94.0"
+  - "@oxlint/binding-linux-x64-gnu@1.94.0"
+  - "@oxlint/binding-linux-x64-musl@1.94.0"
+  - "@oxlint/binding-openharmony-arm64@1.94.0"
+  - "@oxlint/binding-win32-arm64-msvc@1.94.0"
+  - "@oxlint/binding-win32-ia32-msvc@1.94.0"
+  - "@oxlint/binding-win32-x64-msvc@1.94.0"
+  - "@scalar/agent-chat@0.12.53"
+  - "@scalar/api-client@3.26.0"
+  - "@scalar/api-reference@1.79.0"
+  - "@scalar/asyncapi-to-markdown@0.2.9"
+  - "@scalar/blocks@0.7.2"
+  - "@scalar/client-side-rendering@0.4.20"
+  - "@scalar/code-highlight@0.4.14"
+  - "@scalar/components@0.35.0"
+  - "@scalar/icons@0.7.9"
+  - "@scalar/json-magic@0.20.0"
+  - "@scalar/nextjs-api-reference@0.12.19"
+  - "@scalar/oas-utils@0.20.22"
+  - "@scalar/openapi-to-markdown@1.7.7"
+  - "@scalar/openapi-upgrader@0.4.10"
+  - "@scalar/schemas@0.18.0"
+  - "@scalar/sidebar@0.12.10"
+  - "@scalar/snippetz@0.10.18"
+  - "@scalar/themes@0.20.1"
+  - "@scalar/types@0.29.0"
+  - "@scalar/use-hooks@0.4.26"
+  - "@scalar/use-toasts@0.10.7"
+  - "@scalar/validation@0.6.8"
+  - "@scalar/workspace-store@0.72.0"
+  - i18next@27.1.3
+  - next-i18next@16.4.10
+  - oxfmt@0.79.0
+  - oxlint@1.94.0
+  - react-i18next@18.0.2
 
 auditConfig:
   ignoreGhsas:
@@ -174,6 +240,11 @@ overrides:
   # so a single override keeps one native binary in the tree.
   lightningcss: ">=1.33.0"
   lodash: ">=4.18.0"
+  # GHSA-g3hv-75wg-m249 has no fix on 10.x. The only 10.x consumer is
+  # @expo/fingerprint (^10.2.6), which uses the Minimatch class, match(),
+  # pattern and negate; minimatch 11 keeps all four, and the app's
+  # fingerprint hash is the same on 11.
+  "minimatch@>=7.0.0 <11.0.1": ">=11.0.1 <12"
   # Patch within each consumer's major: nanoid 4+ is ESM-only.
   "nanoid@<3.3.17": ">=3.3.17 <4"
   "nanoid@>=4.0.0 <5.1.16": ">=5.1.16 <6"
@@ -186,12 +257,12 @@ overrides:
   # Auto-installed peers in the non-Expo workspaces (drizzle-orm -> expo-sqlite,
   # better-auth -> expo-router) would otherwise drift to the newest release and
   # put a second copy of each in the tree.
-  react-native: "~0.88.0"
+  react-native: "0.88.1"
   react-native-gesture-handler: "~3.3.0"
-  react-native-reanimated: "~4.7.1"
-  react-native-safe-area-context: "~5.10.1"
-  react-native-screens: "~4.30.0"
-  react-native-worklets: "~0.13.0"
+  react-native-reanimated: "4.7.1"
+  react-native-safe-area-context: "~5.11.1"
+  react-native-screens: "~4.30.1"
+  react-native-worklets: "0.13.0"
   shell-quote: ">=1.8.5"
   # next 16.4 still pins 0.35.4; 0.35.5 patches the librsvg advisory.
   sharp: ">=0.35.5"

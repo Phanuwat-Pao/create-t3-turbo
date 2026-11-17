@@ -18,10 +18,10 @@
   "dependencies": {
     "@acme/db": "workspace:*",
     "@better-auth/expo": "catalog:",
-    "@better-auth/i18n": "^1.7.12",
+    "@better-auth/i18n": "^1.7.25",
     "@better-auth/oauth-provider": "catalog:",
     "@better-auth/passkey": "catalog:",
-    "@better-auth/scim": "^1.7.12",
+    "@better-auth/scim": "^1.7.25",
     "@better-auth/sso": "catalog:",
     "@t3-oss/env-core": "^0.13.11",
     "better-auth": "catalog:",
