@@ -402,7 +402,16 @@
     "nameRequired": "ต้องกรอกชื่อ",
     "reasonRequired": "ต้องกรอกเหตุผล",
     "expirationDateRequired": "ต้องเลือกวันหมดอายุ",
-    "otpMinLength": "OTP ต้องมีอย่างน้อย 6 ตัวอักษร"
+    "otpMinLength": "OTP ต้องมีอย่างน้อย 6 ตัวอักษร",
+    "titleMaxLength": "หัวข้อต้องไม่เกิน 256 ตัวอักษร",
+    "contentMaxLength": "เนื้อหาต้องไม่เกิน 256 ตัวอักษร"
+  },
+  "upload": {
+    "aborted": "ยกเลิกการอัปโหลดแล้ว",
+    "signingFailed": "เริ่มการอัปโหลดไม่สำเร็จ กรุณาลองอีกครั้ง",
+    "uploadFailed": "อัปโหลดไฟล์ไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+    "completeFailed": "อัปโหลดไฟล์ไม่เสร็จสมบูรณ์ กรุณาลองอีกครั้ง",
+    "failed": "อัปโหลดไฟล์ไม่สำเร็จ"
   },
   "admin": {
     "title": "แผงควบคุมผู้ดูแล",
@@ -450,7 +459,26 @@
     "time": "เวลา",
     "action": "การกระทำ",
     "user": "ผู้ใช้",
-    "ipAddress": "ที่อยู่ IP"
+    "ipAddress": "ที่อยู่ IP",
+    "actions": {
+      "inviteAccepted": "ยอมรับคำเชิญ",
+      "inviteCancelled": "เพิกถอนคำเชิญ",
+      "inviteRejected": "ปฏิเสธคำเชิญ",
+      "memberInvited": "เชิญสมาชิก",
+      "memberRemoved": "ลบสมาชิก",
+      "organizationCreated": "สร้างองค์กร",
+      "organizationUpdated": "แก้ไของค์กร",
+      "passwordChanged": "เปลี่ยนรหัสผ่าน",
+      "passwordResetCompleted": "รีเซ็ตรหัสผ่าน",
+      "passwordResetRequested": "ขอรีเซ็ตรหัสผ่าน",
+      "twoFactorDisabled": "ปิดใช้งาน 2FA",
+      "twoFactorEnabled": "เปิดใช้งาน 2FA",
+      "userDeleted": "ลบบัญชี",
+      "userProfileUpdated": "แก้ไขโปรไฟล์",
+      "userSignedIn": "เข้าสู่ระบบ",
+      "userSignedOut": "ออกจากระบบ",
+      "userSignedUp": "สมัครสมาชิก"
+    }
   },
   "clientTest": {
     "title": "ทดสอบการยืนยันตัวตนฝั่งไคลเอนต์",

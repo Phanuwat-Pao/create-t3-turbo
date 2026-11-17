@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
+import { uploadErrorMessage } from "~/data/storage/upload-error-message";
 import { uploadFile } from "~/data/storage/upload-file";
 import { withLocale } from "~/i18n/localized-path";
 import { useLocale } from "~/i18n/use-locale";
@@ -60,8 +61,9 @@ export function SignUpForm({
               try {
                 const result = await uploadFile(value.image);
                 await authClient.updateUser({ image: result.key });
-              } catch {
-                // Sign-up succeeded but avatar upload failed. Non-blocking.
+              } catch (error) {
+                // Sign-up succeeded; say the avatar did not, but carry on.
+                toast.error(uploadErrorMessage(error, t));
               }
             }
             toast.success(t("auth.signUp.successMessage"));

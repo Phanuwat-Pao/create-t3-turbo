@@ -12,7 +12,8 @@ export const DEFAULT_UPLOAD_CONCURRENCY = 3;
 
 const noopCleanup = () => undefined;
 
-type StorageUploadErrorCode =
+/** Stable codes for upload failures; forms map them to translated messages. */
+export type StorageUploadErrorCode =
   | "ABORTED"
   | "COMPLETE_FAILED"
   | "SIGNING_FAILED"

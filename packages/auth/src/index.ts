@@ -428,6 +428,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
 }
 
 export { APIError } from "better-auth";
+export type { AuditLogAction } from "./audit-log";
 export { type AuthLocale, resolveRequestLocale } from "./locale";
 export type { Organization } from "better-auth/plugins";
 

@@ -1,7 +1,6 @@
 "use client";
 
 import type { RouterOutputs } from "@acme/api";
-import { CreatePostSchema } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { FieldGroup } from "@acme/ui/field";
@@ -17,6 +16,8 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
 import { orpc } from "~/rpc/react";
+
+import { createPostFormSchema } from "./create-post-schema";
 
 export function CreatePostForm() {
   const { t } = useTranslation();
@@ -52,7 +53,7 @@ export function CreatePostForm() {
     },
     validationLogic: revalidateLogic(),
     validators: {
-      onDynamic: CreatePostSchema,
+      onDynamic: createPostFormSchema(t),
     },
   });
 

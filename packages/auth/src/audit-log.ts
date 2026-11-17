@@ -6,9 +6,32 @@ import { createAuthMiddleware, isAPIError } from "better-auth/api";
 /**
  * Auth events recorded by the self-hosted audit log. Mirrors the event names
  * Better Auth Infrastructure uses so the vocabulary stays familiar, but rows
- * land in our own Postgres `audit_log` table instead of their cloud.
+ * land in our own Postgres `audit_log` table instead of their cloud. The web
+ * app's audit log card has a label for each.
  */
-const ACTION_BY_PATH: Record<string, string> = {
+export const AUDIT_LOG_ACTIONS = [
+  "invite_accepted",
+  "invite_cancelled",
+  "invite_rejected",
+  "member_invited",
+  "member_removed",
+  "organization_created",
+  "organization_updated",
+  "password_changed",
+  "password_reset_completed",
+  "password_reset_requested",
+  "two_factor_disabled",
+  "two_factor_enabled",
+  "user_deleted",
+  "user_profile_updated",
+  "user_signed_in",
+  "user_signed_out",
+  "user_signed_up",
+] as const;
+
+export type AuditLogAction = (typeof AUDIT_LOG_ACTIONS)[number];
+
+const ACTION_BY_PATH: Record<string, AuditLogAction> = {
   "/change-password": "password_changed",
   "/delete-user": "user_deleted",
   "/forget-password": "password_reset_requested",
@@ -29,7 +52,7 @@ const ACTION_BY_PATH: Record<string, string> = {
   "/update-user": "user_profile_updated",
 };
 
-function resolveAction(path: string | undefined): string | null {
+function resolveAction(path: string | undefined): AuditLogAction | null {
   if (!path) {
     return null;
   }

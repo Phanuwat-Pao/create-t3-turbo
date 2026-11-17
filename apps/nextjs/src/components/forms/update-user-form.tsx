@@ -3,8 +3,10 @@
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import * as z from "zod";
 
+import { uploadErrorMessage } from "~/data/storage/upload-error-message";
 import { uploadFile } from "~/data/storage/upload-file";
 import { useUpdateUserMutation } from "~/data/user/update-user-mutation";
 
@@ -39,17 +41,25 @@ export function UpdateUserForm({
       name: "",
     },
     onSubmit: async ({ formApi, value }) => {
-      try {
-        let imageKey: string | undefined;
-        if (value.image) {
+      let imageKey: string | undefined;
+      if (value.image) {
+        try {
           const result = await uploadFile(value.image);
           imageKey = result.key;
+        } catch (error) {
+          const message = uploadErrorMessage(error, t);
+          toast.error(message);
+          onError?.(message);
+          return;
         }
+      }
+      try {
         await updateUserMutation.mutateAsync({
           image: imageKey,
           name: value.name || undefined,
         });
       } catch (error) {
+        // The mutation's onError has already shown a toast.
         onError?.(
           error instanceof Error
             ? error.message

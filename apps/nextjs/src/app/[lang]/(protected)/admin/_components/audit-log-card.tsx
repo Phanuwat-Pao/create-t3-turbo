@@ -1,5 +1,6 @@
 "use client";
 
+import type { AuditLogAction } from "@acme/auth";
 import { Badge } from "@acme/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import {
@@ -15,6 +16,30 @@ import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
 import { orpc } from "~/rpc/react";
+
+const ACTION_LABEL_KEYS = {
+  invite_accepted: "auditLog.actions.inviteAccepted",
+  invite_cancelled: "auditLog.actions.inviteCancelled",
+  invite_rejected: "auditLog.actions.inviteRejected",
+  member_invited: "auditLog.actions.memberInvited",
+  member_removed: "auditLog.actions.memberRemoved",
+  organization_created: "auditLog.actions.organizationCreated",
+  organization_updated: "auditLog.actions.organizationUpdated",
+  password_changed: "auditLog.actions.passwordChanged",
+  password_reset_completed: "auditLog.actions.passwordResetCompleted",
+  password_reset_requested: "auditLog.actions.passwordResetRequested",
+  two_factor_disabled: "auditLog.actions.twoFactorDisabled",
+  two_factor_enabled: "auditLog.actions.twoFactorEnabled",
+  user_deleted: "auditLog.actions.userDeleted",
+  user_profile_updated: "auditLog.actions.userProfileUpdated",
+  user_signed_in: "auditLog.actions.userSignedIn",
+  user_signed_out: "auditLog.actions.userSignedOut",
+  user_signed_up: "auditLog.actions.userSignedUp",
+} as const satisfies Record<AuditLogAction, string>;
+
+function isKnownAction(action: string): action is AuditLogAction {
+  return Object.hasOwn(ACTION_LABEL_KEYS, action);
+}
 
 function AuditLogShell({ children }: { children: React.ReactNode }) {
   const { t } = useTranslation();
@@ -70,7 +95,11 @@ export function AuditLogCard() {
                 {format(log.createdAt, "yyyy-MM-dd HH:mm:ss")}
               </TableCell>
               <TableCell>
-                <Badge variant="outline">{log.action}</Badge>
+                <Badge variant="outline">
+                  {isKnownAction(log.action)
+                    ? t(ACTION_LABEL_KEYS[log.action])
+                    : log.action}
+                </Badge>
               </TableCell>
               <TableCell>
                 {log.user ? (log.user.name ?? log.user.email) : "—"}

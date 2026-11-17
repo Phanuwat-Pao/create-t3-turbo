@@ -402,7 +402,16 @@
     "nameRequired": "Name is required.",
     "reasonRequired": "Reason is required.",
     "expirationDateRequired": "Expiration date is required.",
-    "otpMinLength": "OTP must be at least 6 characters."
+    "otpMinLength": "OTP must be at least 6 characters.",
+    "titleMaxLength": "Title must be at most 256 characters.",
+    "contentMaxLength": "Content must be at most 256 characters."
+  },
+  "upload": {
+    "aborted": "The upload was cancelled.",
+    "signingFailed": "Could not start the upload. Please try again.",
+    "uploadFailed": "The file could not be uploaded. Check your connection and try again.",
+    "completeFailed": "The upload could not be finished. Please try again.",
+    "failed": "The file could not be uploaded."
   },
   "admin": {
     "title": "Admin Panel",
@@ -450,7 +459,26 @@
     "time": "Time",
     "action": "Action",
     "user": "User",
-    "ipAddress": "IP address"
+    "ipAddress": "IP address",
+    "actions": {
+      "inviteAccepted": "Invitation accepted",
+      "inviteCancelled": "Invitation revoked",
+      "inviteRejected": "Invitation declined",
+      "memberInvited": "Member invited",
+      "memberRemoved": "Member removed",
+      "organizationCreated": "Organization created",
+      "organizationUpdated": "Organization updated",
+      "passwordChanged": "Password changed",
+      "passwordResetCompleted": "Password reset",
+      "passwordResetRequested": "Password reset requested",
+      "twoFactorDisabled": "2FA disabled",
+      "twoFactorEnabled": "2FA enabled",
+      "userDeleted": "Account deleted",
+      "userProfileUpdated": "Profile updated",
+      "userSignedIn": "Signed in",
+      "userSignedOut": "Signed out",
+      "userSignedUp": "Signed up"
+    }
   },
   "clientTest": {
     "title": "Client Authentication Test",

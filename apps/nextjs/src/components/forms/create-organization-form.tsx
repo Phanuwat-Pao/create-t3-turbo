@@ -3,9 +3,11 @@
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm, useStore } from "@acme/ui/form";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { useOrganizationCreateMutation } from "~/data/organization/organization-create-mutation";
+import { uploadErrorMessage } from "~/data/storage/upload-error-message";
 import { uploadFile } from "~/data/storage/upload-file";
 
 interface CreateOrganizationFormProps {
@@ -47,18 +49,26 @@ export function CreateOrganizationForm({
       slug: "",
     },
     onSubmit: async ({ value }) => {
-      try {
-        let logoKey: string | undefined;
-        if (value.logo) {
+      let logoKey: string | undefined;
+      if (value.logo) {
+        try {
           const result = await uploadFile(value.logo);
           logoKey = result.key;
+        } catch (error) {
+          const message = uploadErrorMessage(error, t);
+          toast.error(message);
+          onError?.(message);
+          return;
         }
+      }
+      try {
         await createMutation.mutateAsync({
           logo: logoKey,
           name: value.name,
           slug: value.slug,
         });
       } catch (error) {
+        // The mutation's onError has already shown a toast.
         onError?.(
           error instanceof Error
             ? error.message
