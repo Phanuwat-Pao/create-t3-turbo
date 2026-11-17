@@ -37,33 +37,40 @@ export default function SignIn() {
     router.push(callbackURL);
   }, [router, callbackURL]);
 
-  const handleGoogleSignIn = useCallback(async () => {
-    await authClient.signIn.social({
-      callbackURL: withLocale("/dashboard", locale),
-      provider: "google",
-    });
-  }, [locale]);
+  // Social sign-in returns { error } (an unconfigured provider, say) rather
+  // than throwing, and redirects away on success.
+  const handleSocialSignIn = useCallback(
+    async (provider: "github" | "google" | "microsoft" | "vercel") => {
+      const { error } = await authClient.signIn.social({
+        callbackURL,
+        provider,
+      });
+      if (error) {
+        toast.error(error.message || t("common.error"));
+      }
+    },
+    [callbackURL, t]
+  );
 
-  const handleGitHubSignIn = useCallback(async () => {
-    await authClient.signIn.social({
-      callbackURL: withLocale("/dashboard", locale),
-      provider: "github",
-    });
-  }, [locale]);
+  const handleGoogleSignIn = useCallback(
+    () => handleSocialSignIn("google"),
+    [handleSocialSignIn]
+  );
 
-  const handleMicrosoftSignIn = useCallback(async () => {
-    await authClient.signIn.social({
-      callbackURL: withLocale("/dashboard", locale),
-      provider: "microsoft",
-    });
-  }, [locale]);
+  const handleGitHubSignIn = useCallback(
+    () => handleSocialSignIn("github"),
+    [handleSocialSignIn]
+  );
 
-  const handleVercelSignIn = useCallback(async () => {
-    await authClient.signIn.social({
-      callbackURL: withLocale("/dashboard", locale),
-      provider: "vercel",
-    });
-  }, [locale]);
+  const handleMicrosoftSignIn = useCallback(
+    () => handleSocialSignIn("microsoft"),
+    [handleSocialSignIn]
+  );
+
+  const handleVercelSignIn = useCallback(
+    () => handleSocialSignIn("vercel"),
+    [handleSocialSignIn]
+  );
 
   const handlePasskeySignIn = useCallback(async () => {
     await authClient.signIn.passkey({
@@ -91,7 +98,7 @@ export default function SignIn() {
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <SignInForm onSuccess={handleSuccess} callbackURL="/dashboard" />
+          <SignInForm onSuccess={handleSuccess} callbackURL={callbackURL} />
 
           {/* OAuth Buttons - 2 per row */}
           <div className="grid grid-cols-2 gap-2">
