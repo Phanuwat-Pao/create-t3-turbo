@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
+import { env } from "~/env";
 import { withLocale } from "~/i18n/localized-path";
 import { useLocale } from "~/i18n/use-locale";
 import { getCallbackURL } from "~/lib/shared";
@@ -21,6 +22,10 @@ export default function SignInPage() {
   const params = useSearchParams();
 
   useEffect(() => {
+    // Without a Google client ID the One Tap script only logs errors.
+    if (!env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+      return;
+    }
     authClient.oneTap({
       fetchOptions: {
         onError: ({ error }: { error: { message?: string } }) => {
