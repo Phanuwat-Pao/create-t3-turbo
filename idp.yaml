@@ -22,6 +22,10 @@ environments:
           env:
             - name: NODE_ENV
               value: development
+            # The public origin (the domain above). Without it auth falls back
+            # to http://localhost:3000; see README "Deploy anywhere else".
+            # - name: BETTER_AUTH_URL
+            #   value: https://project-dev.thaisee.com
         service:
           port: 3000
         ingress:
@@ -60,6 +64,8 @@ environments:
           env:
             - name: NODE_ENV
               value: production
+            # - name: BETTER_AUTH_URL
+            #   value: https://project.thaisee.com
         service:
           port: 3000
         ingress:

@@ -82,6 +82,9 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
 ) {
   const sendEmail = options.sendEmail ?? noopSendEmail;
   const appName = options.appName ?? "Better Auth App";
+  // The JWT issuer, the protected resource and the organization claim must
+  // agree with the metadata routes, so all of them use this one origin.
+  const baseOrigin = new URL(options.baseUrl).origin;
 
   const authOptions = {
     account: {
@@ -147,15 +150,12 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     plugins: [
       organization({
         async sendInvitationEmail(data) {
-          sendEmail({
+          await sendEmail({
             subject: "You've been invited to join an organization",
             template: "invitation",
             to: data.email,
             variables: {
-              inviteLink:
-                process.env.NODE_ENV === "development"
-                  ? `http://localhost:3000/accept-invitation/${data.id}`
-                  : `${options.productionUrl}/accept-invitation/${data.id}`,
+              inviteLink: `${baseOrigin}/accept-invitation/${data.id}`,
               inviterEmail: data.inviter.user.email,
               inviterName: data.inviter.user.name,
               organizationName: data.organization.name,
@@ -202,7 +202,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       lastLoginMethod(),
       jwt({
         jwt: {
-          issuer: options.productionUrl,
+          issuer: baseOrigin,
         },
       }),
       expo(),
@@ -241,11 +241,14 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       oauthProvider({
         allowDynamicClientRegistration: true,
         allowUnauthenticatedClientRegistration: true,
+        // Dynamically registered clients omit `resources`; link them to this
+        // app's own resource so they can request tokens for it.
+        clientRegistrationDefaultResources: [baseOrigin],
         consentPage: "/oauth/consent",
         customAccessTokenClaims({ referenceId, scopes }) {
           if (referenceId && scopes.includes("read:organization")) {
             return {
-              [`${options.baseUrl}/org`]: referenceId,
+              [`${baseOrigin}/org`]: referenceId,
             };
           }
           return {};
@@ -267,7 +270,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
             return undefined;
           },
           page: "/oauth/select-organization",
-          async shouldRedirect({ session, scopes, headers }) {
+          async shouldRedirect({ session, scopes, headers, isContinuation }) {
             const userOnlyScopes = new Set([
               "openid",
               "profile",
@@ -277,25 +280,31 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
             if (scopes.every((sc) => userOnlyScopes.has(sc))) {
               return false;
             }
-            // Redirect unless the user's only organization is already active
+            if (!session.activeOrganizationId) {
+              return true;
+            }
             try {
               // oxlint-disable-next-line no-use-before-define -- helper is a hoisted function declaration that must close over the later-defined auth instance
               const organizations = (await getAllUserOrganizations(
                 headers
               )) as Organization[];
-              return (
-                organizations.length > 1 ||
-                !(
-                  organizations.length === 1 &&
-                  organizations.at(0)?.id === session.activeOrganizationId
+              if (
+                !organizations.some(
+                  (org) => org.id === session.activeOrganizationId
                 )
-              );
+              ) {
+                return true;
+              }
+              // Ask on every new authorization. /oauth2/continue sets
+              // isContinuation, and the check above has already confirmed the
+              // chosen organization is one of the user's.
+              return !isContinuation && organizations.length > 1;
             } catch {
               return true;
             }
           },
         },
-        resources: [options.baseUrl],
+        resources: [baseOrigin],
         scopes: [
           "openid",
           "profile",

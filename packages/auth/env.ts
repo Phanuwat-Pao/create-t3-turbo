@@ -21,6 +21,10 @@ export function authEnv() {
         process.env.NODE_ENV === "production"
           ? z.string().min(1)
           : z.string().min(1).optional(),
+      // The public origin users reach this deployment at. Required wherever the
+      // Vercel system variables are absent (MiniIDP, docker compose); without
+      // it the app falls back to http://localhost:3000.
+      BETTER_AUTH_URL: z.url().optional(),
       NODE_ENV: z.enum(["development", "production"]).optional(),
     },
     skipValidation:

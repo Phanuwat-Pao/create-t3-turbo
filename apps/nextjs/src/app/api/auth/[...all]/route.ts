@@ -18,10 +18,8 @@ function addCorsHeaders(url: URL, headers: Headers) {
     );
     headers.set("Access-Control-Allow-Origin", "*");
     headers.set("Access-Control-Allow-Headers", "authorization, content-type");
-    headers.set(
-      "Cache-Control",
-      "public, max-age=15, stale-while-revalidate=15, stale-if-error=86400"
-    );
+    // Leave Cache-Control to Better Auth: token responses must be no-store
+    // (RFC 6749 section 5.1).
   }
 }
 

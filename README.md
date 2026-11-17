@@ -9,7 +9,7 @@ every surface.
 
 > [!NOTE]
 >
-> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json) before proceeding (Node 22.18+, 24.3+ or 26+, pnpm ≥ 12).
+> Make sure to follow the system requirements specified in [`package.json#engines`](./package.json) before proceeding (Node 22.18+, 24.3+ or 26+, pnpm ≥ 12.21).
 
 Use this repository as a template, or init via Turbo's CLI (use PNPM as the package manager):
 
@@ -53,7 +53,7 @@ packages
   │   ├─ oRPC v1 router (OpenAPI via @orpc/openapi + Scalar docs)
   │   └─ S3 service for authenticated presigned uploads/downloads
   ├─ auth
-  │   ├─ Better Auth 1.6 with organization, twoFactor, passkey, admin,
+  │   ├─ Better Auth 1.7 with organization, twoFactor, passkey, admin,
   │   │  multiSession, deviceAuthorization, username, sso (SAML), scim,
   │   │  oauthProvider (act as an OAuth/OIDC provider), jwt, bearer,
   │   │  oneTap, lastLoginMethod, oAuthProxy, expo
@@ -268,6 +268,10 @@ Let's deploy the Next.js application to [Vercel](https://vercel.com). If you've 
 2. Add your `POSTGRES_URL` and `AUTH_SECRET` environment variables (plus any optional S3/email variables you use).
 
 3. Done! Your app should successfully deploy. Assign your domain and use that instead of `localhost` for the `url` in the Expo app so that your Expo app can communicate with your backend when you are not in development.
+
+#### Deploy anywhere else
+
+Outside Vercel (MiniIDP through `idp.yaml`, or `docker/docker-compose.yml`), the app cannot see its own domain. Set `BETTER_AUTH_URL` to the public origin, for example `https://project-dev.thaisee.com`. Better Auth uses it as its base URL, and the OAuth provider uses it as the issuer and as the protected resource that `/.well-known/oauth-protected-resource` advertises. Without it, auth falls back to `http://localhost:3000`, and OAuth callbacks, passkeys and issued tokens all name the wrong host.
 
 ### Auth Proxy
 

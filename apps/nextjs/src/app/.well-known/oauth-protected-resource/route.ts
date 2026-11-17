@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 
+import { baseUrl } from "~/auth/server";
 import { serverClient } from "~/lib/server-client";
 
 export async function GET(): Promise<NextResponse> {
+  // Must match the `resources` entry in initAuth, which is also the `aud` of
+  // the access tokens this app issues for itself.
   const config = await serverClient.getProtectedResourceMetadata({
-    resource: process.env.BETTER_AUTH_URL || "https://demo.better-auth.com",
+    resource: baseUrl,
   });
   const headers = new Headers();
   if (process.env.NODE_ENV === "development") {
