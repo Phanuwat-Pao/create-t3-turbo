@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -19,13 +20,16 @@ export async function changePassword(params: ChangePasswordParams) {
 }
 export type ChangePasswordData = Awaited<ReturnType<typeof changePassword>>;
 
-export const useChangePasswordMutation = () =>
-  useMutation({
+export const useChangePasswordMutation = () => {
+  const { t } = useTranslation();
+
+  return useMutation({
     mutationFn: changePassword,
     onError: (error) => {
-      toast.error(error.message || "Failed to change your password");
+      toast.error(error.message || t("dashboard.changePassword.failed"));
     },
     onSuccess: () => {
-      toast.success("Password changed successfully");
+      toast.success(t("dashboard.changePassword.success"));
     },
   });
+};

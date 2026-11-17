@@ -93,7 +93,7 @@ export function UpdateUserForm({
               <field.FileField
                 accept="image/*"
                 className="text-muted-foreground"
-                clearLabel="Clear image"
+                clearLabel={t("dashboard.user.clearImage")}
                 disabled={isSubmitting}
                 id="image"
                 label={t("dashboard.user.profileImageLabel")}

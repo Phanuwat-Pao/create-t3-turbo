@@ -10,11 +10,14 @@ import { getT } from "~/i18n/server";
 import { GoBackBtn } from "./_components/go-back-button";
 import { SelectOrganizationBtn } from "./_components/org-buttons";
 
-export const metadata: Metadata = {
-  description: "Specify which organization to authorize to this application",
-  robots: { follow: false, index: false },
-  title: "Select Organization",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
+  return {
+    description: t("oauth.selectOrganization.metaDescription"),
+    robots: { follow: false, index: false },
+    title: t("oauth.selectOrganization.title"),
+  };
+}
 
 export default async function SelectOrganizationPage() {
   const { t } = await getT();

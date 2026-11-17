@@ -25,6 +25,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, RefreshCw, Trash, UserCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Toaster, toast } from "sonner";
 import * as z from "zod";
 
@@ -60,6 +61,12 @@ const UserRow = memo(
     onImpersonate,
     onBanToggle,
   }: UserRowProps) => {
+    const { t } = useTranslation();
+    const roleLabels: Record<string, string> = {
+      admin: t("admin.roleAdmin"),
+      user: t("admin.roleUser"),
+    };
+    const role = user.role || "user";
     const handleDelete = useCallback(
       () => onDelete(user.id),
       [onDelete, user.id]
@@ -81,12 +88,12 @@ const UserRow = memo(
       <TableRow>
         <TableCell>{user.email}</TableCell>
         <TableCell>{user.name}</TableCell>
-        <TableCell>{user.role || "user"}</TableCell>
+        <TableCell>{roleLabels[role] ?? role}</TableCell>
         <TableCell>
           {user.banned ? (
-            <Badge variant="destructive">Yes</Badge>
+            <Badge variant="destructive">{t("admin.yes")}</Badge>
           ) : (
-            <Badge variant="outline">No</Badge>
+            <Badge variant="outline">{t("admin.no")}</Badge>
           )}
         </TableCell>
         <TableCell>
@@ -126,7 +133,7 @@ const UserRow = memo(
               ) : (
                 <>
                   <UserCircle className="mr-2 h-4 w-4" />
-                  Impersonate
+                  {t("admin.impersonate")}
                 </>
               )}
             </Button>
@@ -139,8 +146,10 @@ const UserRow = memo(
               {isLoading === `ban-${user.id}` && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
-              {isLoading !== `ban-${user.id}` && user.banned && "Unban"}
-              {isLoading !== `ban-${user.id}` && !user.banned && "Ban"}
+              {isLoading !== `ban-${user.id}` &&
+                user.banned &&
+                t("admin.unban")}
+              {isLoading !== `ban-${user.id}` && !user.banned && t("admin.ban")}
             </Button>
           </div>
         </TableCell>
@@ -150,19 +159,8 @@ const UserRow = memo(
 );
 UserRow.displayName = "UserRow";
 
-const createUserSchema = z.object({
-  email: z.email("Please enter a valid email address."),
-  name: z.string().trim().min(1, "Name is required."),
-  password: z.string().min(8, "Password must be at least 8 characters."),
-  role: z.enum(["admin", "user"]),
-});
-
-const banUserSchema = z.object({
-  expirationDate: z.date({ error: "Expiration date is required." }),
-  reason: z.string().trim().min(1, "Reason is required."),
-});
-
 function AdminDashboard() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const router = useRouter();
   const locale = useLocale();
@@ -170,6 +168,18 @@ function AdminDashboard() {
   const [isLoading, setIsLoading] = useState<string | undefined>();
   const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
   const [banUserId, setBanUserId] = useState("");
+
+  const createUserSchema = z.object({
+    email: z.email(t("validation.emailRequired")),
+    name: z.string().trim().min(1, t("validation.nameRequired")),
+    password: z.string().min(8, t("validation.passwordMinLength")),
+    role: z.enum(["admin", "user"]),
+  });
+
+  const banUserSchema = z.object({
+    expirationDate: z.date({ error: t("validation.expirationDateRequired") }),
+    reason: z.string().trim().min(1, t("validation.reasonRequired")),
+  });
 
   const { data: users, isLoading: isUsersLoading } = useQuery({
     queryFn: async () => {
@@ -211,16 +221,16 @@ function AdminDashboard() {
           role: value.role,
         });
         if (error) {
-          toast.error(error.message || "Failed to create user");
+          toast.error(error.message || t("admin.failedToCreateUser"));
           return;
         }
       } catch (error: unknown) {
         toast.error(
-          error instanceof Error ? error.message : "Failed to create user"
+          error instanceof Error ? error.message : t("admin.failedToCreateUser")
         );
         return;
       }
-      toast.success("User created successfully");
+      toast.success(t("admin.createUserSuccess"));
       formApi.reset();
       setIsDialogOpen(false);
       await invalidateUsers();
@@ -248,16 +258,16 @@ function AdminDashboard() {
           userId: banUserId,
         });
         if (error) {
-          toast.error(error.message || "Failed to ban user");
+          toast.error(error.message || t("admin.failedToBanUser"));
         } else {
-          toast.success("User banned successfully");
+          toast.success(t("admin.banUserSuccess"));
           setIsBanDialogOpen(false);
           formApi.reset();
           await invalidateUsers();
         }
       } catch (error: unknown) {
         toast.error(
-          error instanceof Error ? error.message : "Failed to ban user"
+          error instanceof Error ? error.message : t("admin.failedToBanUser")
         );
       }
       setIsLoading(undefined);
@@ -274,39 +284,46 @@ function AdminDashboard() {
       try {
         const { error } = await authClient.admin.removeUser({ userId: id });
         if (error) {
-          toast.error(error.message || "Failed to delete user");
+          toast.error(error.message || t("admin.failedToDeleteUser"));
         } else {
-          toast.success("User deleted successfully");
+          toast.success(t("admin.deleteUserSuccess"));
           await invalidateUsers();
         }
       } catch (error: unknown) {
         const message =
-          error instanceof Error ? error.message : "Failed to delete user";
+          error instanceof Error
+            ? error.message
+            : t("admin.failedToDeleteUser");
         toast.error(message);
       }
       setIsLoading(undefined);
     },
-    [invalidateUsers]
+    [invalidateUsers, t]
   );
 
-  const handleRevokeSessions = useCallback(async (id: string) => {
-    setIsLoading(`revoke-${id}`);
-    try {
-      const { error } = await authClient.admin.revokeUserSessions({
-        userId: id,
-      });
-      if (error) {
-        toast.error(error.message || "Failed to revoke sessions");
-      } else {
-        toast.success("Sessions revoked for user");
+  const handleRevokeSessions = useCallback(
+    async (id: string) => {
+      setIsLoading(`revoke-${id}`);
+      try {
+        const { error } = await authClient.admin.revokeUserSessions({
+          userId: id,
+        });
+        if (error) {
+          toast.error(error.message || t("admin.failedToRevokeSessions"));
+        } else {
+          toast.success(t("admin.revokeSessionsSuccess"));
+        }
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : t("admin.failedToRevokeSessions");
+        toast.error(message);
       }
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : "Failed to revoke sessions";
-      toast.error(message);
-    }
-    setIsLoading(undefined);
-  }, []);
+      setIsLoading(undefined);
+    },
+    [t]
+  );
 
   const handleImpersonateUser = useCallback(
     async (id: string) => {
@@ -316,19 +333,21 @@ function AdminDashboard() {
           userId: id,
         });
         if (error) {
-          toast.error(error.message || "Failed to impersonate user");
+          toast.error(error.message || t("admin.failedToImpersonate"));
         } else {
-          toast.success("Impersonated user");
+          toast.success(t("admin.impersonateSuccess"));
           router.push(withLocale("/dashboard", locale));
         }
       } catch (error: unknown) {
         const message =
-          error instanceof Error ? error.message : "Failed to impersonate user";
+          error instanceof Error
+            ? error.message
+            : t("admin.failedToImpersonate");
         toast.error(message);
       }
       setIsLoading(undefined);
     },
-    [locale, router]
+    [locale, router, t]
   );
 
   const handleBanToggle = useCallback(
@@ -345,19 +364,19 @@ function AdminDashboard() {
           userId: user.id,
         });
         if (error) {
-          toast.error(error.message || "Failed to unban user");
+          toast.error(error.message || t("admin.failedToUnbanUser"));
         } else {
           await invalidateUsers();
-          toast.success("User unbanned successfully");
+          toast.success(t("admin.unbanUserSuccess"));
         }
       } catch (error: unknown) {
         toast.error(
-          error instanceof Error ? error.message : "Failed to unban user"
+          error instanceof Error ? error.message : t("admin.failedToUnbanUser")
         );
       }
       setIsLoading(undefined);
     },
-    [banUserForm, invalidateUsers]
+    [banUserForm, invalidateUsers, t]
   );
 
   return (
@@ -365,16 +384,18 @@ function AdminDashboard() {
       <Toaster richColors />
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-2xl">Admin Dashboard</CardTitle>
+          <CardTitle className="text-2xl">
+            {t("admin.dashboardTitle")}
+          </CardTitle>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" /> Create User
+                <Plus className="mr-2 h-4 w-4" /> {t("admin.createUser")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New User</DialogTitle>
+                <DialogTitle>{t("admin.createUserTitle")}</DialogTitle>
               </DialogHeader>
               <createUserForm.AppForm>
                 <createUserForm.Form className="space-y-4">
@@ -384,7 +405,7 @@ function AdminDashboard() {
                         <field.TextField
                           autoComplete="email"
                           id="email"
-                          label="Email"
+                          label={t("common.email")}
                           type="email"
                         />
                       )}
@@ -394,32 +415,38 @@ function AdminDashboard() {
                         <field.TextField
                           autoComplete="new-password"
                           id="password"
-                          label="Password"
+                          label={t("common.password")}
                           type="password"
                         />
                       )}
                     </createUserForm.AppField>
                     <createUserForm.AppField name="name">
-                      {(field) => <field.TextField id="name" label="Name" />}
+                      {(field) => (
+                        <field.TextField id="name" label={t("common.name")} />
+                      )}
                     </createUserForm.AppField>
                     <createUserForm.AppField name="role">
                       {(field) => (
                         <field.SelectField
                           id="role"
-                          label="Role"
-                          placeholder="Select role"
+                          label={t("admin.roleLabel")}
+                          placeholder={t("admin.rolePlaceholder")}
                         >
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="user">User</SelectItem>
+                          <SelectItem value="admin">
+                            {t("admin.roleAdmin")}
+                          </SelectItem>
+                          <SelectItem value="user">
+                            {t("admin.roleUser")}
+                          </SelectItem>
                         </field.SelectField>
                       )}
                     </createUserForm.AppField>
                   </FieldGroup>
                   <createUserForm.SubmitButton
                     className="w-full"
-                    submittingLabel="Creating..."
+                    submittingLabel={t("admin.creating")}
                   >
-                    Create User
+                    {t("admin.createUser")}
                   </createUserForm.SubmitButton>
                 </createUserForm.Form>
               </createUserForm.AppForm>
@@ -428,30 +455,34 @@ function AdminDashboard() {
           <Dialog open={isBanDialogOpen} onOpenChange={setIsBanDialogOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Ban User</DialogTitle>
+                <DialogTitle>{t("admin.banUser")}</DialogTitle>
               </DialogHeader>
               <banUserForm.AppForm>
                 <banUserForm.Form className="space-y-4">
                   <FieldGroup>
                     <banUserForm.AppField name="reason">
                       {(field) => (
-                        <field.TextField id="reason" label="Reason" />
+                        <field.TextField
+                          id="reason"
+                          label={t("admin.reasonLabel")}
+                        />
                       )}
                     </banUserForm.AppField>
                     <banUserForm.AppField name="expirationDate">
                       {(field) => (
                         <field.DateField
                           id="expirationDate"
-                          label="Expiration Date"
+                          label={t("admin.expirationDateLabel")}
+                          placeholder={t("admin.expirationDatePlaceholder")}
                         />
                       )}
                     </banUserForm.AppField>
                   </FieldGroup>
                   <banUserForm.SubmitButton
                     className="w-full"
-                    submittingLabel="Banning..."
+                    submittingLabel={t("admin.banning")}
                   >
-                    Ban User
+                    {t("admin.banUser")}
                   </banUserForm.SubmitButton>
                 </banUserForm.Form>
               </banUserForm.AppForm>
@@ -467,11 +498,11 @@ function AdminDashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Banned</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t("common.email")}</TableHead>
+                  <TableHead>{t("common.name")}</TableHead>
+                  <TableHead>{t("admin.roleLabel")}</TableHead>
+                  <TableHead>{t("admin.banned")}</TableHead>
+                  <TableHead>{t("admin.actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

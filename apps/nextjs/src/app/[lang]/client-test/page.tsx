@@ -13,6 +13,7 @@ import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { Loader2 } from "lucide-react";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -23,15 +24,16 @@ import { withLocale } from "~/i18n/localized-path";
 import { useLocale } from "~/i18n/use-locale";
 import { getAvatarUrl } from "~/lib/avatar";
 
-const signInSchema = z.object({
-  email: z.email("Please enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
-});
-
 export default function Page() {
+  const { t } = useTranslation();
   const locale = useLocale();
   const { data: session, isPending, error } = useSessionQuery();
   const signOutMutation = useSignOutMutation();
+
+  const signInSchema = z.object({
+    email: z.email(t("validation.emailRequired")),
+    password: z.string().min(1, t("validation.passwordRequired")),
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -50,7 +52,7 @@ export default function Page() {
             toast.error(ctx.error.message);
           },
           onSuccess: () => {
-            toast.success("Successfully logged in!");
+            toast.success(t("clientTest.signInSuccess"));
             formApi.reset();
           },
         }
@@ -70,16 +72,16 @@ export default function Page() {
   return (
     <div className="container mx-auto space-y-8 py-10">
       <h1 className="text-center text-2xl font-bold">
-        Client Authentication Test
+        {t("clientTest.title")}
       </h1>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* Login Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
+            <CardTitle>{t("clientTest.signInTitle")}</CardTitle>
             <CardDescription>
-              Enter your email and password to sign in
+              {t("clientTest.signInDescription")}
             </CardDescription>
           </CardHeader>
           <form.AppForm>
@@ -91,8 +93,8 @@ export default function Page() {
                       <field.TextField
                         autoComplete="email"
                         id="email"
-                        label="Email"
-                        placeholder="m@example.com"
+                        label={t("common.email")}
+                        placeholder={t("auth.signIn.emailPlaceholder")}
                         type="email"
                       />
                     )}
@@ -102,7 +104,7 @@ export default function Page() {
                       <field.TextField
                         autoComplete="current-password"
                         id="password"
-                        label="Password"
+                        label={t("common.password")}
                         placeholder="••••••••"
                         type="password"
                       />
@@ -113,9 +115,9 @@ export default function Page() {
               <CardFooter>
                 <form.SubmitButton
                   className="w-full"
-                  submittingLabel="Signing in..."
+                  submittingLabel={t("clientTest.signingIn")}
                 >
-                  Sign In
+                  {t("clientTest.signInButton")}
                 </form.SubmitButton>
               </CardFooter>
             </form.Form>
@@ -125,11 +127,11 @@ export default function Page() {
         {/* Session Display */}
         <Card>
           <CardHeader>
-            <CardTitle>Session Information</CardTitle>
+            <CardTitle>{t("clientTest.sessionTitle")}</CardTitle>
             <CardDescription>
-              {isPending && "Loading session..."}
-              {!isPending && session && "You are currently logged in"}
-              {!isPending && !session && "You are not logged in"}
+              {isPending && t("clientTest.loadingSession")}
+              {!isPending && session && t("clientTest.loggedIn")}
+              {!isPending && !session && t("clientTest.notLoggedIn")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -140,7 +142,7 @@ export default function Page() {
             )}
             {!isPending && error && (
               <div className="bg-destructive/10 text-destructive rounded-md p-4">
-                Error: {error.message}
+                {t("clientTest.error", { message: error.message })}
               </div>
             )}
             {!isPending && !error && session && (
@@ -149,7 +151,7 @@ export default function Page() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={getAvatarUrl(session.user.id)}
-                    alt="Profile"
+                    alt={t("clientTest.profileAlt")}
                     className="h-12 w-12 rounded-full object-cover"
                   />
                   <div>
@@ -161,7 +163,9 @@ export default function Page() {
                 </div>
 
                 <div className="bg-muted rounded-md p-4">
-                  <p className="mb-2 text-sm font-medium">Session Details:</p>
+                  <p className="mb-2 text-sm font-medium">
+                    {t("clientTest.sessionDetails")}
+                  </p>
                   <pre className="max-h-40 overflow-auto text-xs">
                     {JSON.stringify(session, null, 2)}
                   </pre>
@@ -170,7 +174,7 @@ export default function Page() {
             )}
             {!isPending && !error && !session && (
               <div className="text-muted-foreground py-8 text-center">
-                <p>Sign in to view your session information</p>
+                <p>{t("clientTest.signInPrompt")}</p>
               </div>
             )}
           </CardContent>
@@ -185,7 +189,7 @@ export default function Page() {
                 {signOutMutation.isPending ? (
                   <Loader2 className="animate-spin" size={16} />
                 ) : (
-                  "Sign Out"
+                  t("clientTest.signOut")
                 )}
               </Button>
             </CardFooter>

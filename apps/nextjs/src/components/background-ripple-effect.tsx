@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 
 import { cn } from "~/lib/utils";
 
@@ -34,6 +35,7 @@ type CellStyle = React.CSSProperties & {
 };
 
 interface GridCellProps {
+  label: string;
   rowIdx: number;
   colIdx: number;
   fillColor: string;
@@ -46,6 +48,7 @@ interface GridCellProps {
 
 const GridCell = memo(
   ({
+    label,
     rowIdx,
     colIdx,
     fillColor,
@@ -74,7 +77,7 @@ const GridCell = memo(
     return (
       <button
         type="button"
-        aria-label="Trigger ripple cell"
+        aria-label={label}
         tabIndex={interactive ? 0 : -1}
         className={cn(
           "cell relative border-[0.5px] opacity-50 transition-opacity duration-150 will-change-transform hover:opacity-80",
@@ -105,6 +108,7 @@ const DivGrid = ({
   onCellClick = noop,
   interactive = true,
 }: DivGridProps) => {
+  const { t } = useTranslation();
   const cells = useMemo(
     () => Array.from({ length: rows * cols }, (_, idx) => idx),
     [rows, cols]
@@ -142,6 +146,7 @@ const DivGrid = ({
         return (
           <GridCell
             key={idx}
+            label={t("background.triggerRippleCell")}
             rowIdx={rowIdx}
             colIdx={colIdx}
             fillColor={fillColor}

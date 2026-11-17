@@ -25,42 +25,43 @@ export async function generateMetadata({
   });
 }
 
-const demoPlans = [
-  {
-    buttonText: "Start Free Trial",
-    description: "Perfect for individuals and small projects",
-    features: [
-      "Up to 10 projects",
-      "Basic analytics",
-      "48-hour support response time",
-      "Limited API access",
-    ],
-    href: "/sign-up",
-    isPopular: false,
-    name: "Plus",
-    period: "per month",
-    price: "20",
-    yearlyPrice: "16",
-  },
-  {
-    buttonText: "Get Started",
-    description: "Ideal for growing teams and businesses",
-    features: [
-      "Unlimited projects",
-      "Advanced analytics",
-      "24-hour support response time",
-      "Full API access",
-      "Priority support",
-    ],
-    href: "/sign-up",
-    isPopular: true,
-    name: "Pro",
-    period: "per month",
-    price: "50",
-    yearlyPrice: "40",
-  },
-];
+export default async function Page() {
+  const { t } = await getT();
+  const demoPlans = [
+    {
+      buttonText: t("pricing.plus.buttonText"),
+      description: t("pricing.plus.description"),
+      features: [
+        t("pricing.plus.features.projects"),
+        t("pricing.plus.features.analytics"),
+        t("pricing.plus.features.support"),
+        t("pricing.plus.features.api"),
+      ],
+      href: "/sign-up",
+      isPopular: false,
+      name: "Plus",
+      period: t("pricing.perMonth"),
+      price: "20",
+      yearlyPrice: "16",
+    },
+    {
+      buttonText: t("pricing.pro.buttonText"),
+      description: t("pricing.pro.description"),
+      features: [
+        t("pricing.pro.features.projects"),
+        t("pricing.pro.features.analytics"),
+        t("pricing.pro.features.support"),
+        t("pricing.pro.features.api"),
+        t("pricing.pro.features.priority"),
+      ],
+      href: "/sign-up",
+      isPopular: true,
+      name: "Pro",
+      period: t("pricing.perMonth"),
+      price: "50",
+      yearlyPrice: "40",
+    },
+  ];
 
-export default function Page() {
   return <Pricing plans={demoPlans} />;
 }

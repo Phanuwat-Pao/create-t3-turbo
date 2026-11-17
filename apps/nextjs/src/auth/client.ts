@@ -14,6 +14,7 @@ import {
   usernameClient,
 } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
+import { getI18n } from "react-i18next";
 import { toast } from "sonner";
 
 import { env } from "~/env";
@@ -25,7 +26,10 @@ export const authClient = createAuthClient({
   fetchOptions: {
     onError(e) {
       if (e.error.status === 429) {
-        toast.error("Too many requests. Please try again later.");
+        // The root layout's I18nProvider registers its i18next instance with
+        // react-i18next and switches its language with the route, so this
+        // resolves to the page's language when the toast fires.
+        toast.error(getI18n().t("common.tooManyRequests"));
       }
     },
   },

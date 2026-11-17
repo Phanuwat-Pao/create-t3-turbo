@@ -12,6 +12,7 @@ import {
 import { CheckIcon, XIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 
 import { useInviteAcceptMutation } from "~/data/organization/invitation-accept-mutation";
 import { useInvitationQuery } from "~/data/organization/invitation-query";
@@ -23,6 +24,7 @@ import { InvitationError } from "./_components/invitation-error";
 import { InvitationSkeleton } from "./_components/invitation-skeleton";
 
 export default function Page() {
+  const { t } = useTranslation();
   const params = useParams<{
     id: string;
   }>();
@@ -82,9 +84,9 @@ export default function Page() {
       {invitation && (
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Organization Invitation</CardTitle>
+            <CardTitle>{t("organization.invitation.title")}</CardTitle>
             <CardDescription>
-              You&apos;ve been invited to join an organization
+              {t("organization.invitation.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -94,11 +96,12 @@ export default function Page() {
                   <CheckIcon className="h-8 w-8 text-green-600" />
                 </div>
                 <h2 className="text-center text-2xl font-bold">
-                  Welcome to {invitation.organizationName}!
+                  {t("organization.invitation.welcome", {
+                    organization: invitation.organizationName,
+                  })}
                 </h2>
                 <p className="text-center">
-                  You&apos;ve successfully joined the organization. We&apos;re
-                  excited to have you on board!
+                  {t("organization.invitation.joined")}
                 </p>
               </div>
             )}
@@ -108,23 +111,33 @@ export default function Page() {
                   <XIcon className="h-8 w-8 text-red-600" />
                 </div>
                 <h2 className="text-center text-2xl font-bold">
-                  Invitation Declined
+                  {t("organization.invitation.declinedTitle")}
                 </h2>
                 <p className="text-center">
-                  You&apos;ve declined the invitation to join{" "}
-                  {invitation.organizationName}.
+                  {t("organization.invitation.declinedDescription", {
+                    organization: invitation.organizationName,
+                  })}
                 </p>
               </div>
             )}
             {invitation.status === "pending" && (
               <div className="space-y-4">
                 <p>
-                  <strong>{invitation.inviterEmail}</strong> has invited you to
-                  join <strong>{invitation.organizationName}</strong>.
+                  <Trans
+                    i18nKey="organization.invitation.invitedBy"
+                    values={{
+                      inviter: invitation.inviterEmail,
+                      organization: invitation.organizationName,
+                    }}
+                    components={{ strong: <strong /> }}
+                  />
                 </p>
                 <p>
-                  This invitation was sent to{" "}
-                  <strong>{invitation.email}</strong>.
+                  <Trans
+                    i18nKey="organization.invitation.sentTo"
+                    values={{ email: invitation.email }}
+                    components={{ strong: <strong /> }}
+                  />
                 </p>
               </div>
             )}
@@ -136,15 +149,17 @@ export default function Page() {
                 onClick={handleReject}
                 disabled={rejectMutation.isPending}
               >
-                {rejectMutation.isPending ? "Declining..." : "Decline"}
+                {rejectMutation.isPending
+                  ? t("organization.invitation.declining")
+                  : t("organization.invitation.decline")}
               </Button>
               <Button
                 onClick={handleAccept}
                 disabled={acceptMutation.isPending}
               >
                 {acceptMutation.isPending
-                  ? "Accepting..."
-                  : "Accept Invitation"}
+                  ? t("organization.invitation.accepting")
+                  : t("organization.invitation.accept")}
               </Button>
             </CardFooter>
           )}

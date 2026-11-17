@@ -18,11 +18,14 @@ import { getAvatarUrl } from "~/lib/avatar";
 
 import { ConsentBtns } from "./_components/consent-buttons";
 
-export const metadata: Metadata = {
-  description: "Grant access to your account",
-  robots: { follow: false, index: false },
-  title: "Authorize Application",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
+  return {
+    description: t("oauth.consent.description"),
+    robots: { follow: false, index: false },
+    title: t("oauth.consent.title"),
+  };
+}
 
 interface AuthorizePageProps {
   searchParams: Promise<{
@@ -85,7 +88,7 @@ export default async function AuthorizePage({
               <Avatar className="hidden h-16 w-16 sm:flex">
                 <AvatarImage
                   src={session?.user.id ? getAvatarUrl(session.user.id) : "#"}
-                  alt="Avatar"
+                  alt={t("dashboard.user.avatarAlt")}
                   className="object-cover"
                 />
                 <AvatarFallback>{session?.user.name.charAt(0)}</AvatarFallback>

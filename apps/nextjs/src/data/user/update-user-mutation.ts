@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -21,18 +22,19 @@ export async function updateUser(params: UpdateUserParams) {
 export type UpdateUserData = Awaited<ReturnType<typeof updateUser>>;
 
 export const useUpdateUserMutation = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: updateUser,
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update user");
+      toast.error(error.message || t("dashboard.user.updateFailed"));
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: userKeys.session(),
       });
-      toast.success("User updated successfully!");
+      toast.success(t("dashboard.user.updateSuccess"));
     },
   });
 };

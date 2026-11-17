@@ -1,5 +1,6 @@
 import type { OrganizationRole } from "@acme/auth";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -24,18 +25,19 @@ export async function inviteMember(params: InviteMemberParams) {
 }
 
 export const useInviteMemberMutation = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: inviteMember,
     onError: (error) => {
-      toast.error(error.message || "Failed to invite member");
+      toast.error(error.message || t("organization.invite.failed"));
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: organizationKeys.detail(),
       });
-      toast.success("Member invited successfully");
+      toast.success(t("organization.invite.success"));
     },
   });
 };

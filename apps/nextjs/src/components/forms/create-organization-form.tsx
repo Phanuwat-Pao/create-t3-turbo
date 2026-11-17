@@ -120,7 +120,7 @@ export function CreateOrganizationForm({
               <field.FileField
                 accept="image/*"
                 className="text-muted-foreground"
-                clearLabel="Clear logo"
+                clearLabel={t("organization.create.clearLogo")}
                 disabled={isSubmitting}
                 id="org-logo"
                 label={t("organization.create.logoLabel")}

@@ -10,34 +10,34 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 import { AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import Link from "~/components/link";
 
 export function InvitationError() {
+  const { t } = useTranslation();
   return (
     <Card className="mx-auto w-full max-w-md">
       <CardHeader>
         <div className="flex items-center space-x-2">
           <AlertCircle className="text-destructive h-6 w-6" />
           <CardTitle className="text-destructive text-xl">
-            Invitation Error
+            {t("organization.invitation.errorTitle")}
           </CardTitle>
         </div>
         <CardDescription>
-          There was an issue with your invitation.
+          {t("organization.invitation.errorDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground mb-4 text-sm">
-          The invitation you&apos;re trying to access is either invalid or you
-          don&apos;t have the correct permissions. Please check your email for a
-          valid invitation or contact the person who sent it.
+          {t("organization.invitation.errorBody")}
         </p>
       </CardContent>
       <CardFooter>
         <Link href="/" className="w-full">
           <Button variant="outline" className="w-full">
-            Go back to home
+            {t("organization.invitation.goHome")}
           </Button>
         </Link>
       </CardFooter>

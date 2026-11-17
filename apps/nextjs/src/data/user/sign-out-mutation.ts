@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -15,18 +16,19 @@ export async function signOut() {
 export type SignOutData = Awaited<ReturnType<typeof signOut>>;
 
 export const useSignOutMutation = () => {
+  const { t } = useTranslation();
   const queryClient = getQueryClient();
 
   return useMutation({
     mutationFn: signOut,
     onError: (error) => {
-      toast.error(error.message || "Failed to sign out");
+      toast.error(error.message || t("dashboard.user.signOutFailed"));
     },
     onSettled: () => {
       queryClient.clear();
     },
     onSuccess: () => {
-      toast.success("Successfully signed out!");
+      toast.success(t("dashboard.user.signOutSuccess"));
     },
   });
 };

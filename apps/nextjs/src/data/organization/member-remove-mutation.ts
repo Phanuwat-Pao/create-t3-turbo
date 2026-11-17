@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -21,18 +22,19 @@ export async function removeMember(params: MemberRemoveParams) {
 }
 
 export const useMemberRemoveMutation = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: removeMember,
     onError: (error) => {
-      toast.error(error.message || "Failed to remove member");
+      toast.error(error.message || t("organization.removeMemberFailed"));
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: organizationKeys.detail(),
       });
-      toast.success("Member removed successfully");
+      toast.success(t("organization.removeMemberSuccess"));
     },
   });
 };

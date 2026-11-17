@@ -2,20 +2,23 @@
 
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
-
-const disableSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters."),
-});
 
 interface TwoFactorDisableFormProps {
   onSuccess?: () => void;
 }
 
 export function TwoFactorDisableForm({ onSuccess }: TwoFactorDisableFormProps) {
+  const { t } = useTranslation();
+
+  const disableSchema = z.object({
+    password: z.string().min(8, t("validation.passwordMinLength")),
+  });
+
   const form = useAppForm({
     defaultValues: {
       password: "",
@@ -27,7 +30,7 @@ export function TwoFactorDisableForm({ onSuccess }: TwoFactorDisableFormProps) {
             toast.error(context.error.message);
           },
           onSuccess() {
-            toast.success("2FA disabled successfully");
+            toast.success(t("dashboard.twoFactor.disabledSuccess"));
             onSuccess?.();
           },
         },
@@ -49,13 +52,15 @@ export function TwoFactorDisableForm({ onSuccess }: TwoFactorDisableFormProps) {
               <field.PasswordField
                 autoComplete="current-password"
                 id="disable-password"
-                label="Password"
-                placeholder="Enter your password"
+                label={t("common.password")}
+                placeholder={t("dashboard.twoFactor.passwordPlaceholder")}
               />
             )}
           </form.AppField>
         </FieldGroup>
-        <form.SubmitButton variant="destructive">Disable 2FA</form.SubmitButton>
+        <form.SubmitButton variant="destructive">
+          {t("dashboard.twoFactor.disable")}
+        </form.SubmitButton>
       </form.Form>
     </form.AppForm>
   );

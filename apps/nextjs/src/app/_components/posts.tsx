@@ -14,10 +14,12 @@ import {
   useSuspenseQuery,
 } from "@tanstack/react-query";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 import { orpc } from "~/rpc/react";
 
 export function CreatePostForm() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const createPost = useMutation(
@@ -26,9 +28,7 @@ export function CreatePostForm() {
         const isUnauthorized =
           err instanceof ORPCError && err.code === "UNAUTHORIZED";
         toast.error(
-          isUnauthorized
-            ? "You must be logged in to post"
-            : "Failed to create post"
+          isUnauthorized ? t("posts.loginToCreate") : t("posts.failedToCreate")
         );
       },
       onSuccess: async () => {
@@ -62,16 +62,22 @@ export function CreatePostForm() {
         <FieldGroup>
           <form.AppField name="title">
             {(field) => (
-              <field.TextField label="Bug Title" placeholder="Title" />
+              <field.TextField
+                label={t("posts.titleLabel")}
+                placeholder={t("posts.titlePlaceholder")}
+              />
             )}
           </form.AppField>
           <form.AppField name="content">
             {(field) => (
-              <field.TextField label="Content" placeholder="Content" />
+              <field.TextField
+                label={t("posts.contentLabel")}
+                placeholder={t("posts.contentPlaceholder")}
+              />
             )}
           </form.AppField>
         </FieldGroup>
-        <form.SubmitButton>Create</form.SubmitButton>
+        <form.SubmitButton>{t("posts.create")}</form.SubmitButton>
       </form.Form>
     </form.AppForm>
   );
@@ -106,6 +112,7 @@ export function PostCardSkeleton(props: { pulse?: boolean }) {
 export function PostCard(props: {
   post: RouterOutputs["post"]["all"][number];
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const deletePost = useMutation(
     orpc.post.delete.mutationOptions({
@@ -113,9 +120,7 @@ export function PostCard(props: {
         const isUnauthorized =
           err instanceof ORPCError && err.code === "UNAUTHORIZED";
         toast.error(
-          isUnauthorized
-            ? "You must be logged in to delete a post"
-            : "Failed to delete post"
+          isUnauthorized ? t("posts.loginToDelete") : t("posts.failedToDelete")
         );
       },
       onSuccess: async () => {
@@ -140,7 +145,7 @@ export function PostCard(props: {
           onClick={handleDelete}
           variant="ghost"
         >
-          Delete
+          {t("common.delete")}
         </Button>
       </div>
     </div>
@@ -148,6 +153,7 @@ export function PostCard(props: {
 }
 
 export function PostList() {
+  const { t } = useTranslation();
   const { data: posts } = useSuspenseQuery(orpc.post.all.queryOptions());
 
   if (posts.length === 0) {
@@ -158,7 +164,7 @@ export function PostList() {
         <PostCardSkeleton pulse={false} />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10">
-          <p className="text-2xl font-bold text-white">No posts yet</p>
+          <p className="text-2xl font-bold text-white">{t("posts.empty")}</p>
         </div>
       </div>
     );

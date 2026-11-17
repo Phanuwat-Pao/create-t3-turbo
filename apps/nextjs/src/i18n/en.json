@@ -11,7 +11,8 @@
     "back": "Back",
     "name": "Name",
     "email": "Email",
-    "password": "Password"
+    "password": "Password",
+    "tooManyRequests": "Too many requests. Please try again later."
   },
   "seo": {
     "siteName": "create-t3-turbo",
@@ -57,7 +58,8 @@
     }
   },
   "header": {
-    "title": "BETTER-AUTH."
+    "title": "BETTER-AUTH.",
+    "toggleTheme": "Toggle theme"
   },
   "entryButton": {
     "signIn": "Sign In",
@@ -85,7 +87,8 @@
       "ariaGoogle": "Sign in with Google",
       "ariaGitHub": "Sign in with GitHub",
       "ariaMicrosoft": "Sign in with Microsoft",
-      "ariaVercel": "Sign in with Vercel"
+      "ariaVercel": "Sign in with Vercel",
+      "lastUsed": "Last Used"
     },
     "signUp": {
       "title": "Sign Up",
@@ -104,7 +107,8 @@
       "profileImageAlt": "Profile preview",
       "createAccountButton": "Create an account",
       "successMessage": "Successfully signed up",
-      "builtWith": "built with"
+      "builtWith": "built with",
+      "clearFile": "Clear file"
     },
     "forgotPassword": {
       "title": "Forgot password",
@@ -125,7 +129,8 @@
       "confirmPasswordLabel": "Confirm Password",
       "confirmPasswordPlaceholder": "Confirm new password",
       "resetButton": "Reset Password",
-      "successMessage": "Password reset successfully"
+      "successMessage": "Password reset successfully",
+      "loadingForm": "Loading reset password form"
     },
     "twoFactor": {
       "title": "TOTP Verification",
@@ -163,12 +168,19 @@
       "fullNameLabel": "Full Name",
       "profileImageLabel": "Profile Image",
       "profileImageAlt": "Profile preview",
-      "updateButton": "Update"
+      "updateButton": "Update",
+      "clearImage": "Clear image",
+      "updateSuccess": "User updated successfully!",
+      "updateFailed": "Failed to update user",
+      "signOutSuccess": "Successfully signed out!",
+      "signOutFailed": "Failed to sign out"
     },
     "sessions": {
       "title": "Active Sessions",
       "signOut": "Sign Out",
-      "terminate": "Terminate"
+      "terminate": "Terminate",
+      "terminateSuccess": "Session terminated successfully",
+      "terminateFailed": "Failed to terminate session"
     },
     "emailVerification": {
       "title": "Verify Your Email Address",
@@ -198,7 +210,16 @@
       "enableDescription": "Enable 2FA to secure your account",
       "disableDescription": "Disable the second factor authentication from your account",
       "scanQrCode": "Scan QR Code",
-      "scanQrDescription": "Scan the QR code with your TOTP app"
+      "scanQrDescription": "Scan the QR code with your TOTP app",
+      "passwordPlaceholder": "Enter your password",
+      "continueButton": "Continue",
+      "showQrCode": "Show QR Code",
+      "copyUri": "Copy URI to clipboard",
+      "otpLabel": "Scan the QR code with your TOTP app and enter the code",
+      "otpPlaceholder": "Enter OTP code",
+      "verifyAndEnable": "Verify & Enable",
+      "enabledSuccess": "2FA enabled successfully",
+      "disabledSuccess": "2FA disabled successfully"
     },
     "changePassword": {
       "title": "Change Password",
@@ -210,7 +231,9 @@
       "confirmPasswordLabel": "Confirm Password",
       "confirmPasswordPlaceholder": "Confirm password",
       "revokeOtherSessions": "Sign out from other devices",
-      "changeButton": "Change Password"
+      "changeButton": "Change Password",
+      "success": "Password changed successfully",
+      "failed": "Failed to change your password"
     }
   },
   "organization": {
@@ -238,14 +261,45 @@
       "slugPlaceholder": "my-organization",
       "logoLabel": "Logo",
       "logoAlt": "Logo preview",
-      "createButton": "Create"
+      "createButton": "Create",
+      "clearLogo": "Clear logo",
+      "success": "Organization created successfully",
+      "failed": "Failed to create organization"
     },
     "invite": {
       "emailLabel": "Email",
       "emailPlaceholder": "member@example.com",
       "roleLabel": "Role",
       "rolePlaceholder": "Select a role",
-      "inviteButton": "Invite"
+      "inviteButton": "Invite",
+      "success": "Member invited successfully",
+      "failed": "Failed to invite member"
+    },
+    "removeMemberSuccess": "Member removed successfully",
+    "removeMemberFailed": "Failed to remove member",
+    "invitation": {
+      "title": "Organization Invitation",
+      "description": "You've been invited to join an organization",
+      "welcome": "Welcome to {{organization}}!",
+      "joined": "You've successfully joined the organization. We're excited to have you on board!",
+      "declinedTitle": "Invitation Declined",
+      "declinedDescription": "You've declined the invitation to join {{organization}}.",
+      "invitedBy": "<strong>{{inviter}}</strong> has invited you to join <strong>{{organization}}</strong>.",
+      "sentTo": "This invitation was sent to <strong>{{email}}</strong>.",
+      "decline": "Decline",
+      "declining": "Declining...",
+      "accept": "Accept Invitation",
+      "accepting": "Accepting...",
+      "errorTitle": "Invitation Error",
+      "errorDescription": "There was an issue with your invitation.",
+      "errorBody": "The invitation you're trying to access is either invalid or you don't have the correct permissions. Please check your email for a valid invitation or contact the person who sent it.",
+      "goHome": "Go back to home",
+      "acceptSuccess": "You have accepted the invitation",
+      "acceptFailed": "Failed to accept the invitation",
+      "rejectSuccess": "You have declined the invitation",
+      "rejectFailed": "Failed to decline the invitation",
+      "cancelSuccess": "Invitation revoked successfully",
+      "cancelFailed": "Failed to revoke the invitation"
     }
   },
   "device": {
@@ -303,7 +357,8 @@
       "anotherAccount": "Another Account",
       "noSession": "No session",
       "failedToSetActive": "Failed to set active session",
-      "failedToContinue": "Failed to continue"
+      "failedToContinue": "Failed to continue",
+      "metaDescription": "Select account to authorize this application"
     },
     "selectOrganization": {
       "title": "Select Organization",
@@ -313,7 +368,8 @@
       "goBack": "Go Back",
       "noOrganization": "No organization",
       "failedToSetActive": "Failed to set active organization",
-      "failedToContinue": "Failed to continue"
+      "failedToContinue": "Failed to continue",
+      "metaDescription": "Specify which organization to authorize to this application"
     }
   },
   "accountSwitch": {
@@ -338,11 +394,118 @@
     "slugMaxLength": "Slug must be at most 50 characters",
     "slugInvalidChars": "Slug can only contain lowercase letters, numbers, and hyphens",
     "roleRequired": "Please select a role",
-    "failedToProcessImage": "Failed to process image"
+    "failedToProcessImage": "Failed to process image",
+    "nameRequired": "Name is required.",
+    "reasonRequired": "Reason is required.",
+    "expirationDateRequired": "Expiration date is required.",
+    "otpMinLength": "OTP must be at least 6 characters."
   },
   "admin": {
     "title": "Admin Panel",
     "users": "Users",
-    "impersonate": "Impersonate"
+    "impersonate": "Impersonate",
+    "dashboardTitle": "Admin Dashboard",
+    "createUser": "Create User",
+    "createUserTitle": "Create New User",
+    "creating": "Creating...",
+    "roleLabel": "Role",
+    "rolePlaceholder": "Select role",
+    "roleAdmin": "Admin",
+    "roleUser": "User",
+    "banUser": "Ban User",
+    "banning": "Banning...",
+    "ban": "Ban",
+    "unban": "Unban",
+    "reasonLabel": "Reason",
+    "expirationDateLabel": "Expiration Date",
+    "expirationDatePlaceholder": "Pick a date",
+    "banned": "Banned",
+    "actions": "Actions",
+    "yes": "Yes",
+    "no": "No",
+    "createUserSuccess": "User created successfully",
+    "failedToCreateUser": "Failed to create user",
+    "banUserSuccess": "User banned successfully",
+    "failedToBanUser": "Failed to ban user",
+    "unbanUserSuccess": "User unbanned successfully",
+    "failedToUnbanUser": "Failed to unban user",
+    "deleteUserSuccess": "User deleted successfully",
+    "failedToDeleteUser": "Failed to delete user",
+    "revokeSessionsSuccess": "Sessions revoked for user",
+    "failedToRevokeSessions": "Failed to revoke sessions",
+    "impersonateSuccess": "Impersonated user",
+    "failedToImpersonate": "Failed to impersonate user"
+  },
+  "background": {
+    "triggerRippleCell": "Trigger ripple cell"
+  },
+  "auditLog": {
+    "title": "Audit Logs",
+    "loading": "Loading audit logs…",
+    "empty": "No audit events yet.",
+    "time": "Time",
+    "action": "Action",
+    "user": "User",
+    "ipAddress": "IP address"
+  },
+  "clientTest": {
+    "title": "Client Authentication Test",
+    "signInTitle": "Sign In",
+    "signInDescription": "Enter your email and password to sign in",
+    "signInButton": "Sign In",
+    "signingIn": "Signing in...",
+    "signInSuccess": "Successfully logged in!",
+    "sessionTitle": "Session Information",
+    "loadingSession": "Loading session...",
+    "loggedIn": "You are currently logged in",
+    "notLoggedIn": "You are not logged in",
+    "error": "Error: {{message}}",
+    "profileAlt": "Profile",
+    "sessionDetails": "Session Details:",
+    "signInPrompt": "Sign in to view your session information",
+    "signOut": "Sign Out"
+  },
+  "posts": {
+    "titleLabel": "Bug Title",
+    "titlePlaceholder": "Title",
+    "contentLabel": "Content",
+    "contentPlaceholder": "Content",
+    "create": "Create",
+    "empty": "No posts yet",
+    "loginToCreate": "You must be logged in to post",
+    "failedToCreate": "Failed to create post",
+    "loginToDelete": "You must be logged in to delete a post",
+    "failedToDelete": "Failed to delete post"
+  },
+  "pricing": {
+    "title": "Simple, Transparent Pricing",
+    "description": "Choose the plan that works for you",
+    "popular": "Popular",
+    "perMonth": "per month",
+    "billedMonthly": "billed monthly",
+    "billedAnnually": "billed annually",
+    "annualBilling": "Annual billing",
+    "annualSavings": "(Save 20%)",
+    "plus": {
+      "buttonText": "Start Free Trial",
+      "description": "Perfect for individuals and small projects",
+      "features": {
+        "projects": "Up to 10 projects",
+        "analytics": "Basic analytics",
+        "support": "48-hour support response time",
+        "api": "Limited API access"
+      }
+    },
+    "pro": {
+      "buttonText": "Get Started",
+      "description": "Ideal for growing teams and businesses",
+      "features": {
+        "projects": "Unlimited projects",
+        "analytics": "Advanced analytics",
+        "support": "24-hour support response time",
+        "api": "Full API access",
+        "priority": "Priority support"
+      }
+    }
   }
 }

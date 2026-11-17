@@ -8,11 +8,14 @@ import { getT } from "~/i18n/server";
 import { SelectAccountBtn } from "./_components/account-button";
 import { AnotherAccountBtn } from "./_components/another-account-button";
 
-export const metadata: Metadata = {
-  description: "Select account to authorize this application",
-  robots: { follow: false, index: false },
-  title: "Select Account",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getT();
+  return {
+    description: t("oauth.selectAccount.metaDescription"),
+    robots: { follow: false, index: false },
+    title: t("oauth.selectAccount.title"),
+  };
+}
 
 export default async function SelectAccountPage() {
   const { t } = await getT();

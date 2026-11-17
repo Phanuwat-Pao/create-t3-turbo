@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -25,18 +26,19 @@ export async function createOrganization(params: OrganizationCreateParams) {
 }
 
 export const useOrganizationCreateMutation = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: createOrganization,
     onError: (error) => {
-      toast.error(error.message || "Failed to create organization");
+      toast.error(error.message || t("organization.create.failed"));
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: organizationKeys.all(),
       });
-      toast.success("Organization created successfully");
+      toast.success(t("organization.create.success"));
     },
   });
 };

@@ -2,8 +2,10 @@
 import { Button } from "@acme/ui/button";
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 export function ThemeToggle() {
+  const { t } = useTranslation();
   const { setTheme, resolvedTheme } = useTheme();
 
   const handleToggle = useCallback(() => {
@@ -66,7 +68,7 @@ export function ThemeToggle() {
           fill="#fff"
         />
       </svg>
-      <span className="sr-only">Toggle theme</span>
+      <span className="sr-only">{t("header.toggleTheme")}</span>
     </Button>
   );
 }

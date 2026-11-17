@@ -4,26 +4,28 @@ import CopyButton from "@acme/ui/copy-button";
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qr-code";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 
-const passwordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters."),
-});
-
-const otpSchema = z.object({
-  otp: z.string().min(6, "OTP must be at least 6 characters."),
-});
-
 interface TwoFactorEnableFormProps {
   onSuccess?: () => void;
 }
 
 export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
+  const { t } = useTranslation();
   const [totpURI, setTotpURI] = useState<string>("");
+
+  const passwordSchema = z.object({
+    password: z.string().min(8, t("validation.passwordMinLength")),
+  });
+
+  const otpSchema = z.object({
+    otp: z.string().min(6, t("validation.otpMinLength")),
+  });
 
   const passwordForm = useAppForm({
     defaultValues: {
@@ -61,7 +63,7 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
             formApi.resetField("otp");
           },
           onSuccess() {
-            toast.success("2FA enabled successfully");
+            toast.success(t("dashboard.twoFactor.enabledSuccess"));
             onSuccess?.();
           },
         },
@@ -80,7 +82,9 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
           <QRCode value={totpURI} />
         </div>
         <div className="flex items-center justify-center gap-2">
-          <p className="text-muted-foreground text-sm">Copy URI to clipboard</p>
+          <p className="text-muted-foreground text-sm">
+            {t("dashboard.twoFactor.copyUri")}
+          </p>
           <CopyButton textToCopy={totpURI} />
         </div>
         <otpForm.AppForm>
@@ -91,13 +95,15 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
                   <field.TextField
                     autoComplete="one-time-code"
                     id="enable-otp"
-                    label="Scan the QR code with your TOTP app and enter the code"
-                    placeholder="Enter OTP code"
+                    label={t("dashboard.twoFactor.otpLabel")}
+                    placeholder={t("dashboard.twoFactor.otpPlaceholder")}
                   />
                 )}
               </otpForm.AppField>
             </FieldGroup>
-            <otpForm.SubmitButton>Verify & Enable</otpForm.SubmitButton>
+            <otpForm.SubmitButton>
+              {t("dashboard.twoFactor.verifyAndEnable")}
+            </otpForm.SubmitButton>
           </otpForm.Form>
         </otpForm.AppForm>
       </div>
@@ -113,13 +119,15 @@ export function TwoFactorEnableForm({ onSuccess }: TwoFactorEnableFormProps) {
               <field.PasswordField
                 autoComplete="current-password"
                 id="enable-password"
-                label="Password"
-                placeholder="Enter your password"
+                label={t("common.password")}
+                placeholder={t("dashboard.twoFactor.passwordPlaceholder")}
               />
             )}
           </passwordForm.AppField>
         </FieldGroup>
-        <passwordForm.SubmitButton>Continue</passwordForm.SubmitButton>
+        <passwordForm.SubmitButton>
+          {t("dashboard.twoFactor.continueButton")}
+        </passwordForm.SubmitButton>
       </passwordForm.Form>
     </passwordForm.AppForm>
   );

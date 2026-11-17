@@ -144,6 +144,7 @@ export function SignUpForm({
             {(field) => (
               <field.FileField
                 accept="image/*"
+                clearLabel={t("auth.signUp.clearFile")}
                 id="sign-up-image"
                 label={t("auth.signUp.profileImageLabel")}
                 previewAlt={t("auth.signUp.profileImageAlt")}

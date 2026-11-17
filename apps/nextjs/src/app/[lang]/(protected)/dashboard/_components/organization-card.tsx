@@ -87,6 +87,11 @@ interface MemberItemProps {
 const MemberItem = memo(
   ({ member, currentMember, isRemoving, onRemove }: MemberItemProps) => {
     const { t } = useTranslation();
+    const roleLabels: Record<string, string> = {
+      admin: t("organization.admin"),
+      member: t("organization.member"),
+      owner: t("organization.owner"),
+    };
     const handleRemove = useCallback(() => {
       onRemove(member.id);
     }, [member.id, onRemove]);
@@ -103,7 +108,9 @@ const MemberItem = memo(
           </Avatar>
           <div>
             <p className="text-sm">{member.user.name}</p>
-            <p className="text-muted-foreground text-xs">{member.role}</p>
+            <p className="text-muted-foreground text-xs">
+              {roleLabels[member.role] ?? member.role}
+            </p>
           </div>
         </div>
         {member.role !== ORGANIZATION_ROLES.OWNER &&
@@ -139,6 +146,11 @@ interface InvitationItemProps {
 const InvitationItem = memo(
   ({ invitation, isCanceling, onCancel }: InvitationItemProps) => {
     const { t } = useTranslation();
+    const roleLabels: Record<string, string> = {
+      admin: t("organization.admin"),
+      member: t("organization.member"),
+      owner: t("organization.owner"),
+    };
     const handleCancel = useCallback(() => {
       onCancel(invitation.id);
     }, [invitation.id, onCancel]);
@@ -158,7 +170,9 @@ const InvitationItem = memo(
       >
         <div>
           <p className="text-sm">{invitation.email}</p>
-          <p className="text-muted-foreground text-xs">{invitation.role}</p>
+          <p className="text-muted-foreground text-xs">
+            {roleLabels[invitation.role] ?? invitation.role}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -375,7 +389,8 @@ const OrganizationCard = (props: { session: Session | null }) => {
               }
             />
             <AvatarFallback className="rounded-none">
-              {activeOrganization?.name?.charAt(0) || "P"}
+              {activeOrganization?.name?.charAt(0) ||
+                t("organization.personal").charAt(0)}
             </AvatarFallback>
           </Avatar>
           <div>

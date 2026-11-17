@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -21,18 +22,19 @@ export async function cancelInvitation(params: InvitationCancelParams) {
 }
 
 export const useInvitationCancelMutation = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: cancelInvitation,
     onError: (error) => {
-      toast.error(error.message || "Failed to revoke the invitation");
+      toast.error(error.message || t("organization.invitation.cancelFailed"));
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: organizationKeys.detail(),
       });
-      toast.success("Invitation revoked successfully");
+      toast.success(t("organization.invitation.cancelSuccess"));
     },
   });
 };

@@ -12,14 +12,16 @@ import {
 } from "@acme/ui/table";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 import { orpc } from "~/rpc/react";
 
 function AuditLogShell({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Audit Logs</CardTitle>
+        <CardTitle className="text-2xl">{t("auditLog.title")}</CardTitle>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
@@ -27,6 +29,7 @@ function AuditLogShell({ children }: { children: React.ReactNode }) {
 }
 
 export function AuditLogCard() {
+  const { t } = useTranslation();
   const { data: logs, isLoading } = useQuery(
     orpc.auditLog.list.queryOptions({
       input: { limit: 50, offset: 0 },
@@ -36,7 +39,7 @@ export function AuditLogCard() {
   if (isLoading) {
     return (
       <AuditLogShell>
-        <p className="text-muted-foreground text-sm">Loading audit logs…</p>
+        <p className="text-muted-foreground text-sm">{t("auditLog.loading")}</p>
       </AuditLogShell>
     );
   }
@@ -44,7 +47,7 @@ export function AuditLogCard() {
   if (!logs?.length) {
     return (
       <AuditLogShell>
-        <p className="text-muted-foreground text-sm">No audit events yet.</p>
+        <p className="text-muted-foreground text-sm">{t("auditLog.empty")}</p>
       </AuditLogShell>
     );
   }
@@ -54,10 +57,10 @@ export function AuditLogCard() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Time</TableHead>
-            <TableHead>Action</TableHead>
-            <TableHead>User</TableHead>
-            <TableHead>IP address</TableHead>
+            <TableHead>{t("auditLog.time")}</TableHead>
+            <TableHead>{t("auditLog.action")}</TableHead>
+            <TableHead>{t("auditLog.user")}</TableHead>
+            <TableHead>{t("auditLog.ipAddress")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

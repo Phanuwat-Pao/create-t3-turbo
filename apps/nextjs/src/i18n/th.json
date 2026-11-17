@@ -11,7 +11,8 @@
     "back": "กลับ",
     "name": "ชื่อ",
     "email": "อีเมล",
-    "password": "รหัสผ่าน"
+    "password": "รหัสผ่าน",
+    "tooManyRequests": "มีคำขอมากเกินไป กรุณาลองอีกครั้งในภายหลัง"
   },
   "seo": {
     "siteName": "create-t3-turbo",
@@ -57,7 +58,8 @@
     }
   },
   "header": {
-    "title": "BETTER-AUTH."
+    "title": "BETTER-AUTH.",
+    "toggleTheme": "สลับธีม"
   },
   "entryButton": {
     "signIn": "เข้าสู่ระบบ",
@@ -85,7 +87,8 @@
       "ariaGoogle": "เข้าสู่ระบบด้วย Google",
       "ariaGitHub": "เข้าสู่ระบบด้วย GitHub",
       "ariaMicrosoft": "เข้าสู่ระบบด้วย Microsoft",
-      "ariaVercel": "เข้าสู่ระบบด้วย Vercel"
+      "ariaVercel": "เข้าสู่ระบบด้วย Vercel",
+      "lastUsed": "ใช้ล่าสุด"
     },
     "signUp": {
       "title": "สมัครสมาชิก",
@@ -104,7 +107,8 @@
       "profileImageAlt": "ตัวอย่างโปรไฟล์",
       "createAccountButton": "สร้างบัญชี",
       "successMessage": "สมัครสมาชิกสำเร็จ",
-      "builtWith": "สร้างด้วย"
+      "builtWith": "สร้างด้วย",
+      "clearFile": "นำไฟล์ออก"
     },
     "forgotPassword": {
       "title": "ลืมรหัสผ่าน",
@@ -125,7 +129,8 @@
       "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
       "confirmPasswordPlaceholder": "ยืนยันรหัสผ่านใหม่",
       "resetButton": "รีเซ็ตรหัสผ่าน",
-      "successMessage": "รีเซ็ตรหัสผ่านสำเร็จ"
+      "successMessage": "รีเซ็ตรหัสผ่านสำเร็จ",
+      "loadingForm": "กำลังโหลดฟอร์มรีเซ็ตรหัสผ่าน"
     },
     "twoFactor": {
       "title": "ยืนยัน TOTP",
@@ -163,12 +168,19 @@
       "fullNameLabel": "ชื่อเต็ม",
       "profileImageLabel": "รูปโปรไฟล์",
       "profileImageAlt": "ตัวอย่างโปรไฟล์",
-      "updateButton": "อัปเดต"
+      "updateButton": "อัปเดต",
+      "clearImage": "นำรูปภาพออก",
+      "updateSuccess": "อัปเดตผู้ใช้สำเร็จ!",
+      "updateFailed": "ไม่สามารถอัปเดตผู้ใช้ได้",
+      "signOutSuccess": "ออกจากระบบสำเร็จ!",
+      "signOutFailed": "ไม่สามารถออกจากระบบได้"
     },
     "sessions": {
       "title": "เซสชันที่ใช้งาน",
       "signOut": "ออกจากระบบ",
-      "terminate": "ยุติ"
+      "terminate": "ยุติ",
+      "terminateSuccess": "ยุติเซสชันสำเร็จ",
+      "terminateFailed": "ไม่สามารถยุติเซสชันได้"
     },
     "emailVerification": {
       "title": "ยืนยันที่อยู่อีเมลของคุณ",
@@ -198,7 +210,16 @@
       "enableDescription": "เปิดใช้งาน 2FA เพื่อรักษาความปลอดภัยบัญชีของคุณ",
       "disableDescription": "ปิดการยืนยันตัวตนสองขั้นตอนจากบัญชีของคุณ",
       "scanQrCode": "สแกน QR Code",
-      "scanQrDescription": "สแกน QR Code ด้วยแอป TOTP ของคุณ"
+      "scanQrDescription": "สแกน QR Code ด้วยแอป TOTP ของคุณ",
+      "passwordPlaceholder": "กรอกรหัสผ่านของคุณ",
+      "continueButton": "ดำเนินการต่อ",
+      "showQrCode": "แสดง QR Code",
+      "copyUri": "คัดลอก URI ไปยังคลิปบอร์ด",
+      "otpLabel": "สแกน QR Code ด้วยแอป TOTP ของคุณ แล้วกรอกรหัส",
+      "otpPlaceholder": "กรอกรหัส OTP",
+      "verifyAndEnable": "ยืนยันและเปิดใช้งาน",
+      "enabledSuccess": "เปิดใช้งาน 2FA สำเร็จ",
+      "disabledSuccess": "ปิดใช้งาน 2FA สำเร็จ"
     },
     "changePassword": {
       "title": "เปลี่ยนรหัสผ่าน",
@@ -210,7 +231,9 @@
       "confirmPasswordLabel": "ยืนยันรหัสผ่าน",
       "confirmPasswordPlaceholder": "ยืนยันรหัสผ่าน",
       "revokeOtherSessions": "ออกจากระบบจากอุปกรณ์อื่น",
-      "changeButton": "เปลี่ยนรหัสผ่าน"
+      "changeButton": "เปลี่ยนรหัสผ่าน",
+      "success": "เปลี่ยนรหัสผ่านสำเร็จ",
+      "failed": "ไม่สามารถเปลี่ยนรหัสผ่านได้"
     }
   },
   "organization": {
@@ -238,14 +261,45 @@
       "slugPlaceholder": "my-organization",
       "logoLabel": "โลโก้",
       "logoAlt": "ตัวอย่างโลโก้",
-      "createButton": "สร้าง"
+      "createButton": "สร้าง",
+      "clearLogo": "นำโลโก้ออก",
+      "success": "สร้างองค์กรสำเร็จ",
+      "failed": "ไม่สามารถสร้างองค์กรได้"
     },
     "invite": {
       "emailLabel": "อีเมล",
       "emailPlaceholder": "member@example.com",
       "roleLabel": "บทบาท",
       "rolePlaceholder": "เลือกบทบาท",
-      "inviteButton": "เชิญ"
+      "inviteButton": "เชิญ",
+      "success": "เชิญสมาชิกสำเร็จ",
+      "failed": "ไม่สามารถเชิญสมาชิกได้"
+    },
+    "removeMemberSuccess": "ลบสมาชิกสำเร็จ",
+    "removeMemberFailed": "ไม่สามารถลบสมาชิกได้",
+    "invitation": {
+      "title": "คำเชิญเข้าร่วมองค์กร",
+      "description": "คุณได้รับคำเชิญให้เข้าร่วมองค์กร",
+      "welcome": "ยินดีต้อนรับสู่ {{organization}}!",
+      "joined": "คุณเข้าร่วมองค์กรเรียบร้อยแล้ว เรายินดีที่ได้คุณมาร่วมทีม!",
+      "declinedTitle": "ปฏิเสธคำเชิญแล้ว",
+      "declinedDescription": "คุณได้ปฏิเสธคำเชิญให้เข้าร่วม {{organization}} แล้ว",
+      "invitedBy": "<strong>{{inviter}}</strong> เชิญคุณเข้าร่วม <strong>{{organization}}</strong>",
+      "sentTo": "คำเชิญนี้ส่งถึง <strong>{{email}}</strong>",
+      "decline": "ปฏิเสธ",
+      "declining": "กำลังปฏิเสธ...",
+      "accept": "ยอมรับคำเชิญ",
+      "accepting": "กำลังยอมรับ...",
+      "errorTitle": "คำเชิญมีปัญหา",
+      "errorDescription": "เกิดปัญหากับคำเชิญของคุณ",
+      "errorBody": "คำเชิญที่คุณพยายามเปิดไม่ถูกต้อง หรือคุณไม่มีสิทธิ์เข้าถึง กรุณาตรวจสอบอีเมลเพื่อหาคำเชิญที่ถูกต้อง หรือติดต่อผู้ที่ส่งคำเชิญมา",
+      "goHome": "กลับหน้าแรก",
+      "acceptSuccess": "คุณได้ยอมรับคำเชิญแล้ว",
+      "acceptFailed": "ไม่สามารถยอมรับคำเชิญได้",
+      "rejectSuccess": "คุณได้ปฏิเสธคำเชิญแล้ว",
+      "rejectFailed": "ไม่สามารถปฏิเสธคำเชิญได้",
+      "cancelSuccess": "เพิกถอนคำเชิญสำเร็จ",
+      "cancelFailed": "ไม่สามารถเพิกถอนคำเชิญได้"
     }
   },
   "device": {
@@ -303,7 +357,8 @@
       "anotherAccount": "บัญชีอื่น",
       "noSession": "ไม่มีเซสชัน",
       "failedToSetActive": "ไม่สามารถตั้งค่าเซสชันที่ใช้งานได้",
-      "failedToContinue": "ไม่สามารถดำเนินการต่อได้"
+      "failedToContinue": "ไม่สามารถดำเนินการต่อได้",
+      "metaDescription": "เลือกบัญชีเพื่ออนุญาตแอปพลิเคชันนี้"
     },
     "selectOrganization": {
       "title": "เลือกองค์กร",
@@ -313,7 +368,8 @@
       "goBack": "กลับ",
       "noOrganization": "ไม่มีองค์กร",
       "failedToSetActive": "ไม่สามารถตั้งค่าองค์กรที่ใช้งานได้",
-      "failedToContinue": "ไม่สามารถดำเนินการต่อได้"
+      "failedToContinue": "ไม่สามารถดำเนินการต่อได้",
+      "metaDescription": "ระบุองค์กรที่จะอนุญาตให้แอปพลิเคชันนี้เข้าถึง"
     }
   },
   "accountSwitch": {
@@ -338,11 +394,118 @@
     "slugMaxLength": "Slug ต้องไม่เกิน 50 ตัวอักษร",
     "slugInvalidChars": "Slug สามารถมีได้เฉพาะตัวอักษรพิมพ์เล็ก ตัวเลข และยัติภังค์",
     "roleRequired": "กรุณาเลือกบทบาท",
-    "failedToProcessImage": "ประมวลผลรูปภาพล้มเหลว"
+    "failedToProcessImage": "ประมวลผลรูปภาพล้มเหลว",
+    "nameRequired": "ต้องกรอกชื่อ",
+    "reasonRequired": "ต้องกรอกเหตุผล",
+    "expirationDateRequired": "ต้องเลือกวันหมดอายุ",
+    "otpMinLength": "OTP ต้องมีอย่างน้อย 6 ตัวอักษร"
   },
   "admin": {
     "title": "แผงควบคุมผู้ดูแล",
     "users": "ผู้ใช้",
-    "impersonate": "แอบอ้าง"
+    "impersonate": "แอบอ้าง",
+    "dashboardTitle": "แดชบอร์ดผู้ดูแล",
+    "createUser": "สร้างผู้ใช้",
+    "createUserTitle": "สร้างผู้ใช้ใหม่",
+    "creating": "กำลังสร้าง...",
+    "roleLabel": "บทบาท",
+    "rolePlaceholder": "เลือกบทบาท",
+    "roleAdmin": "ผู้ดูแล",
+    "roleUser": "ผู้ใช้",
+    "banUser": "แบนผู้ใช้",
+    "banning": "กำลังแบน...",
+    "ban": "แบน",
+    "unban": "ยกเลิกแบน",
+    "reasonLabel": "เหตุผล",
+    "expirationDateLabel": "วันหมดอายุ",
+    "expirationDatePlaceholder": "เลือกวันที่",
+    "banned": "ถูกแบน",
+    "actions": "การดำเนินการ",
+    "yes": "ใช่",
+    "no": "ไม่",
+    "createUserSuccess": "สร้างผู้ใช้สำเร็จ",
+    "failedToCreateUser": "ไม่สามารถสร้างผู้ใช้ได้",
+    "banUserSuccess": "แบนผู้ใช้สำเร็จ",
+    "failedToBanUser": "ไม่สามารถแบนผู้ใช้ได้",
+    "unbanUserSuccess": "ยกเลิกแบนผู้ใช้สำเร็จ",
+    "failedToUnbanUser": "ไม่สามารถยกเลิกแบนผู้ใช้ได้",
+    "deleteUserSuccess": "ลบผู้ใช้สำเร็จ",
+    "failedToDeleteUser": "ไม่สามารถลบผู้ใช้ได้",
+    "revokeSessionsSuccess": "เพิกถอนเซสชันของผู้ใช้แล้ว",
+    "failedToRevokeSessions": "ไม่สามารถเพิกถอนเซสชันได้",
+    "impersonateSuccess": "แอบอ้างเป็นผู้ใช้แล้ว",
+    "failedToImpersonate": "ไม่สามารถแอบอ้างเป็นผู้ใช้ได้"
+  },
+  "background": {
+    "triggerRippleCell": "แสดงเอฟเฟกต์ระลอกคลื่นจากช่องนี้"
+  },
+  "auditLog": {
+    "title": "บันทึกการตรวจสอบ",
+    "loading": "กำลังโหลดบันทึกการตรวจสอบ…",
+    "empty": "ยังไม่มีเหตุการณ์ในบันทึกการตรวจสอบ",
+    "time": "เวลา",
+    "action": "การกระทำ",
+    "user": "ผู้ใช้",
+    "ipAddress": "ที่อยู่ IP"
+  },
+  "clientTest": {
+    "title": "ทดสอบการยืนยันตัวตนฝั่งไคลเอนต์",
+    "signInTitle": "เข้าสู่ระบบ",
+    "signInDescription": "กรอกอีเมลและรหัสผ่านเพื่อเข้าสู่ระบบ",
+    "signInButton": "เข้าสู่ระบบ",
+    "signingIn": "กำลังเข้าสู่ระบบ...",
+    "signInSuccess": "เข้าสู่ระบบสำเร็จ!",
+    "sessionTitle": "ข้อมูลเซสชัน",
+    "loadingSession": "กำลังโหลดเซสชัน...",
+    "loggedIn": "คุณเข้าสู่ระบบอยู่",
+    "notLoggedIn": "คุณยังไม่ได้เข้าสู่ระบบ",
+    "error": "ข้อผิดพลาด: {{message}}",
+    "profileAlt": "โปรไฟล์",
+    "sessionDetails": "รายละเอียดเซสชัน:",
+    "signInPrompt": "เข้าสู่ระบบเพื่อดูข้อมูลเซสชันของคุณ",
+    "signOut": "ออกจากระบบ"
+  },
+  "posts": {
+    "titleLabel": "หัวข้อบั๊ก",
+    "titlePlaceholder": "หัวข้อ",
+    "contentLabel": "เนื้อหา",
+    "contentPlaceholder": "เนื้อหา",
+    "create": "สร้าง",
+    "empty": "ยังไม่มีโพสต์",
+    "loginToCreate": "คุณต้องเข้าสู่ระบบก่อนจึงจะโพสต์ได้",
+    "failedToCreate": "ไม่สามารถสร้างโพสต์ได้",
+    "loginToDelete": "คุณต้องเข้าสู่ระบบก่อนจึงจะลบโพสต์ได้",
+    "failedToDelete": "ไม่สามารถลบโพสต์ได้"
+  },
+  "pricing": {
+    "title": "ราคาที่เรียบง่ายและโปร่งใส",
+    "description": "เลือกแพ็กเกจที่เหมาะกับคุณ",
+    "popular": "ยอดนิยม",
+    "perMonth": "ต่อเดือน",
+    "billedMonthly": "เรียกเก็บเงินรายเดือน",
+    "billedAnnually": "เรียกเก็บเงินรายปี",
+    "annualBilling": "ชำระรายปี",
+    "annualSavings": "(ประหยัด 20%)",
+    "plus": {
+      "buttonText": "เริ่มทดลองใช้ฟรี",
+      "description": "เหมาะสำหรับผู้ใช้ทั่วไปและโปรเจกต์ขนาดเล็ก",
+      "features": {
+        "projects": "สูงสุด 10 โปรเจกต์",
+        "analytics": "การวิเคราะห์ขั้นพื้นฐาน",
+        "support": "ทีมสนับสนุนตอบกลับภายใน 48 ชั่วโมง",
+        "api": "เข้าถึง API แบบจำกัด"
+      }
+    },
+    "pro": {
+      "buttonText": "เริ่มต้นใช้งาน",
+      "description": "เหมาะสำหรับทีมและธุรกิจที่กำลังเติบโต",
+      "features": {
+        "projects": "โปรเจกต์ไม่จำกัด",
+        "analytics": "การวิเคราะห์ขั้นสูง",
+        "support": "ทีมสนับสนุนตอบกลับภายใน 24 ชั่วโมง",
+        "api": "เข้าถึง API เต็มรูปแบบ",
+        "priority": "การสนับสนุนแบบเร่งด่วน"
+      }
+    }
   }
 }

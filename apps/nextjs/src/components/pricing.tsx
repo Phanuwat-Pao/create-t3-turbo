@@ -16,6 +16,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { useTranslation } from "react-i18next";
 
 import { withLocale } from "~/i18n/localized-path";
 import { useLocale } from "~/i18n/use-locale";
@@ -69,6 +70,7 @@ function getXOffset(index: number): number {
 
 const PlanCard = memo(
   ({ plan, index, isDesktop, isMonthly }: PlanCardProps) => {
+    const { t } = useTranslation();
     const locale = useLocale();
     const handleUpgrade = useCallback(() => {
       if (plan.href) {
@@ -114,7 +116,7 @@ const PlanCard = memo(
           <div className="bg-primary absolute top-0 right-0 flex items-center rounded-tr-sm rounded-bl-sm px-2 py-0.5">
             <Star className="text-primary-foreground h-4 w-4 fill-current" />
             <span className="text-primary-foreground ml-1 font-sans font-semibold">
-              Popular
+              {t("pricing.popular")}
             </span>
           </div>
         )}
@@ -150,7 +152,9 @@ const PlanCard = memo(
           </div>
 
           <p className="text-muted-foreground text-xs leading-5">
-            {isMonthly ? "billed monthly" : "billed annually"}
+            {isMonthly
+              ? t("pricing.billedMonthly")
+              : t("pricing.billedAnnually")}
           </p>
 
           <ul className="mt-5 flex flex-col gap-2">
@@ -194,11 +198,8 @@ interface PricingProps {
   description?: string;
 }
 
-export function Pricing({
-  plans,
-  title = "Simple, Transparent Pricing",
-  description = "Choose the plan that works for you",
-}: PricingProps) {
+export function Pricing({ plans, title, description }: PricingProps) {
+  const { t } = useTranslation();
   const [isMonthly, setIsMonthly] = useState(true);
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const switchRef = useRef<HTMLButtonElement>(null);
@@ -237,10 +238,10 @@ export function Pricing({
     <div className="container py-4">
       <div className="mb-3 space-y-4 text-center">
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          {title}
+          {title ?? t("pricing.title")}
         </h2>
         <p className="text-muted-foreground whitespace-pre-line">
-          {description}
+          {description ?? t("pricing.description")}
         </p>
       </div>
 
@@ -258,7 +259,8 @@ export function Pricing({
           htmlFor={billingSwitchId}
           className="ml-2 block text-base leading-normal font-semibold"
         >
-          Annual billing <span className="text-primary">(Save 20%)</span>
+          {t("pricing.annualBilling")}{" "}
+          <span className="text-primary">{t("pricing.annualSavings")}</span>
         </Label>
       </div>
 

@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { authClient } from "~/auth/client";
@@ -23,18 +24,19 @@ export async function inviteReject(params: InviteRejectParams) {
 export type InviteRejectData = Awaited<ReturnType<typeof inviteReject>>;
 
 export const useInviteRejectMutation = () => {
+  const { t } = useTranslation();
   const queryClient = getQueryClient();
 
   return useMutation({
     mutationFn: inviteReject,
     onError: (error) => {
-      toast.error(error.message || "Failed to decline the invitation");
+      toast.error(error.message || t("organization.invitation.rejectFailed"));
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: organizationKeys.all(),
       });
-      toast.success("You have declined the invitation");
+      toast.success(t("organization.invitation.rejectSuccess"));
     },
   });
 };

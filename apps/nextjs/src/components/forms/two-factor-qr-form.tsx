@@ -4,22 +4,24 @@ import CopyButton from "@acme/ui/copy-button";
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { QRCode } from "react-qr-code";
 import { toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
 
-const passwordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters."),
-});
-
 interface TwoFactorQrFormProps {
   onSuccess?: (totpURI: string) => void;
 }
 
 export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
+  const { t } = useTranslation();
   const [totpURI, setTotpURI] = useState<string>("");
+
+  const passwordSchema = z.object({
+    password: z.string().min(8, t("validation.passwordMinLength")),
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -52,7 +54,9 @@ export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
           <QRCode value={totpURI} />
         </div>
         <div className="flex items-center justify-center gap-2">
-          <p className="text-muted-foreground text-sm">Copy URI to clipboard</p>
+          <p className="text-muted-foreground text-sm">
+            {t("dashboard.twoFactor.copyUri")}
+          </p>
           <CopyButton textToCopy={totpURI} />
         </div>
       </div>
@@ -68,13 +72,15 @@ export function TwoFactorQrForm({ onSuccess }: TwoFactorQrFormProps) {
               <field.PasswordField
                 autoComplete="current-password"
                 id="qr-password"
-                label="Password"
-                placeholder="Enter your password"
+                label={t("common.password")}
+                placeholder={t("dashboard.twoFactor.passwordPlaceholder")}
               />
             )}
           </form.AppField>
         </FieldGroup>
-        <form.SubmitButton>Show QR Code</form.SubmitButton>
+        <form.SubmitButton>
+          {t("dashboard.twoFactor.showQrCode")}
+        </form.SubmitButton>
       </form.Form>
     </form.AppForm>
   );
