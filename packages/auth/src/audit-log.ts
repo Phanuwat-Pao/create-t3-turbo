@@ -1,7 +1,7 @@
 import { db } from "@acme/db/client";
 import { AuditLog } from "@acme/db/schema";
 import type { BetterAuthPlugin } from "better-auth";
-import { createAuthMiddleware } from "better-auth/api";
+import { createAuthMiddleware, isAPIError } from "better-auth/api";
 
 /**
  * Auth events recorded by the self-hosted audit log. Mirrors the event names
@@ -63,7 +63,25 @@ export const auditLog = () =>
               return;
             }
 
-            const session = ctx.context.newSession ?? ctx.context.session;
+            // A failed request did not do what the action says. Redirects are
+            // APIErrors too (social callbacks end in a 302), so only error
+            // statuses count as failures.
+            const { newSession, returned } = ctx.context;
+            if (isAPIError(returned) && returned.statusCode >= 400) {
+              return;
+            }
+            // Callbacks report failure through their redirect target, and a
+            // sign-in that still needs a second factor has no session yet, so
+            // only a new session proves a sign-in happened.
+            if (action === "user_signed_in" && !newSession) {
+              return;
+            }
+
+            const returnedUser = (returned as { user?: { id?: unknown } })
+              ?.user;
+            const userId =
+              (newSession ?? ctx.context.session)?.user.id ??
+              (typeof returnedUser?.id === "string" ? returnedUser.id : null);
             const headers = ctx.request?.headers ?? ctx.headers;
 
             try {
@@ -74,7 +92,7 @@ export const auditLog = () =>
                   null,
                 metadata: { path: ctx.path },
                 userAgent: headers?.get("user-agent") ?? null,
-                userId: session?.user.id ?? null,
+                userId,
               });
             } catch (error) {
               console.error("[audit-log] failed to record event", error);
