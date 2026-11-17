@@ -8,6 +8,7 @@
     "./middleware": "./src/middleware.ts",
     "./client": "./src/client.ts",
     "./device-clients": "./src/device-clients.ts",
+    "./translations": "./src/translations.ts",
     "./env": "./env.ts"
   },
   "scripts": {

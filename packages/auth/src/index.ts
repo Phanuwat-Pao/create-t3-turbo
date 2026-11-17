@@ -148,6 +148,10 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       },
     },
     onAPIError: {
+      // Failed social, SSO and OAuth provider flows land on the app's own
+      // translated page. Without this, production sends them to the home
+      // page with only ?error= in the URL.
+      errorURL: `${baseOrigin}/auth-error`,
       onError(error, ctx) {
         console.error("BETTER AUTH API ERROR", error, ctx);
       },

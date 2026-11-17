@@ -38,6 +38,10 @@
     "forgotPassword": {
       "title": "Forgot password",
       "description": "Request a link to reset your password."
+    },
+    "authError": {
+      "title": "Sign-in error",
+      "description": "Sign-in could not finish."
     }
   },
   "landing": {
@@ -582,6 +586,25 @@
       "heading": "Sign in",
       "link": "Click here to sign in with this magic link",
       "footer": "If you didn't try to sign in, you can safely ignore this email."
+    }
+  },
+  "authError": {
+    "title": "Sign-in could not finish",
+    "generic": "Something went wrong while signing you in. Start again, or try another sign-in method.",
+    "details": "Error details",
+    "backToSignIn": "Back to sign in",
+    "goHome": "Go to the home page",
+    "reasons": {
+      "restart": "The sign-in was interrupted or took too long. Start signing in again.",
+      "unavailable": "This sign-in method is not available.",
+      "missingProfile": "The provider did not share the details needed to sign you in, such as your email address.",
+      "emailNotVerified": "Verify your email address with the provider, then try again.",
+      "linkFailed": "This account could not be linked. It may already belong to another user, or its email may not match yours.",
+      "signupDisabled": "New sign-ups are closed.",
+      "banned": "This account is banned.",
+      "accessDenied": "Access was denied. The request was canceled, or you do not have permission.",
+      "invalidClientRequest": "The application that sent you here made a request this server cannot accept.",
+      "serverError": "Something went wrong on our side. Try again in a moment."
     }
   }
 }
