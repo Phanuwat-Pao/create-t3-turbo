@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, buttonVariants } from "@acme/ui/button";
+import { Button } from "@acme/ui/button";
 import { Label } from "@acme/ui/label";
 import { Switch } from "@acme/ui/switch";
 import NumberFlow from "@number-flow/react";
@@ -167,17 +167,15 @@ const PlanCard = memo(
           </ul>
 
           <hr className="my-4 w-full" />
+          {/* The popular plan takes the primary variant. Overriding the outline
+              variant's background with a class loses to its dark-mode
+              background, which left the label dark on dark. */}
           <Button
             onClick={handleUpgrade}
+            variant={plan.isPopular ? "default" : "outline"}
             className={cn(
-              buttonVariants({
-                variant: "outline",
-              }),
               "group relative w-full gap-2 overflow-hidden text-lg font-semibold tracking-tighter",
-              "hover:ring-primary hover:bg-primary hover:text-primary-foreground transform-gpu ring-offset-current transition-all duration-300 ease-out hover:ring-2 hover:ring-offset-1",
-              plan.isPopular
-                ? "bg-primary text-primary-foreground"
-                : "bg-background text-foreground"
+              "hover:ring-primary transform-gpu ring-offset-current transition-all duration-300 ease-out hover:ring-2 hover:ring-offset-1"
             )}
           >
             {plan.buttonText}
