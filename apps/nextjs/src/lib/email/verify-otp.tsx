@@ -1,31 +1,37 @@
 import { Heading, Text } from "react-email";
 
-import { BaseEmail, styles } from "./components/base-email";
+import type { Locale } from "~/i18n/i18n-config";
+
+import { BaseEmail, DEFAULT_BRAND_NAME, styles } from "./components/base-email";
+import type { EmailT } from "./i18n";
 
 interface VerifyOTPProps {
+  locale: Locale;
+  t: EmailT;
   code: string;
   brandName?: string;
-  brandTagline?: string;
   brandLogoUrl?: string;
 }
 
+/** The one-time code for two-factor sign-in. */
 export default function VerifyOTP({
+  locale,
+  t,
   code,
-  brandName,
-  brandTagline,
+  brandName = DEFAULT_BRAND_NAME,
   brandLogoUrl,
 }: VerifyOTPProps) {
   return (
     <BaseEmail
-      previewText="Your verification code"
+      lang={locale}
+      previewText={t("email.twoFactor.preview")}
+      footerText={t("email.footer", { brand: brandName })}
       brandName={brandName}
-      brandTagline={brandTagline}
       brandLogoUrl={brandLogoUrl}
+      brandLogoAlt={t("email.logoAlt", { brand: brandName })}
     >
-      <Heading style={styles.h1}>Verify your email</Heading>
-      <Text style={styles.text}>
-        Enter this verification code to verify your email address:
-      </Text>
+      <Heading style={styles.h1}>{t("email.twoFactor.heading")}</Heading>
+      <Text style={styles.text}>{t("email.twoFactor.body")}</Text>
       <code style={styles.code}>{code}</code>
       <Text
         style={{
@@ -35,12 +41,8 @@ export default function VerifyOTP({
           marginTop: "14px",
         }}
       >
-        If you didn&apos;t create an account, you can safely ignore this email.
+        {t("email.twoFactor.footer")}
       </Text>
     </BaseEmail>
   );
-}
-
-export function reactVerifyOTP(props: VerifyOTPProps) {
-  return <VerifyOTP {...props} />;
 }

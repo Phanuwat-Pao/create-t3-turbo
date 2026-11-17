@@ -1,28 +1,35 @@
 import { Heading, Link, Text } from "react-email";
 
-import { BaseEmail, styles } from "./components/base-email";
+import type { Locale } from "~/i18n/i18n-config";
+
+import { BaseEmail, DEFAULT_BRAND_NAME, styles } from "./components/base-email";
+import type { EmailT } from "./i18n";
 
 interface BetterAuthMagicLinkEmailProps {
+  locale: Locale;
+  t: EmailT;
   url: string;
   brandName?: string;
-  brandTagline?: string;
   brandLogoUrl?: string;
 }
 
 export default function MagicLinkEmail({
+  locale,
+  t,
   url,
-  brandName,
-  brandTagline,
+  brandName = DEFAULT_BRAND_NAME,
   brandLogoUrl,
 }: BetterAuthMagicLinkEmailProps) {
   return (
     <BaseEmail
-      previewText="Sign in with this magic link"
+      lang={locale}
+      previewText={t("email.magicLink.preview")}
+      footerText={t("email.footer", { brand: brandName })}
       brandName={brandName}
-      brandTagline={brandTagline}
       brandLogoUrl={brandLogoUrl}
+      brandLogoAlt={t("email.logoAlt", { brand: brandName })}
     >
-      <Heading style={styles.h1}>Sign in</Heading>
+      <Heading style={styles.h1}>{t("email.magicLink.heading")}</Heading>
       <Link
         href={url}
         target="_blank"
@@ -32,7 +39,7 @@ export default function MagicLinkEmail({
           marginBottom: "16px",
         }}
       >
-        Click here to sign in with this magic link
+        {t("email.magicLink.link")}
       </Link>
       <Text
         style={{
@@ -42,12 +49,8 @@ export default function MagicLinkEmail({
           marginTop: "14px",
         }}
       >
-        If you didn&apos;t try to sign in, you can safely ignore this email.
+        {t("email.magicLink.footer")}
       </Text>
     </BaseEmail>
   );
-}
-
-export function reactMagicLinkEmail(props: BetterAuthMagicLinkEmailProps) {
-  return <MagicLinkEmail {...props} />;
 }

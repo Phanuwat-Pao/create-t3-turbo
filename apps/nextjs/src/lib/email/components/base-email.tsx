@@ -10,14 +10,18 @@ import {
   Text,
 } from "react-email";
 
+export const DEFAULT_BRAND_NAME = "Better Auth";
+
 export interface BaseEmailProps {
   children: React.ReactNode;
+  /** The email's language, for the `lang` attribute. */
+  lang: string;
   previewText: string;
+  footerText: string;
   footerLinks?: { text: string; href: string }[];
-  footerText?: string;
   brandName?: string;
-  brandTagline?: string;
   brandLogoUrl?: string;
+  brandLogoAlt?: string;
 }
 
 export const styles = {
@@ -76,28 +80,24 @@ const EMPTY_FOOTER_LINKS: NonNullable<BaseEmailProps["footerLinks"]> = [];
 
 export function BaseEmail({
   children,
+  lang,
   previewText,
-  footerLinks = EMPTY_FOOTER_LINKS,
   footerText,
-  brandName = "Better Auth",
-  brandTagline = "Simple, secure authentication for your applications",
+  footerLinks = EMPTY_FOOTER_LINKS,
+  brandName = DEFAULT_BRAND_NAME,
   brandLogoUrl,
+  brandLogoAlt = brandName,
 }: BaseEmailProps) {
   return (
-    <Html>
+    <Html lang={lang}>
       <Head />
-      <Body style={styles.main}>
+      <Body lang={lang} style={styles.main}>
         <Preview>{previewText}</Preview>
         <Container style={styles.container}>
           {children}
 
           {brandLogoUrl && (
-            <Img
-              src={brandLogoUrl}
-              width="32"
-              height="32"
-              alt={`${brandName} Logo`}
-            />
+            <Img src={brandLogoUrl} width="32" height="32" alt={brandLogoAlt} />
           )}
 
           <Text style={styles.footer}>
@@ -114,11 +114,7 @@ export function BaseEmail({
               </React.Fragment>
             ))}
             {footerLinks.length > 0 && <br />}
-            {footerText ?? (
-              <>
-                {brandName}, {brandTagline.toLowerCase()}
-              </>
-            )}
+            {footerText}
           </Text>
         </Container>
       </Body>

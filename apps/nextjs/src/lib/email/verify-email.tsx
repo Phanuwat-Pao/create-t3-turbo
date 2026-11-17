@@ -1,28 +1,35 @@
 import { Heading, Link, Text } from "react-email";
 
-import { BaseEmail, styles } from "./components/base-email";
+import type { Locale } from "~/i18n/i18n-config";
+
+import { BaseEmail, DEFAULT_BRAND_NAME, styles } from "./components/base-email";
+import type { EmailT } from "./i18n";
 
 interface VerifyEmailProps {
+  locale: Locale;
+  t: EmailT;
   url: string;
   brandName?: string;
-  brandTagline?: string;
   brandLogoUrl?: string;
 }
 
 export default function VerifyEmail({
+  locale,
+  t,
   url,
-  brandName,
-  brandTagline,
+  brandName = DEFAULT_BRAND_NAME,
   brandLogoUrl,
 }: VerifyEmailProps) {
   return (
     <BaseEmail
-      previewText="Verify your email address"
+      lang={locale}
+      previewText={t("email.verifyEmail.preview")}
+      footerText={t("email.footer", { brand: brandName })}
       brandName={brandName}
-      brandTagline={brandTagline}
       brandLogoUrl={brandLogoUrl}
+      brandLogoAlt={t("email.logoAlt", { brand: brandName })}
     >
-      <Heading style={styles.h1}>Verify your email</Heading>
+      <Heading style={styles.h1}>{t("email.verifyEmail.heading")}</Heading>
       <Link
         href={url}
         target="_blank"
@@ -32,7 +39,7 @@ export default function VerifyEmail({
           marginBottom: "16px",
         }}
       >
-        Click here to verify your email address
+        {t("email.verifyEmail.link")}
       </Link>
       <Text
         style={{
@@ -42,7 +49,7 @@ export default function VerifyEmail({
           marginTop: "14px",
         }}
       >
-        If you didn&apos;t create an account, you can safely ignore this email.
+        {t("email.verifyEmail.footer")}
       </Text>
     </BaseEmail>
   );

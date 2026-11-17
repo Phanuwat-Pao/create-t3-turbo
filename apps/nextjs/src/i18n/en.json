@@ -539,5 +539,49 @@
         "priority": "Priority support"
       }
     }
+  },
+  "email": {
+    "footer": "{{brand}}, simple, secure authentication for your applications",
+    "logoAlt": "{{brand}} logo",
+    "copyUrl": "Or copy and paste this URL into your browser:",
+    "resetPassword": {
+      "subject": "Reset your password",
+      "preview": "Reset your Better Auth password",
+      "heading": "Reset your <strong>Better Auth</strong> password",
+      "greeting": "Hello {{name}},",
+      "body": "We received a request to reset the password for your Better Auth account. If you didn't make this request, you can safely ignore this email.",
+      "button": "Reset Password",
+      "footer": "If you didn't request a password reset, please ignore this email or contact support if you have concerns."
+    },
+    "verifyEmail": {
+      "subject": "Verify your email address",
+      "preview": "Verify your email address",
+      "heading": "Verify your email",
+      "link": "Click here to verify your email address",
+      "footer": "If you didn't create an account, you can safely ignore this email."
+    },
+    "invitation": {
+      "subject": "You've been invited to join an organization",
+      "preview": "Join {{inviter}} on Better Auth",
+      "heading": "Join <strong>{{inviter}}</strong> on <strong>Better Auth</strong>",
+      "greeting": "Hello there,",
+      "body": "<strong>{{inviter}}</strong> (<email>{{email}}</email>) has invited you to the <strong>{{organization}}</strong> team on <strong>Better Auth</strong>.",
+      "button": "Join the team",
+      "footer": "This invitation was intended for <recipient>{{recipient}}</recipient>. If you were not expecting this invitation, you can ignore this email."
+    },
+    "twoFactor": {
+      "subject": "Your two-factor authentication code",
+      "preview": "Your two-factor authentication code",
+      "heading": "Two-factor authentication",
+      "body": "Enter this code to finish signing in:",
+      "footer": "If you didn't try to sign in, someone else may know your password. Change it as soon as you can."
+    },
+    "magicLink": {
+      "subject": "Your sign-in link",
+      "preview": "Sign in with this magic link",
+      "heading": "Sign in",
+      "link": "Click here to sign in with this magic link",
+      "footer": "If you didn't try to sign in, you can safely ignore this email."
+    }
   }
 }

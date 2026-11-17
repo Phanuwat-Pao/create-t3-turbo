@@ -32,7 +32,7 @@ import {
 
 import { auditLog } from "./audit-log";
 import { deviceClients } from "./device-clients";
-import { resolveRequestLocale } from "./locale";
+import { type AuthLocale, resolveRequestLocale } from "./locale";
 import { translations } from "./translations";
 
 export interface InitAuthOptions<
@@ -65,10 +65,15 @@ export interface InitAuthOptions<
   extraPlugins?: TExtraPlugins;
   trustedOrigins?: string[];
 
+  /**
+   * Delivers an auth email. The app picks the subject and copy from
+   * `template`, written in `locale`: the language of the request that
+   * triggered the email (see `resolveRequestLocale`).
+   */
   sendEmail?: (options: {
-    to: string;
-    subject: string;
+    locale: AuthLocale;
     template: string;
+    to: string;
     variables: Record<string, string>;
   }) => Promise<void>;
 }
@@ -112,9 +117,9 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     }),
     emailAndPassword: {
       enabled: true,
-      async sendResetPassword({ user, url }) {
+      async sendResetPassword({ user, url }, request) {
         await sendEmail({
-          subject: "Reset your password",
+          locale: resolveRequestLocale(request),
           template: "reset-password",
           to: user.email,
           variables: {
@@ -126,9 +131,9 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       },
     },
     emailVerification: {
-      async sendVerificationEmail({ user, url }) {
+      async sendVerificationEmail({ user, url }, request) {
         await sendEmail({
-          subject: "Verify your email address",
+          locale: resolveRequestLocale(request),
           template: "verify-email",
           to: user.email,
           variables: {
@@ -149,9 +154,10 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
     },
     plugins: [
       organization({
-        async sendInvitationEmail(data) {
+        async sendInvitationEmail(data, request) {
           await sendEmail({
-            subject: "You've been invited to join an organization",
+            // The recipient's language is unknown; write in the inviter's.
+            locale: resolveRequestLocale(request),
             template: "invitation",
             to: data.email,
             variables: {
@@ -166,9 +172,9 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       }),
       twoFactor({
         otpOptions: {
-          async sendOTP({ user, otp }) {
+          async sendOTP({ user, otp }, ctx) {
             await sendEmail({
-              subject: "Your two-factor authentication code",
+              locale: resolveRequestLocale(ctx),
               template: "two-factor",
               to: user.email,
               variables: {
