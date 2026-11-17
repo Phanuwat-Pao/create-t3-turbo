@@ -32,9 +32,8 @@ import {
 
 import { auditLog } from "./audit-log";
 import { deviceClients } from "./device-clients";
+import { resolveRequestLocale } from "./locale";
 import { translations } from "./translations";
-
-const SUPPORTED_LOCALES = new Set(["th", "en"]);
 
 export interface InitAuthOptions<
   TExtraPlugins extends BetterAuthPlugin[] = [],
@@ -218,22 +217,12 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
       username(),
       auditLog(),
       i18n({
-        // The web app's locale is path-based (/th, /en), so the Referer path
-        // is the source of truth there; Accept-Language covers Expo and
-        // direct API callers.
-        detection: ["callback", "header"],
-        getLocale: (ctx) => {
-          const referer = ctx.request?.headers.get("referer");
-          if (!referer) {
-            return null;
-          }
-          try {
-            const segment = new URL(referer).pathname.split("/")[1] ?? "";
-            return SUPPORTED_LOCALES.has(segment) ? segment : null;
-          } catch {
-            return null;
-          }
-        },
+        // One rule for error messages and emails: the Referer's /th or /en
+        // path segment, then Accept-Language, then English. It always picks
+        // a locale, so the plugin's own header detection is not needed; an
+        // "en" answer finds no translations and keeps Better Auth's English.
+        detection: ["callback"],
+        getLocale: (ctx) => resolveRequestLocale(ctx),
         translations,
       }),
       oauthProvider({
@@ -439,6 +428,7 @@ export function initAuth<TExtraPlugins extends BetterAuthPlugin[] = []>(
 }
 
 export { APIError } from "better-auth";
+export { type AuthLocale, resolveRequestLocale } from "./locale";
 export type { Organization } from "better-auth/plugins";
 
 export type Auth = ReturnType<typeof initAuth>;

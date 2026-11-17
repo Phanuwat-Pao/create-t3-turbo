@@ -11,9 +11,10 @@
     "./env": "./env.ts"
   },
   "scripts": {
-    "ncu": "ncu -u",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "generate": "dotenv -e ../../.env -- pnpx auth@latest generate --config script/auth-cli.ts --output ../db/src/auth-schema.ts",
+    "ncu": "ncu -u",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -30,6 +31,8 @@
   },
   "devDependencies": {
     "@acme/tsconfig": "workspace:*",
-    "typescript": "catalog:"
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
