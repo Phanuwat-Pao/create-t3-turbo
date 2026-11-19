@@ -87,7 +87,7 @@ function resolveAction(path: string | undefined): AuditLogAction | null {
 
 /**
  * Self-hosted audit logging: an after-hook that records auth events into the
- * `audit_log` table. Inserts are best-effort — a logging failure must never
+ * `audit_log` table. Inserts are best-effort. A logging failure must never
  * break the auth flow itself.
  */
 export const auditLog = () =>

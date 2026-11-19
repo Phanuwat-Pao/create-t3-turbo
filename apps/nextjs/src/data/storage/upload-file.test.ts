@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this, import/first, jest/max-expects, jest/no-hooks, jest/valid-title, no-empty-function, no-use-before-define, typescript-eslint/consistent-type-imports */
 const storageRequests = vi.hoisted(() => ({
   requestAbortMultipartUpload: vi.fn(),
   requestCompleteMultipartUpload: vi.fn(),
@@ -7,11 +6,13 @@ const storageRequests = vi.hoisted(() => ({
   requestSignMultipartPart: vi.fn(),
 }));
 
+// oxlint-disable-next-line typescript-eslint/consistent-type-imports -- vi.mock types its factory with typeof import()
 vi.mock<typeof import("./storage-mutations")>(
   import("./storage-mutations"),
   () => storageRequests
 );
 
+// oxlint-disable-next-line import/first -- the mock it depends on reads better above it
 import { StorageUploadError, uploadFile } from "./upload-file";
 
 type ProgressListener = (event: ProgressEvent) => void;
@@ -126,6 +127,7 @@ class FakeXMLHttpRequest {
     this.url = url;
   }
 
+  // oxlint-disable-next-line class-methods-use-this -- no-op stub of the XMLHttpRequest method
   overrideMimeType(): void {}
 
   removeEventListener(

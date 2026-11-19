@@ -77,6 +77,10 @@ export function AuditLogCard() {
     );
   }
 
+  const unknown = (
+    <span className="text-muted-foreground">{t("auditLog.unknown")}</span>
+  );
+
   return (
     <AuditLogShell>
       <Table>
@@ -102,9 +106,9 @@ export function AuditLogCard() {
                 </Badge>
               </TableCell>
               <TableCell>
-                {log.user ? (log.user.name ?? log.user.email) : "—"}
+                {log.user ? (log.user.name ?? log.user.email) : unknown}
               </TableCell>
-              <TableCell>{log.ipAddress ?? "—"}</TableCell>
+              <TableCell>{log.ipAddress ?? unknown}</TableCell>
             </TableRow>
           ))}
         </TableBody>

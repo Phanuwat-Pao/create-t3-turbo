@@ -122,8 +122,8 @@ function defineConfig({ config }: ConfigContext): ExpoConfig {
     ],
     // Deep-link scheme. Must stay in sync with the mobile origin trusted in
     // packages/auth (a session cookie is redirected to it after OAuth), and
-    // must be unique to this app — a generic scheme can be claimed by any
-    // other app installed on the device.
+    // must be unique to this app. Any other app installed on the device can
+    // claim a generic scheme.
     scheme: "create-t3-turbo",
     slug: "create-t3-turbo",
     userInterfaceStyle: "automatic",

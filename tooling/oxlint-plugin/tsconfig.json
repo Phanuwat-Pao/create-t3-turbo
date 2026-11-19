@@ -1,0 +1,10 @@
+{
+  "extends": "@acme/tsconfig/base.json",
+  "include": ["src", "vitest.config.ts"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "strictNullChecks": true,
+    "types": ["node", "vitest/globals"]
+  }
+}

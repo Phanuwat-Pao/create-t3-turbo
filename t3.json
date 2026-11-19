@@ -1,0 +1,24 @@
+{
+  "$schema": "https://t3.codes/schema/t3.json",
+  "scripts": [
+    {
+      "name": "Dev",
+      "command": "pnpm dev",
+      "icon": "play",
+      "stopOnSettle": true
+    },
+    {
+      "name": "Setup worktree",
+      "command": "node scripts/setup-worktree.ts",
+      "icon": "configure",
+      "runOnWorktreeCreate": true,
+      "async": false
+    },
+    {
+      "name": "Clean build output",
+      "command": "node scripts/clean-worktree.ts",
+      "icon": "configure",
+      "runOnSettle": true
+    }
+  ]
+}

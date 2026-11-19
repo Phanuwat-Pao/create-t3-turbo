@@ -464,6 +464,7 @@
     "action": "Action",
     "user": "User",
     "ipAddress": "IP address",
+    "unknown": "Unknown",
     "actions": {
       "inviteAccepted": "Invitation accepted",
       "inviteCancelled": "Invitation revoked",

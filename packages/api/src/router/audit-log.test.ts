@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-hooks, jest/require-hook, promise/prefer-await-to-callbacks */
 import { call } from "@orpc/server";
 
 import type { Context } from "../orpc";
@@ -17,8 +16,8 @@ function createContext(options: {
         findMany: options.findMany ?? vi.fn(),
       },
     },
-    transaction: async (callback: (tx: Context["db"]) => Promise<unknown>) =>
-      callback(db as unknown as Context["db"]),
+    transaction: async (run: (tx: Context["db"]) => Promise<unknown>) =>
+      run(db as unknown as Context["db"]),
   };
 
   return {

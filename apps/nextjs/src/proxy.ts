@@ -50,6 +50,5 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // oxlint-disable-next-line unicorn/prefer-string-raw
   matcher: ["/((?!.*\\..*|_next|api|.well-known).*)", "/"],
 };

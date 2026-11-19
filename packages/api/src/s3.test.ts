@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-hooks, jest/require-hook */
 import {
   AbortMultipartUploadCommand,
   CompleteMultipartUploadCommand,

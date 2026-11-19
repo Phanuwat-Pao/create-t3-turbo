@@ -148,7 +148,7 @@ export default function Page() {
             {!isPending && !error && session && (
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {/* oxlint-disable-next-line @next/next/no-img-element -- /api/avatar redirects to S3 and OAuth hosts that next/image is not configured for */}
                   <img
                     src={getAvatarUrl(session.user.id)}
                     alt={t("clientTest.profileAlt")}

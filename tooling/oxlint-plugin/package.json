@@ -1,0 +1,25 @@
+{
+  "name": "@acme/oxlint-plugin",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "ncu": "ncu -u",
+    "clean": "git clean -xdf .cache .turbo node_modules",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@oxlint/plugins": "^1.94.0"
+  },
+  "devDependencies": {
+    "@acme/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "oxlint": "^1.94.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-hooks, jest/require-hook, promise/prefer-await-to-callbacks */
 import { ORPCError, call } from "@orpc/server";
 
 import type { Context } from "../orpc";
@@ -35,8 +34,8 @@ function createContext(options: { s3: S3Service; userId?: string }): Context {
   return {
     authApi: {} as Context["authApi"],
     db: {
-      transaction: async (callback: (tx: Context["db"]) => Promise<unknown>) =>
-        callback({} as Context["db"]),
+      transaction: async (run: (tx: Context["db"]) => Promise<unknown>) =>
+        run({} as Context["db"]),
     } as Context["db"],
     s3: options.s3,
     session: options.userId

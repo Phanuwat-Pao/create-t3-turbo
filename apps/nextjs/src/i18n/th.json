@@ -464,6 +464,7 @@
     "action": "การกระทำ",
     "user": "ผู้ใช้",
     "ipAddress": "ที่อยู่ IP",
+    "unknown": "ไม่ทราบ",
     "actions": {
       "inviteAccepted": "ยอมรับคำเชิญ",
       "inviteCancelled": "เพิกถอนคำเชิญ",
