@@ -96,7 +96,12 @@ most common defect. Before calling work done, walk this list:
   `generateMetadata` call `getT()` from `~/i18n/server`, Client Components
   call `useTranslation()` from react-i18next. Keep `en.json` and `th.json`
   key-for-key; the web client only receives the current language, and a
-  test enforces the parity. User-visible strings need entries in both apps
+  test enforces the parity. The browser reads that language from its own
+  file, `/i18n/<lng>.translation.<hash>.json` (`~/i18n/translation-files`,
+  `app/i18n/[file]/route.ts`), which it keeps for a year; the root layout
+  preloads it and `~/i18n/translations-provider` hands it to next-i18next's
+  `I18nProvider`. Never pass `resources` from a layout: they ride inside the
+  RSC payload of every hard load and every `router.refresh()`. User-visible strings need entries in both apps
   where they appear. No em dashes in copy or comments; `acme/no-em-dash`
   fails lint on them in code.
 - **Locale in every in-app URL.** Links come from `~/components/link` (lint

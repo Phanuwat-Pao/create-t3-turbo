@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import en from "./en.json";
 import { i18nConfig } from "./i18n-config";
 import { toLocale, withLocale } from "./localized-path";
+import { setSsrTranslations } from "./ssr-translations";
 import th from "./th.json";
 
 /**
@@ -12,13 +13,16 @@ import th from "./th.json";
  * Components and `generateMetadata` call it without arguments. Route
  * handlers (OG image, manifest) have no root params and must pass `lng`.
  */
-export const { getT, getResources } = createServerI18next({
+export const { getT } = createServerI18next({
   ...i18nConfig,
   resources: {
     en: { translation: en },
     th: { translation: th },
   },
 });
+
+// For the server render of Client Components (see ./translations-provider): there they render at once, as before.
+setSsrTranslations({ en, th });
 
 /**
  * `redirect()` to an in-app path in the current request's locale, so the

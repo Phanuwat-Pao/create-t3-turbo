@@ -1,13 +1,15 @@
 import { cn } from "@acme/ui";
 import type { Metadata, Viewport } from "next";
-import { I18nProvider } from "next-i18next/client";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { BackgroundRippleEffect } from "~/components/background-ripple-effect";
 import Header from "~/components/header";
 import Providers from "~/components/providers";
 import { i18n } from "~/i18n/i18n-config";
-import { getResources, getT } from "~/i18n/server";
+import { toLocale } from "~/i18n/localized-path";
+import { getT } from "~/i18n/server";
+import { preloadTranslations } from "~/i18n/translation-files";
+import { TranslationsProvider } from "~/i18n/translations-provider";
 import { getSiteUrl } from "~/lib/site-url";
 
 import "~/app/styles.css";
@@ -69,22 +71,32 @@ export const viewport: Viewport = {
   ],
 };
 
+/*
+ * Not preloaded. A preload goes out in the page's Link header, so the browser asks for the fonts before the
+ * stylesheet, and on a fresh connection far from the server the first round trips carry only 15 to 60 KB: the font
+ * files push the stylesheet, and the first paint with it, back by a round trip. Without them the page paints in the
+ * fallback (sized to match by next/font) and the fonts swap in when the stylesheet asks for them.
+ */
 const geistSans = Geist({
+  preload: false,
   subsets: ["latin"],
   variable: "--font-geist-sans",
 });
 const geistMono = Geist_Mono({
+  preload: false,
   subsets: ["latin"],
   variable: "--font-geist-mono",
 });
 
 /**
  * `getT()` reads the `[lang]` root param and falls back to the default locale
- * for anything unsupported. Client Components get only the current language's
- * resources; th and en carry the same keys, so nothing needs a fallback.
+ * for anything unsupported. Client Components get only the current language,
+ * read from its own cached file (see ~/i18n/translations-provider); th and en
+ * carry the same keys, so nothing needs a fallback.
  */
 export default async function RootLayout({ children }: LayoutProps) {
-  const { i18n: i18nInstance, lng } = await getT();
+  const { lng } = await getT();
+  const locale = toLocale(lng);
   return (
     <html lang={lng} suppressHydrationWarning>
       <body
@@ -94,10 +106,9 @@ export default async function RootLayout({ children }: LayoutProps) {
           geistMono.variable
         )}
       >
-        <I18nProvider
-          defaultNS="translation"
-          language={lng}
-          resources={getResources(i18nInstance, ["translation"], [lng])}
+        <TranslationsProvider
+          hrefs={preloadTranslations(locale)}
+          language={locale}
         >
           <Providers>
             <div className="relative mt-14 min-h-[calc(100vh-3.5rem)] w-full">
@@ -115,7 +126,7 @@ export default async function RootLayout({ children }: LayoutProps) {
               </div>
             </div>
           </Providers>
-        </I18nProvider>
+        </TranslationsProvider>
       </body>
     </html>
   );
