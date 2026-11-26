@@ -451,14 +451,16 @@
     "revokeSessionsSuccess": "Sessions revoked for user",
     "failedToRevokeSessions": "Failed to revoke sessions",
     "impersonateSuccess": "Impersonated user",
-    "failedToImpersonate": "Failed to impersonate user"
+    "failedToImpersonate": "Failed to impersonate user",
+    "search": "Search users",
+    "searchPlaceholder": "Search by name, or by email with an @",
+    "noUsers": "No users found."
   },
   "background": {
     "triggerRippleCell": "Trigger ripple cell"
   },
   "auditLog": {
     "title": "Audit Logs",
-    "loading": "Loading audit logs…",
     "empty": "No audit events yet.",
     "time": "Time",
     "action": "Action",
@@ -483,7 +485,9 @@
       "userSignedIn": "Signed in",
       "userSignedOut": "Signed out",
       "userSignedUp": "Signed up"
-    }
+    },
+    "search": "Search audit logs",
+    "searchPlaceholder": "Search by action, user or IP address"
   },
   "clientTest": {
     "title": "Client Authentication Test",
@@ -607,5 +611,14 @@
       "invalidClientRequest": "The application that sent you here made a request this server cannot accept.",
       "serverError": "Something went wrong on our side. Try again in a moment."
     }
+  },
+  "dataTable": {
+    "rowsPerPage": "Rows per page",
+    "range": "{{from}}-{{to}} of {{total}}",
+    "pager": "Pages",
+    "first": "First page",
+    "previous": "Previous page",
+    "next": "Next page",
+    "last": "Last page"
   }
 }

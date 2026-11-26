@@ -1,20 +1,20 @@
 "use client";
 
+import type { RouterOutputs } from "@acme/api";
 import type { AuditLogAction } from "@acme/auth";
 import { Badge } from "@acme/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@acme/ui/table";
+import { DataTable, dataColumns, SortableHeader } from "@acme/ui/data-table";
+import { AUDIT_LOG_SORTS } from "@acme/validators/admin";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
+import { TableSearch } from "~/components/data-table/table-search";
+import {
+  usePaging,
+  useTableQuery,
+} from "~/components/data-table/use-table-query";
 import { orpc } from "~/rpc/react";
 
 const ACTION_LABEL_KEYS = {
@@ -41,78 +41,89 @@ function isKnownAction(action: string): action is AuditLogAction {
   return Object.hasOwn(ACTION_LABEL_KEYS, action);
 }
 
-function AuditLogShell({ children }: { children: React.ReactNode }) {
+type AuditLogRow = RouterOutputs["auditLog"]["list"]["rows"][number];
+
+const column = dataColumns<AuditLogRow>();
+
+function useAuditLogColumns() {
   const { t } = useTranslation();
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">{t("auditLog.title")}</CardTitle>
-      </CardHeader>
-      <CardContent>{children}</CardContent>
-    </Card>
+  const unknown = (
+    <span className="text-muted-foreground">{t("auditLog.unknown")}</span>
   );
+  return column.columns([
+    column.accessor("createdAt", {
+      cell: (info) => format(info.getValue(), "yyyy-MM-dd HH:mm:ss"),
+      header: ({ column: header }) => (
+        <SortableHeader column={header} title={t("auditLog.time")} />
+      ),
+    }),
+    column.accessor("action", {
+      cell: (info) => {
+        const action = info.getValue();
+        return (
+          <Badge variant="outline">
+            {isKnownAction(action) ? t(ACTION_LABEL_KEYS[action]) : action}
+          </Badge>
+        );
+      },
+      header: ({ column: header }) => (
+        <SortableHeader column={header} title={t("auditLog.action")} />
+      ),
+    }),
+    column.accessor((row) => row.user?.name ?? row.user?.email ?? null, {
+      cell: (info) => info.getValue() ?? unknown,
+      header: ({ column: header }) => (
+        <SortableHeader column={header} title={t("auditLog.user")} />
+      ),
+      id: "user",
+    }),
+    column.accessor("ipAddress", {
+      cell: (info) => info.getValue() ?? unknown,
+      header: ({ column: header }) => (
+        <SortableHeader column={header} title={t("auditLog.ipAddress")} />
+      ),
+    }),
+  ]);
 }
 
 export function AuditLogCard() {
   const { t } = useTranslation();
-  const { data: logs, isLoading } = useQuery(
-    orpc.auditLog.list.queryOptions({
-      input: { limit: 50, offset: 0 },
-    })
-  );
-
-  if (isLoading) {
-    return (
-      <AuditLogShell>
-        <p className="text-muted-foreground text-sm">{t("auditLog.loading")}</p>
-      </AuditLogShell>
-    );
-  }
-
-  if (!logs?.length) {
-    return (
-      <AuditLogShell>
-        <p className="text-muted-foreground text-sm">{t("auditLog.empty")}</p>
-      </AuditLogShell>
-    );
-  }
-
-  const unknown = (
-    <span className="text-muted-foreground">{t("auditLog.unknown")}</span>
-  );
+  const query = useTableQuery({
+    columns: AUDIT_LOG_SORTS,
+    sort: { desc: true, id: "createdAt" },
+  });
+  const { data, isPending } = useQuery({
+    ...orpc.auditLog.list.queryOptions({ input: query.input }),
+    // Keep the last page on screen while the next one loads.
+    placeholderData: (previous) => previous,
+  });
+  const paging = usePaging(query, data?.total ?? 0);
+  const columns = useAuditLogColumns();
 
   return (
-    <AuditLogShell>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t("auditLog.time")}</TableHead>
-            <TableHead>{t("auditLog.action")}</TableHead>
-            <TableHead>{t("auditLog.user")}</TableHead>
-            <TableHead>{t("auditLog.ipAddress")}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {logs.map((log) => (
-            <TableRow key={log.id}>
-              <TableCell className="whitespace-nowrap">
-                {format(log.createdAt, "yyyy-MM-dd HH:mm:ss")}
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline">
-                  {isKnownAction(log.action)
-                    ? t(ACTION_LABEL_KEYS[log.action])
-                    : log.action}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                {log.user ? (log.user.name ?? log.user.email) : unknown}
-              </TableCell>
-              <TableCell>{log.ipAddress ?? unknown}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </AuditLogShell>
+    <Card>
+      <CardHeader className="gap-3">
+        <CardTitle className="text-2xl">{t("auditLog.title")}</CardTitle>
+        <TableSearch
+          id="audit-log-search"
+          label={t("auditLog.search")}
+          onChange={query.search.handleChange}
+          placeholder={t("auditLog.searchPlaceholder")}
+          value={query.search.value}
+        />
+      </CardHeader>
+      <CardContent>
+        <DataTable
+          columnClassName={{ createdAt: "whitespace-nowrap" }}
+          columns={columns}
+          data={data?.rows ?? []}
+          empty={t("auditLog.empty")}
+          getRowId={(row) => row.id}
+          loading={isPending}
+          paging={paging}
+          sorting={query.sorting}
+        />
+      </CardContent>
+    </Card>
   );
 }

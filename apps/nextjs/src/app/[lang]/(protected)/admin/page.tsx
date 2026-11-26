@@ -3,6 +3,7 @@
 import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+import { DataTable, dataColumns, SortableHeader } from "@acme/ui/data-table";
 import {
   Dialog,
   DialogContent,
@@ -13,14 +14,7 @@ import {
 import { FieldGroup } from "@acme/ui/field";
 import { revalidateLogic, useAppForm } from "@acme/ui/form";
 import { SelectItem } from "@acme/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@acme/ui/table";
+import { ADMIN_USER_SORTS } from "@acme/validators/admin";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus, RefreshCw, Trash, UserCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -30,6 +24,13 @@ import { Toaster, toast } from "sonner";
 import * as z from "zod";
 
 import { authClient } from "~/auth/client";
+import { TableSearch } from "~/components/data-table/table-search";
+import {
+  usePaging,
+  useTableQuery,
+} from "~/components/data-table/use-table-query";
+import { adminKeys } from "~/data/admin/keys";
+import { useUserListQuery } from "~/data/admin/user-list-query";
 import { dateLocales } from "~/i18n/date-locale";
 import { withLocale } from "~/i18n/localized-path";
 import { useLocale } from "~/i18n/use-locale";
@@ -44,7 +45,7 @@ interface User {
   banned: boolean | null;
 }
 
-interface UserRowProps {
+interface UserActionsProps {
   user: User;
   isLoading: string | undefined;
   onDelete: (id: string) => void;
@@ -53,7 +54,10 @@ interface UserRowProps {
   onBanToggle: (user: User) => void;
 }
 
-const UserRow = memo(
+const userColumn = dataColumns<User>();
+
+/** The buttons in a user's row of the admin user table. */
+const UserActions = memo(
   ({
     user,
     isLoading,
@@ -61,13 +65,8 @@ const UserRow = memo(
     onRevoke,
     onImpersonate,
     onBanToggle,
-  }: UserRowProps) => {
+  }: UserActionsProps) => {
     const { t } = useTranslation();
-    const roleLabels: Record<string, string> = {
-      admin: t("admin.roleAdmin"),
-      user: t("admin.roleUser"),
-    };
-    const role = user.role || "user";
     const handleDelete = useCallback(
       () => onDelete(user.id),
       [onDelete, user.id]
@@ -86,79 +85,108 @@ const UserRow = memo(
     );
 
     return (
-      <TableRow>
-        <TableCell>{user.email}</TableCell>
-        <TableCell>{user.name}</TableCell>
-        <TableCell>{roleLabels[role] ?? role}</TableCell>
-        <TableCell>
-          {user.banned ? (
-            <Badge variant="destructive">{t("admin.yes")}</Badge>
+      <div className="flex space-x-2">
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleDelete}
+          disabled={isLoading?.startsWith("delete")}
+        >
+          {isLoading === `delete-${user.id}` ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Badge variant="outline">{t("admin.no")}</Badge>
+            <Trash className="h-4 w-4" />
           )}
-        </TableCell>
-        <TableCell>
-          <div className="flex space-x-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDelete}
-              disabled={isLoading?.startsWith("delete")}
-            >
-              {isLoading === `delete-${user.id}` ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRevoke}
-              disabled={isLoading?.startsWith("revoke")}
-            >
-              {isLoading === `revoke-${user.id}` ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleImpersonate}
-              disabled={isLoading?.startsWith("impersonate")}
-            >
-              {isLoading === `impersonate-${user.id}` ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  <UserCircle className="mr-2 h-4 w-4" />
-                  {t("admin.impersonate")}
-                </>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleBanToggle}
-              disabled={isLoading?.startsWith("ban")}
-            >
-              {isLoading === `ban-${user.id}` && (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              )}
-              {isLoading !== `ban-${user.id}` &&
-                user.banned &&
-                t("admin.unban")}
-              {isLoading !== `ban-${user.id}` && !user.banned && t("admin.ban")}
-            </Button>
-          </div>
-        </TableCell>
-      </TableRow>
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRevoke}
+          disabled={isLoading?.startsWith("revoke")}
+        >
+          {isLoading === `revoke-${user.id}` ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleImpersonate}
+          disabled={isLoading?.startsWith("impersonate")}
+        >
+          {isLoading === `impersonate-${user.id}` ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <>
+              <UserCircle className="mr-2 h-4 w-4" />
+              {t("admin.impersonate")}
+            </>
+          )}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleBanToggle}
+          disabled={isLoading?.startsWith("ban")}
+        >
+          {isLoading === `ban-${user.id}` && (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          )}
+          {isLoading !== `ban-${user.id}` && user.banned && t("admin.unban")}
+          {isLoading !== `ban-${user.id}` && !user.banned && t("admin.ban")}
+        </Button>
+      </div>
     );
   }
 );
-UserRow.displayName = "UserRow";
+UserActions.displayName = "UserActions";
+
+/** The admin user table's columns; the last one holds each row's buttons. */
+function useUserColumns(actions: Omit<UserActionsProps, "user">) {
+  const { t } = useTranslation();
+  const roleLabels: Record<string, string> = {
+    admin: t("admin.roleAdmin"),
+    user: t("admin.roleUser"),
+  };
+  return userColumn.columns([
+    userColumn.accessor("email", {
+      header: ({ column }) => (
+        <SortableHeader column={column} title={t("common.email")} />
+      ),
+    }),
+    userColumn.accessor("name", {
+      header: ({ column }) => (
+        <SortableHeader column={column} title={t("common.name")} />
+      ),
+    }),
+    userColumn.accessor((user) => user.role || "user", {
+      cell: (info) => roleLabels[info.getValue()] ?? info.getValue(),
+      header: ({ column }) => (
+        <SortableHeader column={column} title={t("admin.roleLabel")} />
+      ),
+      id: "role",
+    }),
+    userColumn.accessor((user) => user.banned === true, {
+      cell: (info) =>
+        info.getValue() ? (
+          <Badge variant="destructive">{t("admin.yes")}</Badge>
+        ) : (
+          <Badge variant="outline">{t("admin.no")}</Badge>
+        ),
+      header: ({ column }) => (
+        <SortableHeader column={column} title={t("admin.banned")} />
+      ),
+      id: "banned",
+    }),
+    userColumn.display({
+      cell: ({ row }) => <UserActions user={row.original} {...actions} />,
+      header: t("admin.actions"),
+      id: "actions",
+    }),
+  ]);
+}
 
 function AdminDashboard() {
   const { t } = useTranslation();
@@ -182,27 +210,17 @@ function AdminDashboard() {
     reason: z.string().trim().min(1, t("validation.reasonRequired")),
   });
 
-  const { data: users, isLoading: isUsersLoading } = useQuery({
-    queryFn: async () => {
-      const data = await authClient.admin.listUsers(
-        {
-          query: {
-            limit: 10,
-            sortBy: "createdAt",
-            sortDirection: "desc",
-          },
-        },
-        {
-          throw: true,
-        }
-      );
-      return data?.users || [];
-    },
-    queryKey: ["users"],
+  const userQuery = useTableQuery({
+    columns: ADMIN_USER_SORTS,
+    sort: { desc: true, id: "createdAt" },
   });
+  const { data: users, isPending: isUsersPending } = useUserListQuery(
+    userQuery.input
+  );
+  const userPaging = usePaging(userQuery, users?.total ?? 0);
 
   const invalidateUsers = useCallback(
-    () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+    () => queryClient.invalidateQueries({ queryKey: adminKeys.users() }),
     [queryClient]
   );
 
@@ -380,6 +398,14 @@ function AdminDashboard() {
     [banUserForm, invalidateUsers, t]
   );
 
+  const userColumns = useUserColumns({
+    isLoading,
+    onBanToggle: handleBanToggle,
+    onDelete: handleDeleteUser,
+    onImpersonate: handleImpersonateUser,
+    onRevoke: handleRevokeSessions,
+  });
+
   return (
     <div className="container mx-auto space-y-8 p-4">
       <Toaster richColors />
@@ -492,36 +518,24 @@ function AdminDashboard() {
           </Dialog>
         </CardHeader>
         <CardContent>
-          {isUsersLoading ? (
-            <div className="flex h-64 items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("common.email")}</TableHead>
-                  <TableHead>{t("common.name")}</TableHead>
-                  <TableHead>{t("admin.roleLabel")}</TableHead>
-                  <TableHead>{t("admin.banned")}</TableHead>
-                  <TableHead>{t("admin.actions")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users?.map((user: User) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    isLoading={isLoading}
-                    onDelete={handleDeleteUser}
-                    onRevoke={handleRevokeSessions}
-                    onImpersonate={handleImpersonateUser}
-                    onBanToggle={handleBanToggle}
-                  />
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <div className="grid gap-3">
+            <TableSearch
+              id="admin-user-search"
+              label={t("admin.search")}
+              onChange={userQuery.search.handleChange}
+              placeholder={t("admin.searchPlaceholder")}
+              value={userQuery.search.value}
+            />
+            <DataTable
+              columns={userColumns}
+              data={users?.rows ?? []}
+              empty={t("admin.noUsers")}
+              getRowId={(user) => user.id}
+              loading={isUsersPending}
+              paging={userPaging}
+              sorting={userQuery.sorting}
+            />
+          </div>
         </CardContent>
       </Card>
       <AuditLogCard />

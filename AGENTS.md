@@ -112,6 +112,17 @@ most common defect. Before calling work done, walk this list:
   still works via the proxy's redirect, but Next's segment prefetches break
   on it and every click pays a second hop;
   `apps/e2e/src/tests/locale-links.test.ts` guards it.
+- **Lists.** A list that can grow is a `DataTable` from `@acme/ui/data-table`
+  (shadcn's data table on TanStack Table), paged on the server by page
+  number. The procedure takes `pagedQuery(columns, fallback)` from
+  `@acme/validators/paging` (`page` from 1, `pageSize` up to 100, `search`,
+  `sort`) and returns `{ rows, total }`; search with `matchesSearch` from
+  `packages/api/src/paging.ts`. The page uses `useTableQuery` and `usePaging`
+  from `~/components/data-table/use-table-query`, so a new sort or search goes
+  back to page 1. Never `limit`/`offset` from the client, cursors, "load more"
+  or `getPaginationRowModel` on server data. The admin page's audit log and
+  user list are the examples. Short lists that cannot grow (a user's passkeys)
+  stay plain `Table`s.
 - **Env.** New environment variables go through the t3-env definitions
   (`apps/nextjs/src/env.ts`, `packages/auth/env.ts`) and `turbo.json`'s
   `globalEnv` when tasks depend on them.
@@ -165,8 +176,11 @@ most common defect. Before calling work done, walk this list:
   `pgTableCreator`; relations use the v2 relational API (`defineRelations`)
   in `relations.ts`; client in `client.ts`.
 - `packages/ui` holds the shared shadcn/radix components. Add new ones with
-  `pnpm ui-add`, not by hand-copying.
-- `packages/validators` holds shared Zod schemas and helpers.
+  `pnpm ui-add`, not by hand-copying. `data-table.tsx` (TanStack Table) and
+  `form.tsx` (TanStack Form's `useAppForm`) are this repo's own and have no
+  shadcn registry entry.
+- `packages/validators` holds shared Zod schemas and helpers, including the
+  data table paging contract (`paging.ts`).
 - `tooling/*` holds shared TypeScript and Tailwind config, and
   `tooling/oxlint-plugin`, this repo's own lint rules (`acme/*`).
 - `scripts/` holds the T3 Code worktree scripts that `t3.json` runs.
